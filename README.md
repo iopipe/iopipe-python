@@ -1,6 +1,8 @@
 IOpipe Telemetry Agent for Python
 ---------------------------------
 
+*WARNING*: Work-in-Progress! This module is not yet ready for production. -- @ewindisch
+
 This package provides a Python decorator
 to send telemetry to the IOpipe platform for
 application performance monitoring, analytics,
