@@ -3,10 +3,27 @@ import json
 import sys
 import urllib2
 
-def iopipe(client_id):
+# module level vars
+CLIENT_ID = None
+
+def set_iopipe_global_client_id(client_id):
+  """
+  Set the client_id once for all future decorators in this run
+  """
+  global CLIENT_ID
+  CLIENT_ID = client_id
+
+def iopipe(client_id=None):
   """
   Outer method to allow arguments in the decorator
   """
+
+  # allow the client_id to be set once
+  if not client_id and CLIENT_ID:
+    client_id = CLIENT_ID
+  else:
+    print("A client_id is required to send telemetry upstream to IOPipe")
+
   # ensure that client_id can be passed
   def iopipe_decorator(func): # actual wrapper function
     """
@@ -25,7 +42,7 @@ def iopipe(client_id):
         result = None
         current_report = _measure_exception(report=current_report, lambda_context=context, err=err)
 
-      # send the report to IO|
+      # send the report to IOPipe
       request = urllib2.Request('https://metrics-api.iopipe.com')
       request.add_header('Content-Type', 'application/json')
       try:
