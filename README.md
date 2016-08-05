@@ -12,7 +12,7 @@ Simple copy ```iopipe.py``` to your project. It is a self-contained module with 
 
 Simply decorate your code using ```@iopipe```:
 
-```
+```python
 from iopipe import iopipe
 
 @iopipe(YOUR_IOPIPE_CLIENTID)
@@ -25,7 +25,7 @@ def handler(event, context):
 If wrapping multiple functions, you can set the clientid once
 as such:
 
-```
+```python
 from iopipe import iopipe
 from iopipe import set_iopipe_global_client_id
 
