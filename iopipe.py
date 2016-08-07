@@ -3,6 +3,9 @@ import json
 import sys
 import urllib2
 
+# 3rd party libraries
+import libs.requests as requests
+
 # module level vars
 CLIENT_ID = None
 
@@ -13,7 +16,7 @@ def set_iopipe_global_client_id(client_id):
   global CLIENT_ID
   CLIENT_ID = client_id
 
-def iopipe(client_id=None):
+def iopipe(client_id=None, custom_namespace=None, custom_data=None):
   """
   Outer method to allow arguments in the decorator
   """
@@ -23,6 +26,17 @@ def iopipe(client_id=None):
     client_id = CLIENT_ID
   else:
     print("A client_id is required to send telemetry upstream to IOPipe")
+
+  # ensure that the custom data is properly formatted in it's own namespace
+  if custom_namespace and not type(custom_namespace) == type(""):
+    # can IOPipe handle unicode?
+    custom_namespace = str(custom_namespace)
+
+  if custom_data and not type(custom_data) == type({}):
+    custom_data = { 'custom_data': custom_data }
+
+  if custom_data and not custom_namespace:
+    custom_namespace = 'custom_data'
 
   # ensure that client_id can be passed
   def iopipe_decorator(func): # actual wrapper function
@@ -42,6 +56,9 @@ def iopipe(client_id=None):
         result = None
         current_report = _measure_exception(report=current_report, lambda_context=context, err=err)
 
+      # add any custom data
+      if custom_namespace and custom_data: current_report[custom_namespace] = custom_data
+
       # send the report to IOPipe
 
       # Tracking down urllib2 issue in alternate branch
@@ -52,8 +69,8 @@ def iopipe(client_id=None):
       #request.add_data(report_data)
       try:
         #response = urllib2.urlopen(request)
-        response = requests.post('https://metrics-api.iopipe.com/v0/event', data=report_data)
-        print('POST response: {}'.format(response
+        response = requests.post('https://metrics-api.iopipe.com/v0/event', data=json.dumps(current_report)))
+        print('POST response: {}'.format(response))
       except urllib2.HTTPError as err:
         print('Error reporting metrics to IOPipe. {}'.format(err))
         print(json.dumps(current_report))
