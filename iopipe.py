@@ -43,11 +43,15 @@ def iopipe(client_id=None):
         current_report = _measure_exception(report=current_report, lambda_context=context, err=err)
 
       # send the report to IOPipe
-      request = urllib2.Request('https://metrics-api.iopipe.com')
+      request = urllib2.Request('https://metrics-api.iopipe.com/v0/event')
+      report_data = json.dumps(current_report)
       request.add_header('Content-Type', 'application/json')
+      request.add_header('Content-Length', len(report_data))
+      request.add_data(report_data)
       try:
-        response = urllib2.urlopen(request, json.dumps(current_report))
-        print('POST response: {}'.format(response))
+        #response = urllib2.urlopen(request)
+        response = requests.post('https://metrics-api.iopipe.com/v0/event', data=report_data)
+        print('POST response: {}'.format(response
       except urllib2.HTTPError as err:
         print('Error reporting metrics to IOPipe. {}'.format(err))
         print(json.dumps(current_report))
