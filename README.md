@@ -2,7 +2,7 @@
 
 *WARNING*: Work-in-Progress! This module is not yet ready for production. -- @ewindisch < this -- @marknca
 
-This package provides a Python decorator to send telemetry to the IOpipe platform for application performance monitoring, analytics, and distributed tracing.
+This package provides a Python object to send telemetry to the IOpipe platform for application performance monitoring, analytics, and distributed tracing.
 
 ## Installation
 
@@ -28,7 +28,7 @@ When the iopipe.Report object is destroyed, it will send the data upstream. You 
 
 ### Custom Namespaces
 
-You can add a custom namespace to the data sent upstream to IOPipe using teh following syntax;
+You can add a custom namespace to the data sent upstream to IOPipe using the following syntax;
 
 ```python
 import iopipe
