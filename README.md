@@ -16,7 +16,7 @@ Simply instantiate an ```iopipe.Report``` object inside of your function.
 import iopipe
 
 def handler(event, context):
-	report = iopipe.Report(CLIENT_ID, context)
+  report = iopipe.Report(CLIENT_ID, context)
   pass
 ```
 
@@ -38,8 +38,8 @@ You can add a custom namespace to the data sent upstream to IOPipe using the fol
 import iopipe
 
 def handler(event, context):
-	report = iopipe.Report(CLIENT_ID, context, custom_data_namespace='MySpace')
-	report.add_custom_data('custom_key', 'custom_value')
+  report = iopipe.Report(CLIENT_ID, context, custom_data_namespace='MySpace')
+  report.add_custom_data('custom_key', 'custom_value')
   pass
 ```
 
