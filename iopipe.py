@@ -1,6 +1,7 @@
 # standard library
 import datetime
 import json
+import os
 import sys
 
 # 3rd party libraries
@@ -18,7 +19,7 @@ class Report(object):
     if lambda_context:
       self._lambda_context = lambda_context
       self._add_aws_lambda_data()
-    self._add_python_sys_data()
+    self._add_python_local_data()
     self._sent = False
 
   def __del__(self):
@@ -47,53 +48,82 @@ class Report(object):
       if v in dir(self._lambda_context):
         self.report[aws_key][k] = getattr(self._lambda_context, v)
 
-  def _add_python_sys_data(self):
+  def _add_python_local_data(self, get_all=False):
     """
     Add the python sys attributes relevant to AWS Lambda execution
     """
     python_key = 'python'
     sys_key = 'sys'
+    os_key = 'os'
     self.report[python_key] = {}
     self.report[python_key][sys_key] = {}
+    self.report[python_key][os_key] = {}
+
+    sys_attr = {}
+    if get_all: # full set of data
+      sys_attr = {
+        # lower_ case to align with python standards
+        'argv': 'argv',
+        'byte_order': 'byteorder',
+        'builtin_module_names': 'builtin_module_names',
+        'executable': 'executable',
+        'flags': 'flags',
+        'float_info': 'float_info',
+        'float_repr_style': 'float_repr_style',
+        'hex_version': 'hexversion',
+        'long_info': 'long_info',
+        'max_int': 'maxint',
+        'max_size': 'maxsize',
+        'max_unicode': 'maxunicode',
+        'meta_path': 'meta_path',
+        'path': 'path',
+        'platform': 'platform',
+        'prefix': 'prefix',
+        'traceback_limit': 'tracebacklimit',
+        'version': 'version',
+        'api_version': 'api_version',
+        'version_info': 'version_info',
+      }
+    else: # reduced set of data for common cases
+      sys_attr = {
+        # lower_ case to align with python standards
+        'argv': 'argv',
+        'path': 'path',
+        'platform': 'platform',
+        'version': 'version',
+        'api_version': 'api_version',
+      }
 
     # get the sys attributes first
-    for k, v in {
-      # lower_ case to align with python standards
-      'argv': 'argv',
-      'byte_order': 'byteorder',
-      'builtin_module_names': 'builtin_module_names',
-      'executable': 'executable',
-      'flags': 'flags',
-      'float_info': 'float_info',
-      'float_repr_style': 'float_repr_style',
-      'hex_version': 'hexversion',
-      'long_info': 'long_info',
-      'max_int': 'maxint',
-      'max_size': 'maxsize',
-      'max_unicode': 'maxunicode',
-      'meta_path': 'meta_path',
-      'path': 'path',
-      'platform': 'platform',
-      'prefix': 'prefix',
-      'traceback_limit': 'tracebacklimit',
-      'version': 'version',
-      'api_version': 'api_version',
-      'version_info': 'version_info',
-      'modules': 'modules',
-    }.items():
+    for k, v in sys_attr.items():
       if v in dir(sys):
         self.report[python_key][sys_key][k] = "{}".format(getattr(sys, v))
  
     # now the sys functions
-    for k, v in {
-      # lower_ case to align with python standards
-      'check_interval': 'getcheckinterval',
-      'default_encoding': 'getdefaultencoding',
-      'dl_open_flags': 'getdlopenflags',
-      'file_system_encoding': 'getfilesystemencoding',
-    }.items():
-      if v in dir(sys):
-        self.report[python_key][sys_key][k] = "{}".format(getattr(sys, v)())
+    if get_all:
+      for k, v in {
+        # lower_ case to align with python standards
+        'check_interval': 'getcheckinterval',
+        'default_encoding': 'getdefaultencoding',
+        'dl_open_flags': 'getdlopenflags',
+        'file_system_encoding': 'getfilesystemencoding',
+      }.items():
+        if v in dir(sys):
+          self.report[python_key][sys_key][k] = "{}".format(getattr(sys, v)())
+
+    # convert sys.modules to something more usable
+    self.report[python_key][sys_key]['modules'] = {}
+    for k, v in sys.modules.items():
+      val = ""
+      if '__file__' in dir(v):
+        val = v.__file__
+      elif '__path__' in dir(v):
+        val = v.__path__ 
+
+      self.report[python_key][sys_key]['modules'][k] = val
+
+    # grab the environment variables
+    self.report[python_key][os_key]['environ'] = os.environ
 
   def add_custom_data(self, key, value, namespace=None):
     """
@@ -134,7 +164,10 @@ class Report(object):
     else:
       if not type(self.report[err_key]) == type([]): self[report][err_key] = [ self.report[err_key] ]
 
-      self.report[err_key].append(err_details)
+    self.report[err_key].append(err_details)
+
+    # add the full local python data as well
+    self._add_python_local_data(get_all=True)
 
   def send(self):
     """
