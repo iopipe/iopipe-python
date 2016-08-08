@@ -123,7 +123,8 @@ class Report(object):
       self.report[python_key][sys_key]['modules'][k] = val
 
     # grab the environment variables
-    self.report[python_key][os_key]['environ'] = os.environ
+    # @TODO investigate JSON serialization issue
+    #self.report[python_key][os_key]['environ'] = os.environ
 
   def add_custom_data(self, key, value, namespace=None):
     """
@@ -173,11 +174,19 @@ class Report(object):
     """
     Send the current report to IOPipe
     """
+    json_report = None
     try:
-      response = requests.post('https://metrics-api.iopipe.com/v0/event', data=json.dumps(self.report))
-      print('POST response: {}'.format(response))
-      print(json.dumps(self.report, indent=2))
-      self._sent = True
+      json_report = json.dumps(self.report)
     except Exception as err:
-      print('Error reporting metrics to IOPipe. {}'.format(err))
-      print(json.dumps(self.report, indent=2))
+      print("Could not convert the report to JSON. Threw exception: {}".format(err))
+      print('Report: {}'.format(self.report))
+
+    if json_report:
+      try:
+        response = requests.post('https://metrics-api.iopipe.com/v0/event', data=json.dumps(self.report))
+        print('POST response: {}'.format(response))
+        print(json.dumps(self.report, indent=2))
+        self._sent = True
+      except Exception as err:
+        print('Error reporting metrics to IOPipe. {}'.format(err))
+        print(json.dumps(self.report, indent=2))
