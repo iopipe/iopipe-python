@@ -10,7 +10,7 @@ Currently you need to include the ```iopipe.py``` and ```libs/``` directory in y
 
 ## Usage
 
-Simply decorate your code using ```@iopipe```:
+Simply instantiate an ```iopipe.Report``` object inside of your function.
 
 ```python
 import iopipe
