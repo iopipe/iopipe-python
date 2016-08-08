@@ -1,139 +1,149 @@
 # standard library
+import datetime
 import json
 import sys
-import urllib2
 
 # 3rd party libraries
 import libs.requests as requests
 
-# module level vars
-CLIENT_ID = None
+TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
-def set_iopipe_global_client_id(client_id):
-  """
-  Set the client_id once for all future decorators in this run
-  """
-  global CLIENT_ID
-  CLIENT_ID = client_id
-
-def iopipe(client_id=None, custom_namespace=None, custom_data=None):
-  """
-  Outer method to allow arguments in the decorator
-  """
-
-  # allow the client_id to be set once
-  if not client_id and CLIENT_ID:
-    client_id = CLIENT_ID
-  else:
-    print("A client_id is required to send telemetry upstream to IOPipe")
-
-  # ensure that the custom data is properly formatted in it's own namespace
-  if custom_namespace and not type(custom_namespace) == type(""):
-    # can IOPipe handle unicode?
-    custom_namespace = str(custom_namespace)
-
-  if custom_data and not type(custom_data) == type({}):
-    custom_data = { 'custom_data': custom_data }
-
-  if custom_data and not custom_namespace:
-    custom_namespace = 'custom_data'
-
-  # ensure that client_id can be passed
-  def iopipe_decorator(func): # actual wrapper function
-    """
-    @iopipe decorator
-    """
-    def wrapped(event, context):
-      """
-      Function to execute around the wrapped function
-      """
-      # event and context are pulled from AWS Lambda
-      current_report = _measure(client_id=client_id, lambda_context=context)
-      result = None
-      try:
-        result = func(event, context)
-      except Exception as err:
-        result = None
-        current_report = _measure_exception(report=current_report, lambda_context=context, err=err)
-
-      # add any custom data
-      if custom_namespace and custom_data: current_report[custom_namespace] = custom_data
-
-      # send the report to IOPipe
-
-      # Tracking down urllib2 issue in alternate branch
-      #request = urllib2.Request('https://metrics-api.iopipe.com/v0/event')
-      #report_data = json.dumps(current_report)
-      #request.add_header('Content-Type', 'application/json')
-      #request.add_header('Content-Length', len(report_data))
-      #request.add_data(report_data)
-      try:
-        #response = urllib2.urlopen(request)
-        response = requests.post('https://metrics-api.iopipe.com/v0/event', data=json.dumps(current_report)))
-        print('POST response: {}'.format(response))
-      except urllib2.HTTPError as err:
-        print('Error reporting metrics to IOPipe. {}'.format(err))
-        print(json.dumps(current_report))
-
-      return result
-    return wrapped
-  return iopipe_decorator
-
-def _measure(client_id, lambda_context):
-  """
-  Build a report containing measurements of the current function and it's execution environment
-  """
-  return {
-    'client_id': client_id,
-    'aws': { # camel case to align with AWS standards
-      'functionName': lambda_context.function_name if 'function_name' in dir(lambda_context) else '',
-      'functionVersion': lambda_context.function_version if 'function_version' in dir(lambda_context) else '',
-      'memoryLimitInMB': lambda_context.memory_limit_in_mb if 'memory_limit_in_mb' in dir(lambda_context) else '',
-      'invokedFunctionArn': lambda_context.invoked_function_arn if 'invoked_function_arn' in dir(lambda_context) else '',
-      'awsRequestId': lambda_context.aws_request_id if 'aws_request_id' in dir(lambda_context) else '',
-      'logGroupName': lambda_context.log_group_name if 'log_group_name' in dir(lambda_context) else '',
-      'logStreamName': lambda_context.log_stream_name if 'log_stream_name' in dir(lambda_context) else '',
-    },
-    'python': {
-      'sys': { # lower_ case to align with python standards
-        'argv': sys.argv if 'argv' in dir(sys) else '',
-        'byte_order': sys.byteorder if 'byteorder' in dir(sys) else '',
-        'builtin_module_names': sys.builtin_module_names if 'builtin_module_names' in dir(sys) else '',
-        'executable': sys.executable if 'executable' in dir(sys) else '',
-        'flags': '{}'.format(sys.flags) if 'flags' in dir(sys) else '',
-        'float_info': '{}'.format(sys.float_info) if 'float_info' in dir(sys) else '',
-        'float_repr_style': sys.float_repr_style if 'float_repr_style' in dir(sys) else '',
-        'check_interval': sys.getcheckinterval(),
-        'default_encoding': sys.getdefaultencoding(),
-        'dl_open_flags': sys.getdlopenflags(),
-        'file_system_encoding': sys.getfilesystemencoding(),
-        'hex_version': sys.hexversion if 'hexversion' in dir(sys) else '',
-        'long_info': '{}'.format(sys.long_info) if 'long_info' in dir(sys) else '',
-        'max_int': sys.maxint if 'maxint' in dir(sys) else '',
-        'max_size': sys.maxsize if 'maxsize' in dir(sys) else '',
-        'max_unicode': sys.maxunicode if 'maxunicode' in dir(sys) else '',
-        'meta_path': sys.meta_path if 'meta_path' in dir(sys) else '',
-        'modules': sys.modules.keys() if 'modules' in dir(sys) else '',
-        'path': sys.path if 'path' in dir(sys) else '',
-        'platform': sys.platform if 'platform' in dir(sys) else '',
-        'prefix': sys.prefix if 'prefix' in dir(sys) else '',
-        'traceback_limit': sys.tracebacklimit if 'tracebacklimit' in dir(sys) else '',
-        'version': '{}'.format(sys.version) if 'version' in dir(sys) else '',
-        'api_version': sys.api_version if 'api_version' in dir(sys) else '',
-        'version_info': '{}'.format(sys.version_info) if 'version_info' in dir(sys) else '',
-        }
+class Report(object):
+  def __init__(self, client_id, lambda_context=None, custom_data_namespace='custom_data'):
+    self.client_id = client_id
+    self.custom_data_namespace = custom_data_namespace
+    self.report = {
+      'client_id': self.client_id,
       }
-    }
+    if lambda_context:
+      self._add_aws_lambda_data(lambda_context)
+    self._add_python_sys_data()
+    self._sent = False
 
-def _measure_exception(report, lambda_context, err):
-  """
-  Add the details for any exceptions thrown during execution
-  """
-  report['errors'] = {
-      'message': err.message
-    }
-  report['aws']['getRemainingTimeInMillis'] = lambda_context.get_remaining_time_in_millis()
-  report['time_nanosec'] = 0
-  report['time_sec'] = 0
+  def __del__(self):
+    """
+    Send the report if it hasn't already been sent
+    """
+    if not self._sent: self.send()
 
-  return report
+  def _add_aws_lambda_data(self, lambda_context):
+    """
+    Add AWS Lambda specific data to the report
+    """
+    aws_key = 'aws'
+    self.report[aws_key] = {}
+
+    for k, v in {
+      # camel case names in the report to align with AWS standards
+      'functionName': 'function_name',
+      'functionVersion': 'function_version',
+      'memoryLimitInMB': 'memory_limit_in_mb',
+      'invokedFunctionArn': 'invoked_function_arn',
+      'awsRequestId': 'aws_request_id',
+      'logGroupName': 'log_group_name',
+      'logStreamName': 'log_stream_name',
+    }.items():
+      if v in dir(lambda_context):
+        self.report[aws_key][k] = getattr(lambda_context, v)
+
+  def _add_python_sys_data(self):
+    """
+    Add the python sys attributes relevant to AWS Lambda execution
+    """
+    python_key = 'python'
+    sys_key = 'sys'
+    self.report[python_key] = {}
+    self.report[python_key][sys_key] = {}
+
+    # get the sys attributes first
+    for k, v in {
+      # lower_ case to align with python standards
+      'argv': 'argv',
+      'byte_order': 'byteorder',
+      'builtin_module_names': 'builtin_module_names',
+      'executable': 'executable',
+      'flags': 'flags',
+      'float_info': 'float_info',
+      'float_repr_style': 'float_repr_style',
+      'hex_version': 'hexversion',
+      'long_info': 'long_info',
+      'max_int': 'maxint',
+      'max_size': 'maxsize',
+      'max_unicode': 'maxunicode',
+      'meta_path': 'meta_path',
+      'path': 'path',
+      'platform': 'platform',
+      'prefix': 'prefix',
+      'traceback_limit': 'tracebacklimit',
+      'version': 'version',
+      'api_version': 'api_version',
+      'version_info': 'version_info',
+      'modules': 'modules',
+    }.items():
+      if v in dir(sys):
+        self.report[python_key][sys_key][k] = "{}".format(getattr(sys, v))
+ 
+    # now the sys functions
+    for k, v in {
+      # lower_ case to align with python standards
+      'check_interval': 'getcheckinterval',
+      'default_encoding': 'getdefaultencoding',
+      'dl_open_flags': 'getdlopenflags',
+      'file_system_encoding': 'getfilesystemencoding',
+    }.items():
+      if v in dir(sys):
+        self.report[python_key][sys_key][k] = "{}".format(getattr(sys, v)())
+
+  def add_custom_data(self, key, value, namespace=None):
+    """
+    Add custom data to the report
+    """
+    # make sure we have a namespace
+    if not namespace: namespace = self.custom_data_namespace
+    
+    # make sure the namespace exists
+    if not self.report.has_key(namespace): self.report[namespace] = {}
+    
+
+    if self.report[namespace].has_key(key):
+      # the key exists, merge the data
+      if type(self.report[namespace][key]) == type([]):
+        self.report[namespace][key].append(value)
+      else:
+        self.report[namespace][key] = [ self.report[namespace][key], value ]
+    else:
+      self.report[namespace][key] = value
+
+  def report_err(self, err, lambda_context=None):
+    """
+    Add the details of an error to the report
+    """
+    err_details = {
+      'exception': '{}'.format(err),
+      'time_reported': datetime.datetime.now().strftime(TIMESTAMP_FORMAT)
+    }
+    if lambda_context:
+      try:
+        err_key['aws']['getRemainingTimeInMillis'] = lambda_context.get_remaining_time_in_millis()
+      except Exception as aws_lambda_err: pass # @TODO handle this more gracefully
+
+    err_key = 'errors'
+    if not self.report.has_key(err_key):
+      self.report[err_key] = err_details
+    else:
+      if not type(self.report[err_key]) == type([]): self[report][err_key] = [ self.report[err_key] ]
+
+      self.report[err_key].append(err_details)
+
+  def send(self):
+    """
+    Send the current report to IOPipe
+    """
+    try:
+      response = requests.post('https://metrics-api.iopipe.com/v0/event', data=json.dumps(self.report))
+      print('POST response: {}'.format(response))
+      print(json.dumps(self.report, indent=2))
+      self._sent = True
+    except Exception as err:
+      print('Error reporting metrics to IOPipe. {}'.format(err))
+      print(json.dumps(self.report, indent=2))

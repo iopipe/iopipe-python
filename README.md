@@ -1,57 +1,45 @@
 # IOpipe Telemetry Agent for Python
 
-*WARNING*: Work-in-Progress! This module is not yet ready for production. -- @ewindisch
+*WARNING*: Work-in-Progress! This module is not yet ready for production. -- @ewindisch < this -- @marknca
 
 This package provides a Python decorator to send telemetry to the IOpipe platform for application performance monitoring, analytics, and distributed tracing.
 
 ## Installation
 
-Simple copy ```iopipe.py``` to your project. It is a self-contained module with no requirements outside of the standard library.
-
-**Update:** Added back Requests library while troubleshooting a 403 error using urllib2. Please make sure that the libs/* directory is included with your AWS Lambda function.
+Currently you need to include the ```iopipe.py``` and ```libs/``` directory in your AWS Lambda function. Removing the requirement for external libraries is on the short term @TODO list.
 
 ## Usage
 
 Simply decorate your code using ```@iopipe```:
 
 ```python
-from iopipe import iopipe
+import iopipe
 
-@iopipe(YOUR_IOPIPE_CLIENTID)
 def handler(event, context):
+	report = iopipe.Report(CLIENT_ID, context)
   pass
 ```
 
-### Wrapping Multiple Functions
+If you want to report on multiple functions, you can simply pass the iopipe.Report object from function to function.
 
-If wrapping multiple functions, you can set the clientid once as such:
+### Explicitly Sending Data
 
-```python
-from iopipe import iopipe
-from iopipe import set_iopipe_global_client_id
-
-set_iopipe_global_client_id(YOUR_IOPIPE_CLIENTID)
-
-@iopipe()
-def handler(event, context):
-  pass
-```
+When the iopipe.Report object is destroyed, it will send the data upstream. You can explicitly send the data upstream by calling the ```.send()``` method of the object.
 
 ### Custom Namespaces
 
 You can add a custom namespace to the data sent upstream to IOPipe using teh following syntax;
 
 ```python
-from iopipe import iopipe
+import iopipe
 
-@iopipe(YOUR_IOPIPE_CLIENTID, custom_namespace='myspace', custom_data={ 'mykey': 1 })
 def handler(event, context):
+	report = iopipe.Report(CLIENT_ID, context, custom_data_namespace='MySpace')
+	report.add_custom_data('custom_key', 'custom_value')
   pass
 ```
 
 This makes it easy to add custom data and telemetry.
-
-**@TODO:** Make it possible to add custom data from within the primary AWS Lambda function. Custom data currently needs to be added before the function is wrapped.
 
 ## Copyright
 
