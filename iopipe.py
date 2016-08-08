@@ -16,7 +16,8 @@ class Report(object):
       'client_id': self.client_id,
       }
     if lambda_context:
-      self._add_aws_lambda_data(lambda_context)
+      self._lambda_context = lambda_context
+      self._add_aws_lambda_data()
     self._add_python_sys_data()
     self._sent = False
 
@@ -26,7 +27,7 @@ class Report(object):
     """
     if not self._sent: self.send()
 
-  def _add_aws_lambda_data(self, lambda_context):
+  def _add_aws_lambda_data(self):
     """
     Add AWS Lambda specific data to the report
     """
@@ -43,8 +44,8 @@ class Report(object):
       'logGroupName': 'log_group_name',
       'logStreamName': 'log_stream_name',
     }.items():
-      if v in dir(lambda_context):
-        self.report[aws_key][k] = getattr(lambda_context, v)
+      if v in dir(self._lambda_context):
+        self.report[aws_key][k] = getattr(self._lambda_context, v)
 
   def _add_python_sys_data(self):
     """
@@ -114,7 +115,7 @@ class Report(object):
     else:
       self.report[namespace][key] = value
 
-  def report_err(self, err, lambda_context=None):
+  def report_err(self, err):
     """
     Add the details of an error to the report
     """
@@ -122,9 +123,9 @@ class Report(object):
       'exception': '{}'.format(err),
       'time_reported': datetime.datetime.now().strftime(TIMESTAMP_FORMAT)
     }
-    if lambda_context:
+    if self._lambda_context:
       try:
-        err_key['aws']['getRemainingTimeInMillis'] = lambda_context.get_remaining_time_in_millis()
+        err_key['aws']['getRemainingTimeInMillis'] = self._lambda_context.get_remaining_time_in_millis()
       except Exception as aws_lambda_err: pass # @TODO handle this more gracefully
 
     err_key = 'errors'

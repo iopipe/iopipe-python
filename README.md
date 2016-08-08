@@ -26,6 +26,10 @@ If you want to report on multiple functions, you can simply pass the iopipe.Repo
 
 When the iopipe.Report object is destroyed, it will send the data upstream. You can explicitly send the data upstream by calling the ```.send()``` method of the object.
 
+### Reporting Exceptions
+
+If you want to trace exceptions thrown in your case, you can use the ```.report_err(err)``` function. This will automatically add the exception to the current report.
+
 ### Custom Namespaces
 
 You can add a custom namespace to the data sent upstream to IOPipe using the following syntax;
