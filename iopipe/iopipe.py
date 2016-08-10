@@ -61,7 +61,6 @@ class IOpipe(object):
     """
     self.report['environment'] = {}
     self.report['environment']['python'] = {}
-    self.report['environment']['python']['sys'] = {}
 
     sys_attr = {}
     if get_all: # full set of data
@@ -101,7 +100,7 @@ class IOpipe(object):
     # get the sys attributes first
     for k, v in sys_attr.items():
       if v in dir(sys):
-        self.report['environment']['python']['sys'][k] = "{}".format(getattr(sys, v))
+        self.report['environment']['python']["sys_"+k] = "{}".format(getattr(sys, v))
  
     # now the sys functions
     if get_all:
@@ -113,18 +112,7 @@ class IOpipe(object):
         'file_system_encoding': 'getfilesystemencoding',
       }.items():
         if v in dir(sys):
-          self.report['environment']['python']['sys'][k] = "{}".format(getattr(sys, v)())
-
-    # convert sys.modules to something more usable
-    self.report['environment']['python']['sys']['modules'] = {}
-    for k, v in sys.modules.items():
-      val = ""
-      if '__file__' in dir(v):
-        val = v.__file__
-      elif '__path__' in dir(v):
-        val = v.__path__ 
-
-      self.report['environment']['python']['sys']['modules'][k] = val
+          self.report['environment']['python']['sys_'+k] = "{}".format(getattr(sys, v)())
 
   def log(self, key, value):
     """
@@ -167,7 +155,7 @@ class IOpipe(object):
     json_report = None
 
     # Duration of execution.
-    self.report['time_nanosec'] = time.time() - self._time_start
+    #self.report['time_nanosec'] = time.time() - self._time_start
     # Falsify function_id
     self.report['function_id'] = '0xDEADBEEF'
 
