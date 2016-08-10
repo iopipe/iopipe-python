@@ -59,12 +59,9 @@ class IOpipe(object):
     """
     Add the python sys attributes relevant to AWS Lambda execution
     """
-    python_key = 'python'
-    sys_key = 'sys'
-    os_key = 'os'
-    self.report[python_key] = {}
-    self.report[python_key][sys_key] = {}
-    self.report[python_key][os_key] = {}
+    self.report['environment'] = {}
+    self.report['environment']['python'] = {}
+    self.report['environment']['python']['sys'] = {}
 
     sys_attr = {}
     if get_all: # full set of data
@@ -104,7 +101,7 @@ class IOpipe(object):
     # get the sys attributes first
     for k, v in sys_attr.items():
       if v in dir(sys):
-        self.report[python_key][sys_key][k] = "{}".format(getattr(sys, v))
+        self.report['environment']['python']['sys'][k] = "{}".format(getattr(sys, v))
  
     # now the sys functions
     if get_all:
@@ -116,10 +113,10 @@ class IOpipe(object):
         'file_system_encoding': 'getfilesystemencoding',
       }.items():
         if v in dir(sys):
-          self.report[python_key][sys_key][k] = "{}".format(getattr(sys, v)())
+          self.report['environment']['python']['sys'][k] = "{}".format(getattr(sys, v)())
 
     # convert sys.modules to something more usable
-    self.report[python_key][sys_key]['modules'] = {}
+    self.report['environment']['python']['sys']['modules'] = {}
     for k, v in sys.modules.items():
       val = ""
       if '__file__' in dir(v):
@@ -127,11 +124,7 @@ class IOpipe(object):
       elif '__path__' in dir(v):
         val = v.__path__ 
 
-      self.report[python_key][sys_key]['modules'][k] = val
-
-    # grab the environment variables
-    # @TODO investigate JSON serialization issue
-    #self.report[python_key][os_key]['environ'] = os.environ
+      self.report['environment']['python']['sys']['modules'][k] = val
 
   def log(self, key, value):
     """
@@ -188,7 +181,7 @@ class IOpipe(object):
       return
 
     try:
-      response = requests.post(self._url + '/v0/event', data=json_report)
+      response = requests.post(self._url + '/v0/event', data=json_report, headers={ "Content-Type": "application/json" })
       if self._debug:
         print('POST response: {}'.format(response))
       self._sent = True
