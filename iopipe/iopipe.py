@@ -168,6 +168,8 @@ class IOpipe(object):
 
     # Duration of execution.
     self.report['time_nanosec'] = time.time() - self._time_start
+    # Falsify function_id
+    self.report['function_id'] = '0xDEADBEEF'
 
     if context:
       self._add_aws_lambda_data(context)
