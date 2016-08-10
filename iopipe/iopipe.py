@@ -172,7 +172,7 @@ class IOpipe(object):
 
   def send(self):
     """
-    Send the current report to IOPipe
+    Send the current report to IOpipe
     """
     json_report = None
 
@@ -196,7 +196,7 @@ class IOpipe(object):
         print('POST response: {}'.format(response))
       self._sent = True
     except Exception as err:
-      print('Error reporting metrics to IOPipe. {}'.format(err))
+      print('Error reporting metrics to IOpipe. {}'.format(err))
     finally:
       if self._debug:
         print(json_report)
