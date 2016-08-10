@@ -1,25 +1,30 @@
-# standard library
 import datetime
 import json
 import os
 import sys
+import time
 
-# 3rd party libraries
-import libs.requests as requests
+import requests
 
 TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
+DEFAULT_ENDPOINT_URL = "https://metrics-api.iopipe.com"
 
-class Report(object):
-  def __init__(self, client_id, lambda_context=None, custom_data_namespace='custom_data'):
+
+class IOpipe(object):
+  def __init__(self,
+               client_id=None,
+               url=DEFAULT_ENDPOINT_URL,
+               lambda_context=None,
+               debug=False):
+    self._url = url
+    self._debug = debug
+    self._time_start = time.time()
     self.client_id = client_id
-    self.custom_data_namespace = custom_data_namespace
     self.report = {
       'client_id': self.client_id,
       }
     if lambda_context:
       self._lambda_context = lambda_context
-      self._add_aws_lambda_data()
-    self._add_python_local_data()
     self._sent = False
 
   def __del__(self):
@@ -126,27 +131,23 @@ class Report(object):
     # @TODO investigate JSON serialization issue
     #self.report[python_key][os_key]['environ'] = os.environ
 
-  def add_custom_data(self, key, value, namespace=None):
+  def log(self, key, value):
     """
     Add custom data to the report
     """
-    # make sure we have a namespace
-    if not namespace: namespace = self.custom_data_namespace
-    
     # make sure the namespace exists
-    if not self.report.has_key(namespace): self.report[namespace] = {}
-    
+    if not self.report.has_key('events'): self.report['events'] = {}
 
-    if self.report[namespace].has_key(key):
+    if self.report['events'].has_key(key):
       # the key exists, merge the data
-      if type(self.report[namespace][key]) == type([]):
-        self.report[namespace][key].append(value)
+      if type(self.report['events'][key]) == type([]):
+        self.report['events'][key].append(value)
       else:
-        self.report[namespace][key] = [ self.report[namespace][key], value ]
+        self.report['events'][key] = [ self.report['events'][key], value ]
     else:
-      self.report[namespace][key] = value
+      self.report['events'][key] = value
 
-  def report_err(self, err):
+  def err(self, err):
     """
     Add the details of an error to the report
     """
@@ -154,18 +155,17 @@ class Report(object):
       'exception': '{}'.format(err),
       'time_reported': datetime.datetime.now().strftime(TIMESTAMP_FORMAT)
     }
-    if self._lambda_context:
+    if self._lambda_context and 'get_remaining_time_in_millis' in self._lambda_context:
       try:
         err_key['aws']['getRemainingTimeInMillis'] = self._lambda_context.get_remaining_time_in_millis()
       except Exception as aws_lambda_err: pass # @TODO handle this more gracefully
 
-    err_key = 'errors'
-    if not self.report.has_key(err_key):
-      self.report[err_key] = err_details
-    else:
-      if not type(self.report[err_key]) == type([]): self[report][err_key] = [ self.report[err_key] ]
+    if not self.report.has_key('errors'):
+      self.report['errors'] = err_details
+    elif type(self.report['errors']) != type([]):
+      self[report]['errors'] = [ self.report['errors'] ]
 
-    self.report[err_key].append(err_details)
+    self.report['errors'].append(err_details)
 
     # add the full local python data as well
     self._add_python_local_data(get_all=True)
@@ -175,18 +175,39 @@ class Report(object):
     Send the current report to IOPipe
     """
     json_report = None
+
+    # Duration of execution.
+    self.report['time_nanosec'] = time.time() - self._time_start
+
+    if self._lambda_context:
+      self._add_aws_lambda_data()
+    self._add_python_local_data()
+
     try:
-      json_report = json.dumps(self.report)
+      json_report = json.dumps(self.report, indent=2)
     except Exception as err:
       print("Could not convert the report to JSON. Threw exception: {}".format(err))
       print('Report: {}'.format(self.report))
+      return
 
-    if json_report:
-      try:
-        response = requests.post('https://metrics-api.iopipe.com/v0/event', data=json.dumps(self.report))
+    try:
+      response = requests.post(self._url + '/v0/event', data=json_report)
+      if self._debug:
         print('POST response: {}'.format(response))
-        print(json.dumps(self.report, indent=2))
-        self._sent = True
+      self._sent = True
+    except Exception as err:
+      print('Error reporting metrics to IOPipe. {}'.format(err))
+    finally:
+      if self._debug:
+        print(json_report)
+
+  def decorator(self, fun):
+    def wrapped(event, context):
+      err = None
+      try:
+        result = fun(event, context)
       except Exception as err:
-        print('Error reporting metrics to IOPipe. {}'.format(err))
-        print(json.dumps(self.report, indent=2))
+        self.err(err)
+      self.send()
+      return result
+    return wrapped
