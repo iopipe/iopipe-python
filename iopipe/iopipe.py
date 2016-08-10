@@ -14,7 +14,6 @@ class IOpipe(object):
   def __init__(self,
                client_id=None,
                url=DEFAULT_ENDPOINT_URL,
-               lambda_context=None,
                debug=False):
     self._url = url
     self._debug = debug
@@ -23,8 +22,6 @@ class IOpipe(object):
     self.report = {
       'client_id': self.client_id,
       }
-    if lambda_context:
-      self._lambda_context = lambda_context
     self._sent = False
 
   def __del__(self):
@@ -33,7 +30,7 @@ class IOpipe(object):
     """
     if not self._sent: self.send()
 
-  def _add_aws_lambda_data(self):
+  def _add_aws_lambda_data(self, context):
     """
     Add AWS Lambda specific data to the report
     """
@@ -50,8 +47,13 @@ class IOpipe(object):
       'logGroupName': 'log_group_name',
       'logStreamName': 'log_stream_name',
     }.items():
-      if v in dir(self._lambda_context):
-        self.report[aws_key][k] = getattr(self._lambda_context, v)
+      if v in dir(context):
+        self.report[aws_key][k] = getattr(context, v)
+
+    if context and 'get_remaining_time_in_millis' in context:
+      try:
+        self.report['aws']['getRemainingTimeInMillis'] = context.get_remaining_time_in_millis()
+      except Exception as aws_lambda_err: pass # @TODO handle this more gracefully
 
   def _add_python_local_data(self, get_all=False):
     """
@@ -155,11 +157,6 @@ class IOpipe(object):
       'exception': '{}'.format(err),
       'time_reported': datetime.datetime.now().strftime(TIMESTAMP_FORMAT)
     }
-    if self._lambda_context and 'get_remaining_time_in_millis' in self._lambda_context:
-      try:
-        err_key['aws']['getRemainingTimeInMillis'] = self._lambda_context.get_remaining_time_in_millis()
-      except Exception as aws_lambda_err: pass # @TODO handle this more gracefully
-
     if not self.report.has_key('errors'):
       self.report['errors'] = err_details
     elif type(self.report['errors']) != type([]):
@@ -170,7 +167,7 @@ class IOpipe(object):
     # add the full local python data as well
     self._add_python_local_data(get_all=True)
 
-  def send(self):
+  def send(self, context=None):
     """
     Send the current report to IOpipe
     """
@@ -179,8 +176,8 @@ class IOpipe(object):
     # Duration of execution.
     self.report['time_nanosec'] = time.time() - self._time_start
 
-    if self._lambda_context:
-      self._add_aws_lambda_data()
+    if context:
+      self._add_aws_lambda_data(context)
     self._add_python_local_data()
 
     try:
@@ -208,6 +205,6 @@ class IOpipe(object):
         result = fun(event, context)
       except Exception as err:
         self.err(err)
-      self.send()
+      self.send(context)
       return result
     return wrapped

@@ -6,40 +6,67 @@ This package provides a Python object to send telemetry to the IOpipe platform f
 
 ## Installation
 
-Currently you need to include the ```iopipe.py``` and ```libs/``` directory in your AWS Lambda function. Removing the requirement for external libraries is on the short term @TODO list.
+Until this module is available in PyPi, install from this git repo:
 
-## Usage
+```
+$ pip install https://github.com/iopipe/iopipe-python
+```
 
-Simply instantiate an ```iopipe.Report``` object inside of your function.
+## Basic Usage
+
+Simply use our decorator to report metrics:
 
 ```python
-import iopipe
+from iopipe.iopipe import IOpipe
+iopipe = IOpipe("your-client-id")
 
-def handler(event, context):
-  report = iopipe.Report(CLIENT_ID, context)
+@iopipe.decorator
+def handler(event, context)
   pass
 ```
 
-If you want to report on multiple functions, you can simply pass the iopipe.Report object from function to function.
+## Configuration
+
+The following may be set as kwargs to the IOpipe class initializer:
+
+- client_id: your client_id (register at [www.iopipe.com](https://www.iopipe.com)
+- debug: enable debug logging.
+- url: custom URL for reporting metrics
+
+## Advanced Usage
+
+Instantiate an ```iopipe.IOpipe``` object inside of your function, then
+call .err(Exception) and .send() as necessary.
+
+```python
+import iopipe.iopipe
+
+def handler(event, context):
+  report = iopipe.IOpipe(CLIENT_ID, context)
+  pass
+```
+
+If you want to report on multiple functions, you can simply pass the IOpipe object from function to function.
 
 ### Explicitly Sending Data
 
-When the iopipe.Report object is destroyed, it will send the data upstream. You can explicitly send the data upstream by calling the ```.send()``` method of the object.
+When the IOpipe object is destroyed, it will send the data upstream. You can explicitly send the data upstream by calling the `.send()` method of the object. Provide the AWS Lambda context as a parameter to `.send()`, to report AWS Lambda specific metrics.
 
 ### Reporting Exceptions
 
-If you want to trace exceptions thrown in your case, you can use the ```.report_err(err)``` function. This will automatically add the exception to the current report.
+If you want to trace exceptions thrown in your case, you can use the `.err(err)` function. This will add the exception to the current report.
 
-### Custom Namespaces
+### Logging additional data (ALPHA)
 
 You can add a custom namespace to the data sent upstream to IOPipe using the following syntax;
 
 ```python
-import iopipe
+from iopipe.iopipe import IOpipe
+iopipe = IOpipe()
 
+@iopipe.decorator
 def handler(event, context):
-  report = iopipe.Report(CLIENT_ID, context, custom_data_namespace='MySpace')
-  report.add_custom_data('custom_key', 'custom_value')
+  iopipe.log("key", "value")
   pass
 ```
 
