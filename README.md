@@ -1,47 +1,78 @@
-IOpipe Telemetry Agent for Python
----------------------------------
+# IOpipe Telemetry Agent for Python
 
-*WARNING*: Work-in-Progress! This module is not yet ready for production. -- @ewindisch
+*WARNING*: Work-in-Progress! This module is not yet ready for production. -- @ewindisch < this -- @marknca
 
-This package provides a Python decorator
-to send telemetry to the IOpipe platform for
-application performance monitoring, analytics,
-and distributed tracing.
+This package provides a Python object to send telemetry to the IOpipe platform for application performance monitoring, analytics, and distributed tracing.
 
-# Installation
+## Installation
+
+Until this module is available in PyPi, install from this git repo:
 
 ```
-echo "iopipe" >> requirements.txt
-pip install -r requirements.txt
+$ pip install https://github.com/iopipe/iopipe-python
 ```
 
-# Usage
+## Basic Usage
 
-Simply decorate your code using `@iopipe`:
+Simply use our decorator to report metrics:
 
-```
-import iopipe
+```python
+from iopipe.iopipe import IOpipe
+iopipe = IOpipe("your-client-id")
 
-@iopipe(YOUR_IOPIPE_CLIENTID)
-def handler(event, context):
+@iopipe.decorator
+def handler(event, context)
   pass
 ```
 
-### Wrapping multiple functions.
+## Configuration
 
-If wrapping multiple functions, you can set the clientid once
-as such:
+The following may be set as kwargs to the IOpipe class initializer:
 
-```
-import iopipe as iopipe_module
-iopipe = iopipe_module(YOUR_IOPIPE_CLIENTID)
+- client_id: your client_id (register at [www.iopipe.com](https://www.iopipe.com)
+- debug: enable debug logging.
+- url: custom URL for reporting metrics
 
-@iopipe
+## Advanced Usage
+
+Instantiate an ```iopipe.IOpipe``` object inside of your function, then
+call .err(Exception) and .send() as necessary.
+
+```python
+import iopipe.iopipe
+
 def handler(event, context):
+  report = iopipe.IOpipe(CLIENT_ID, context)
   pass
 ```
 
-# Copyright
+If you want to report on multiple functions, you can simply pass the IOpipe object from function to function.
+
+### Explicitly Sending Data
+
+When the IOpipe object is destroyed, it will send the data upstream. You can explicitly send the data upstream by calling the `.send()` method of the object. Provide the AWS Lambda context as a parameter to `.send()`, to report AWS Lambda specific metrics.
+
+### Reporting Exceptions
+
+If you want to trace exceptions thrown in your case, you can use the `.err(err)` function. This will add the exception to the current report.
+
+### Logging additional data (ALPHA)
+
+You can add a custom namespace to the data sent upstream to IOPipe using the following syntax;
+
+```python
+from iopipe.iopipe import IOpipe
+iopipe = IOpipe()
+
+@iopipe.decorator
+def handler(event, context):
+  iopipe.log("key", "value")
+  pass
+```
+
+This makes it easy to add custom data and telemetry.
+
+## Copyright
 
 Provided under the Apache-2.0 license. See LICENSE for details.
 
