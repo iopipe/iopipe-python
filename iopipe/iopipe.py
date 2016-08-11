@@ -50,7 +50,7 @@ class IOpipe(object):
       if v in dir(context):
         self.report[aws_key][k] = getattr(context, v)
 
-    if context and 'get_remaining_time_in_millis' in context:
+    if context and 'get_remaining_time_in_millis' in dir(context):
       try:
         self.report['aws']['getRemainingTimeInMillis'] = context.get_remaining_time_in_millis()
       except Exception as aws_lambda_err: pass # @TODO handle this more gracefully
