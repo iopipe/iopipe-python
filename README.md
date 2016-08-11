@@ -12,6 +12,27 @@ Until this module is available in PyPi, install from this git repo:
 $ pip install https://github.com/iopipe/iopipe-python
 ```
 
+### Deployment In AWS Lambda
+
+In order to use the IOPipe module in an AWS Lambda function, the [requests module](https://github.com/kennethreitz/requests) is required. You can manually copy over the contents of the modules to a 'requests' folder under the 'iopipe' folder. More reliably use;
+
+```
+$ pip install requests -t iopipe/requests
+```
+
+Your folder structure for the function should look similar to;
+
+```
+index.py # contains your lambda handler
+  /iopipe
+    - __init__.py
+    - iopipe.py
+    /requests
+      - __init__.py
+      - api.py
+      - ...
+```      
+
 ## Basic Usage
 
 Simply use our decorator to report metrics:
