@@ -33,6 +33,8 @@ index.py # contains your lambda handler
       - ...
 ```      
 
+More details about lambda deployments are available in the [AWS documentation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-python-how-to-create-deployment-package.html).
+
 ## Basic Usage
 
 Simply use our decorator to report metrics:
