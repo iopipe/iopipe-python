@@ -6,17 +6,14 @@ This package provides a Python object to send telemetry to the IOpipe platform f
 
 ## Installation
 
-Until this module is available in PyPi, install from this git repo:
+We expect you will import this library into an existing (or new) Python project
+intended to be run on AWS Lambda.  On Lambda, functions are expected to include
+module dependencies within their project paths, thus we use `-t $PWD`.
+
+From your project directory:
 
 ```
-$ pip install https://github.com/iopipe/iopipe-python
-```
-
-### Deployment In AWS Lambda
-
-In order to use the IOPipe module in an AWS Lambda function, the [requests module](https://github.com/kennethreitz/requests) is required. You can manually copy over the contents of the modules to a 'requests' folder under the 'iopipe' folder. More reliably use;
-
-```
+$ pip install https://github.com/iopipe/iopipe-python -t .
 $ pip install requests -t iopipe/requests
 ```
 
