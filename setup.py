@@ -8,7 +8,7 @@ install_reqs = parse_requirements('./requirements.txt', session=PipSession())
 reqs = [str(ir.req) for ir in install_reqs]
 
 setup(name='iopipe',
-      version='0.1',
+      version='0.1.1',
       description='IOpipe Collector for serverless Application Performance Monitoring',
       author='Eric Windisch',
       author_email='eric@iopipe.com',
