@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import socket
 import sys
 import time
 
@@ -54,6 +55,37 @@ class IOpipe(object):
       try:
         self.report['aws']['getRemainingTimeInMillis'] = context.get_remaining_time_in_millis()
       except Exception as aws_lambda_err: pass # @TODO handle this more gracefully
+
+  def _add_os_host_data(self):
+    """
+    Add os field to payload
+    """
+    uptime = None
+    self.report['os'] = self.report.get('os', {})
+    self.report['os']['linux'] = self.report['os'].get('linux', {})
+    self.report['os']['linux']['mem'] = self.report['os']['linux'].get('mem', {})
+
+    with open("/proc/uptime") as uptime_file:
+      utf = uptime_file.readline().split(" ")
+      #//print (utf[0], utf[1].rstrip())
+      uptime = int(float(utf[0]))
+
+    with open("/proc/meminfo") as meminfo:
+      for row in meminfo:
+        line = row.split(":")
+        # Example content:
+        # MemTotal:        3801016 kB
+        # MemFree:         1840972 kB
+        # MemAvailable:    3287752 kB
+        # HugePages_Total:       0
+        self.report['os']['linux']['mem'][line[0]] = int(line[1].lstrip().rstrip(" kB\n"))
+
+    self.report['os'] = {
+      'hostname': socket.gethostname(),
+      'uptime': uptime,
+      'freemem': self.report['os']['linux']['mem']['MemFree'],
+      'totalmem': self.report['os']['linux']['mem']['MemTotal']
+    }
 
   def _add_python_local_data(self, get_all=False):
     """
@@ -159,9 +191,15 @@ class IOpipe(object):
     # Falsify function_id
     self.report['function_id'] = '0xDEADBEEF'
 
+    self.report['agent'] = {
+      'runtime': "python",
+      'version': sys.version_info[0]
+    }
+
     if context:
       self._add_aws_lambda_data(context)
     self._add_python_local_data()
+    self._add_os_host_data()
 
     try:
       json_report = json.dumps(self.report, indent=2)
