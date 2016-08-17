@@ -9,7 +9,7 @@ import requests
 
 TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 DEFAULT_ENDPOINT_URL = "https://metrics-api.iopipe.com"
-
+VERSION = "0.1.1"
 
 class IOpipe(object):
   def __init__(self,
@@ -193,7 +193,7 @@ class IOpipe(object):
 
     self.report['agent'] = {
       'runtime': "python",
-      'version': sys.version_info[0]
+      'version': VERSION
     }
 
     if context:
