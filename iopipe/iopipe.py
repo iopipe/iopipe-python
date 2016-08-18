@@ -80,6 +80,14 @@ class IOpipe(object):
           softirq: cpu_stat[7]
         }
 
+    with open("/proc/loadavg") as loadavg_file:
+      loadavg = loadavg_file.readline().split(" ")
+      self.report['os']['linux']['loadavg'] = {
+        loadavg[0],
+        loadavg[1],
+        loadavg[2]
+      }
+
     with open("/proc/uptime") as uptime_file:
       utf = uptime_file.readline().split(" ")
       uptime = int(float(utf[0]))
