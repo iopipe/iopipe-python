@@ -187,7 +187,8 @@ class IOpipe(object):
     json_report = None
 
     # Duration of execution.
-    #self.report['time_nanosec'] = time.time() - self._time_start
+    self.report['time_nanosec'] = int((time.time() - self._time_start) * 1000000000)
+
     # Falsify function_id
     self.report['function_id'] = '0xDEADBEEF'
 
