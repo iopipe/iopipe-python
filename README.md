@@ -78,7 +78,7 @@ If you want to trace exceptions thrown in your case, you can use the `.err(err)`
 
 ### Logging additional data (ALPHA)
 
-You can add a custom namespace to the data sent upstream to IOPipe using the following syntax;
+You can add a custom namespace to the data sent upstream to IOpipe using the following syntax;
 
 ```python
 from iopipe.iopipe import IOpipe
