@@ -67,7 +67,6 @@ class IOpipe(object):
 
     with open("/proc/uptime") as uptime_file:
       utf = uptime_file.readline().split(" ")
-      #//print (utf[0], utf[1].rstrip())
       uptime = int(float(utf[0]))
 
     with open("/proc/meminfo") as meminfo:
