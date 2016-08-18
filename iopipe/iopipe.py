@@ -5,18 +5,21 @@ import socket
 import sys
 import time
 
-import requests
+import boto3
+
+awslambda = boto3.client('lambda')
 
 TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
-DEFAULT_ENDPOINT_URL = "https://metrics-api.iopipe.com"
+DEFAULT_LAMBDA_ARN = "arn:aws:lambda:us-east-1:554407330061:function:iopipe-org-collector_iopipe-event-store"
 VERSION = "0.1.1"
+
 
 class IOpipe(object):
   def __init__(self,
                client_id=None,
-               url=DEFAULT_ENDPOINT_URL,
+               lambda_arn=DEFAULT_LAMBDA_ARN,
                debug=False):
-    self._url = url
+    self._lambda_arn = lambda_arn
     self._debug = debug
     self._time_start = time.time()
     self.client_id = client_id
@@ -209,9 +212,9 @@ class IOpipe(object):
       return
 
     try:
-      response = requests.post(self._url + '/v0/event', data=json_report, headers={ "Content-Type": "application/json" })
-      if self._debug:
-        print('POST response: {}'.format(response))
+      awslambda.invoke(FunctionName=self._lambda_arn,
+                       InvocationType="Event",
+                       Payload=json_report)
       self._sent = True
     except Exception as err:
       print('Error reporting metrics to IOpipe. {}'.format(err))

@@ -8,13 +8,12 @@ This package provides a Python object to send telemetry to the IOpipe platform f
 
 We expect you will import this library into an existing (or new) Python project
 intended to be run on AWS Lambda.  On Lambda, functions are expected to include
-module dependencies within their project paths, thus we use `-t $PWD`.
+module dependencies within their project paths, thus we use `-t .`.
 
 From your project directory:
 
 ```
 $ pip install https://github.com/iopipe/iopipe-python -t .
-$ pip install requests -t iopipe/requests
 ```
 
 Your folder structure for the function should look similar to;
@@ -24,9 +23,6 @@ index.py # contains your lambda handler
   /iopipe
     - __init__.py
     - iopipe.py
-    /requests
-      - __init__.py
-      - api.py
       - ...
 ```      
 
