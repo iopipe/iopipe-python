@@ -65,6 +65,21 @@ class IOpipe(object):
     self.report['os']['linux'] = self.report['os'].get('linux', {})
     self.report['os']['linux']['mem'] = self.report['os']['linux'].get('mem', {})
 
+    with open("/proc/stat") as stat_file:
+      for line in stat_file:
+        cpu_stat = line.split(" ")
+        if cpu_stat[0][:3] != "cpu":
+          break
+        self.report['os']['linux']['cpu'][cpu_stat[0]] = {
+          user: cpu_stat[1],
+          nice: cpu_stat[2],
+          system: cpu_stat[3],
+          idle: cpu_stat[4],
+          iowait: cpu_stat[5],
+          irq: cpu_stat[6],
+          softirq: cpu_stat[7]
+        }
+
     with open("/proc/uptime") as uptime_file:
       utf = uptime_file.readline().split(" ")
       uptime = int(float(utf[0]))
