@@ -67,7 +67,6 @@ class IOpipe(object):
 
     with open("/proc/uptime") as uptime_file:
       utf = uptime_file.readline().split(" ")
-      #//print (utf[0], utf[1].rstrip())
       uptime = int(float(utf[0]))
 
     with open("/proc/meminfo") as meminfo:
@@ -187,7 +186,8 @@ class IOpipe(object):
     json_report = None
 
     # Duration of execution.
-    #self.report['time_nanosec'] = time.time() - self._time_start
+    self.report['time_nanosec'] = int((time.time() - self._time_start) * 1000000000)
+
     # Falsify function_id
     self.report['function_id'] = '0xDEADBEEF'
 
