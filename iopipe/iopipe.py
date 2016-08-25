@@ -265,6 +265,8 @@ class IOpipe(object):
                 result = fun(event, context)
             except Exception as err:
                 self.err(err)
+                self.send(context)
+                raise err
             self.send(context)
             return result
         return wrapped
