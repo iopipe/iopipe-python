@@ -71,6 +71,7 @@ class IOpipe(object):
             self.report['os']['linux'].get('mem', {})
 
         with open("/proc/stat") as stat_file:
+            self.report['os']['linux']['cpu'] = {}
             for line in stat_file:
                 cpu_stat = line.split(" ")
                 if cpu_stat[0][:3] != "cpu":
@@ -205,9 +206,9 @@ class IOpipe(object):
         if 'errors' not in self.report:
             self.report['errors'] = err_details
         elif not isinstance(self.report['errors'], []):
-            self[report]['errors'] = [self.report['errors']]
-
-        self.report['errors'].append(err_details)
+            self.report['errors'] = [self.report['errors']]
+        else:
+            self.report['errors'].append(err_details)
 
         # add the full local python data as well
         self._add_python_local_data(get_all=True)
