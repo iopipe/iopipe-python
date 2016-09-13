@@ -65,30 +65,32 @@ class IOpipe(object):
         Add os field to payload
         """
         uptime = None
-        self.report['os'] = self.report.get('os', {})
-        self.report['os']['linux'] = self.report['os'].get('linux', {})
-        self.report['os']['linux']['mem'] = \
-            self.report['os']['linux'].get('mem', {})
+        self.report['environment']['os'] = self.report.get('os', {})
+        self.report['environment']['os']['linux'] = \
+            self.report['os'].get('linux', {})
+        self.report['environment']['os']['linux']['mem'] = \
+            self.report['environment']['os']['linux'].get('mem', {})
 
         with open("/proc/stat") as stat_file:
-            self.report['os']['linux']['cpu'] = {}
+            self.report['environment']['os']['linux']['cpu'] = {}
             for line in stat_file:
                 cpu_stat = line.split(" ")
                 if cpu_stat[0][:3] != "cpu":
                     break
-                self.report['os']['linux']['cpu'][cpu_stat[0]] = {
-                    'user': cpu_stat[1],
-                    'nice': cpu_stat[2],
-                    'system': cpu_stat[3],
-                    'idle': cpu_stat[4],
-                    'iowait': cpu_stat[5],
-                    'irq': cpu_stat[6],
-                    'softirq': cpu_stat[7]
+                self.report['environment']['os']['linux']['cpu'][cpu_stat[0]] \
+                    = {
+                        'user': cpu_stat[1],
+                        'nice': cpu_stat[2],
+                        'system': cpu_stat[3],
+                        'idle': cpu_stat[4],
+                        'iowait': cpu_stat[5],
+                        'irq': cpu_stat[6],
+                        'softirq': cpu_stat[7]
                 }
 
         with open("/proc/loadavg") as loadavg_file:
             loadavg = loadavg_file.readline().split(" ")
-            self.report['os']['linux']['loadavg'] = {
+            self.report['environment']['os']['linux']['loadavg'] = {
                 loadavg[0],
                 loadavg[1],
                 loadavg[2]
@@ -106,14 +108,19 @@ class IOpipe(object):
                 # MemFree:                 1840972 kB
                 # MemAvailable:        3287752 kB
                 # HugePages_Total:             0
-                self.report['os']['linux']['mem'][line[0]] = \
+                self.report['environment']['os']['linux']['mem'][line[0]] = \
                     int(line[1].lstrip().rstrip(" kB\n"))
 
-        self.report['os'] = {
+        self.report['environment']['os'] = {
             'hostname': socket.gethostname(),
             'uptime': uptime,
-            'freemem': self.report['os']['linux']['mem']['MemFree'],
-            'totalmem': self.report['os']['linux']['mem']['MemTotal']
+            'freemem':
+                self.report['environment']['os']['linux']['mem']['MemFree'],
+            'totalmem':
+                self.report['environment']['os']['linux']['mem']['MemTotal'],
+            'usedmem':
+                self.report['environment']['os']['linux']['mem']['MemTotal'] -
+                self.report['environment']['os']['linux']['mem']['MemFree']
         }
 
     def _add_python_local_data(self, get_all=False):
@@ -223,10 +230,7 @@ class IOpipe(object):
         self.report['time_nanosec'] = \
             int((time.time() - self._time_start) * 1000000000)
 
-        # Falsify function_id
-        self.report['function_id'] = '0xDEADBEEF'
-
-        self.report['agent'] = {
+        self.report['environment']['agent'] = {
             'runtime': "python",
             'version': VERSION
         }
