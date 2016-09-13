@@ -5,7 +5,10 @@ import socket
 import sys
 import time
 
-import requests
+try:
+  import requests
+except:
+  from botocore.vendored import requests
 
 TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 DEFAULT_ENDPOINT_URL = "https://metrics-api.iopipe.com"

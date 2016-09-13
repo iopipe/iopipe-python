@@ -14,7 +14,7 @@ From your project directory:
 
 ```
 $ pip install https://github.com/iopipe/iopipe-python -t .
-$ pip install requests -t iopipe/requests
+$ pip install requests -t iopipe/requests  # Optional
 ```
 
 Your folder structure for the function should look similar to;
@@ -29,6 +29,10 @@ index.py # contains your lambda handler
       - api.py
       - ...
 ```      
+
+Installation of the requests library is necessary for local dev/test, but not
+when running on AWS Lambda as this library is part of the default environment
+via the botocore library.
 
 More details about lambda deployments are available in the [AWS documentation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-python-how-to-create-deployment-package.html).
 
