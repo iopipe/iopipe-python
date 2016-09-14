@@ -9,7 +9,7 @@ import requests
 
 TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 DEFAULT_ENDPOINT_URL = "https://metrics-api.iopipe.com"
-VERSION = "0.1.1"
+VERSION = "0.1.2"
 
 
 class IOpipe(object):
