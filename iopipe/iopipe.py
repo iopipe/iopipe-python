@@ -103,6 +103,10 @@ class IOpipe(object):
             utf = uptime_file.readline().split(" ")
             uptime = int(float(utf[0]))
 
+        with open("/proc/sys/kernel/random/boot_id") as bootid_file:
+            self.report['environment']['host']['container_id'] = \
+                bootid_file.readline()
+
         with open("/proc/meminfo") as meminfo:
             for row in meminfo:
                 line = row.split(":")
