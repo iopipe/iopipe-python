@@ -13,7 +13,7 @@ module dependencies within their project paths, thus we use `-t $PWD`.
 From your project directory:
 
 ```
-$ pip install https://github.com/iopipe/iopipe-python -t .
+$ pip install https://github.com/iopipe/iopipe-python/archive/master.zip -t .
 $ pip install requests -t iopipe/requests  # Optional
 ```
 
