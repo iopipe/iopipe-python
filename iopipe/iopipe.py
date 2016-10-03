@@ -70,7 +70,7 @@ class IOpipe(object):
         uptime = None
         self.report['environment']['os'] = self.report.get('os', {})
         self.report['environment']['os']['linux'] = \
-            self.report['os'].get('linux', {})
+            self.report['environment']['os'].get('linux', {})
         self.report['environment']['os']['linux']['mem'] = \
             self.report['environment']['os']['linux'].get('mem', {})
 
