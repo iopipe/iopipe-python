@@ -1,14 +1,13 @@
 import datetime
 import json
-import os
 import socket
 import sys
 import time
 
 try:
-  import requests
+    import requests
 except:
-  from botocore.vendored import requests
+    from botocore.vendored import requests
 
 TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 DEFAULT_ENDPOINT_URL = "https://metrics-api.iopipe.com"
@@ -60,7 +59,7 @@ class IOpipe(object):
             try:
                 self.report['aws']['getRemainingTimeInMillis'] = \
                     context.get_remaining_time_in_millis()
-            except Exception as aws_lambda_err:
+            except Exception:
                 pass  # @TODO handle this more gracefully
 
     def _add_os_host_data(self):
