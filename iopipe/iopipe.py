@@ -11,7 +11,7 @@ except:
 
 TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 DEFAULT_ENDPOINT_URL = "https://metrics-api.iopipe.com"
-VERSION = "0.1.3"
+VERSION = "0.1.4"
 
 
 class IOpipe(object):
@@ -103,6 +103,7 @@ class IOpipe(object):
             uptime = int(float(utf[0]))
 
         with open("/proc/sys/kernel/random/boot_id") as bootid_file:
+            self.report['environment']['host'] = {}
             self.report['environment']['host']['container_id'] = \
                 bootid_file.readline()
 
@@ -236,6 +237,7 @@ class IOpipe(object):
         self.report['time_nanosec'] = \
             int((time.time() - self._time_start) * 1000000000)
 
+        self.report['environment'] = {}
         self.report['environment']['agent'] = {
             'runtime': "python",
             'version': VERSION
