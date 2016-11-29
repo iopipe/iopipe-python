@@ -234,8 +234,12 @@ class IOpipe(object):
         json_report = None
 
         # Duration of execution.
+        duration = (time.time() - self._time_start)
+        self.report['duration'] = \
+            int(duration * 1000000000)
+        self.report['time_sec'] = int(duration)
         self.report['time_nanosec'] = \
-            int((time.time() - self._time_start) * 1000000000)
+            int((duration - int(duration)) * 1000000000)
 
         self.report['environment'] = {}
         self.report['environment']['agent'] = {
