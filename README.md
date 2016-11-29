@@ -1,7 +1,5 @@
 # IOpipe Telemetry Agent for Python
 
-*WARNING*: Work-in-Progress! This module is not yet ready for production. -- @ewindisch < this -- @marknca
-
 This package provides a Python object to send telemetry to the IOpipe platform for application performance monitoring, analytics, and distributed tracing.
 
 ## Installation
@@ -49,7 +47,7 @@ from iopipe.iopipe import IOpipe
 iopipe = IOpipe("your-client-id")
 
 @iopipe.decorator
-def handler(event, context)
+def handler(event, context):
   pass
 ```
 
