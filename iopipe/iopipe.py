@@ -11,6 +11,8 @@ except:
 
 TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 DEFAULT_ENDPOINT_URL = "https://metrics-api.iopipe.com"
+MODULE_LOAD_TIME = time.time() * 1000
+COLDSTART = True
 VERSION = "0.1.5"
 
 
@@ -277,9 +279,14 @@ class IOpipe(object):
             {
                 'agent': {
                   'runtime': "python",
-                  'version': VERSION
-                }
+                  'version': VERSION,
+                  'load_time': MODULE_LOAD_TIME
+                },
+                'coldstart': COLDSTART
             })
+
+        if COLDSTART:
+            COLDSTART = False
 
         if context:
             self._add_aws_lambda_data(context)
