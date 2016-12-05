@@ -118,7 +118,7 @@ class IOpipe(object):
                 self.report['environment']['os']['linux']['mem'][line[0]] = \
                     int(line[1].lstrip().rstrip(" kB\n"))
 
-        self.report['environment']['os'] = {
+        self.report['environment']['os'].update({
             'hostname': socket.gethostname(),
             'uptime': uptime,
             'freemem':
@@ -128,7 +128,7 @@ class IOpipe(object):
             'usedmem':
                 self.report['environment']['os']['linux']['mem']['MemTotal'] -
                 self.report['environment']['os']['linux']['mem']['MemFree']
-        }
+        })
 
     def _add_python_local_data(self, get_all=False):
         """
