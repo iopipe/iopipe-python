@@ -4,4 +4,4 @@ iopipe = IOpipe("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6ImF1dGgwfDU4MTA4ZW
 
 @iopipe.decorator
 def handle(event, context):
-  pass
+    pass
