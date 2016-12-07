@@ -25,7 +25,19 @@ class IOpipe(object):
         self.client_id = client_id
         self.report = {
             'client_id': self.client_id,
+            'environment': {
+                'host': {},
+                'os': {
+                    'linux': {
+                        'cpu': {},
+                        'loadavg': {},
+                        'mem': {},
+                    }
+                },
+                'python': {}
             }
+        }
+
         self._sent = False
 
     def __del__(self):
@@ -67,14 +79,8 @@ class IOpipe(object):
         Add os field to payload
         """
         uptime = None
-        self.report['environment']['os'] = self.report.get('os', {})
-        self.report['environment']['os']['linux'] = \
-            self.report['environment']['os'].get('linux', {})
-        self.report['environment']['os']['linux']['mem'] = \
-            self.report['environment']['os']['linux'].get('mem', {})
 
         with open("/proc/stat") as stat_file:
-            self.report['environment']['os']['linux']['cpu'] = {}
             for line in stat_file:
                 cpu_stat = line.split(" ")
                 if cpu_stat[0][:3] != "cpu":
@@ -103,11 +109,12 @@ class IOpipe(object):
             uptime = int(float(utf[0]))
 
         with open("/proc/sys/kernel/random/boot_id") as bootid_file:
-            self.report['environment']['host'] = {}
-            self.report['environment']['host']['container_id'] = \
-                bootid_file.readline()
+            self.report['environment']['host'].update({
+                'container_id': bootid_file.readline()
+            })
 
         with open("/proc/meminfo") as meminfo:
+            linux_mem = {}
             for row in meminfo:
                 line = row.split(":")
                 # Example content:
@@ -115,8 +122,9 @@ class IOpipe(object):
                 # MemFree:                 1840972 kB
                 # MemAvailable:        3287752 kB
                 # HugePages_Total:             0
-                self.report['environment']['os']['linux']['mem'][line[0]] = \
+                linux_mem[line[0]] = \
                     int(line[1].lstrip().rstrip(" kB\n"))
+            self.report['environment']['os']['linux']['mem'].update(linux_mem)
 
         self.report['environment']['os'].update({
             'hostname': socket.gethostname(),
@@ -134,9 +142,6 @@ class IOpipe(object):
         """
         Add the python sys attributes relevant to AWS Lambda execution
         """
-        self.report['environment'] = {}
-        self.report['environment']['python'] = {}
-
         sys_attr = {}
         if get_all:  # full set of data
             sys_attr = {
@@ -234,18 +239,20 @@ class IOpipe(object):
         json_report = None
 
         # Duration of execution.
-        duration = (time.time() - self._time_start)
+        duration = time.time() - self._time_start
         self.report['duration'] = \
             int(duration * 1000000000)
         self.report['time_sec'] = int(duration)
         self.report['time_nanosec'] = \
             int((duration - int(duration)) * 1000000000)
 
-        self.report['environment'] = {}
-        self.report['environment']['agent'] = {
-            'runtime': "python",
-            'version': VERSION
-        }
+        self.report['environment'].update(
+            {
+                'agent': {
+                  'runtime': "python",
+                  'version': VERSION
+                }
+            })
 
         if context:
             self._add_aws_lambda_data(context)
