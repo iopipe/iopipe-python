@@ -52,7 +52,9 @@ if [ -z $LATEST ] ; then
   exit 1
 else
   echo "downloading apex"
-  wget -sL https://github.com/apex/apex/releases/download/$LATEST/apex_$PLATFORM -o $DEST
+  echo https://github.com/apex/apex/releases/download/$LATEST/apex_$PLATFORM
+  curl -sL https://github.com/apex/apex/releases/download/$LATEST/apex_$PLATFORM -o $DEST
+  echo "downloaded"
   chmod +x $DEST
 fi
 }
