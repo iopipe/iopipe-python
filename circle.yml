@@ -1,0 +1,11 @@
+dependencies:
+  pre:
+    - npm install -g yarn
+    - curl https://raw.githubusercontent.com/apex/apex/master/install.sh | sh
+
+deployment:
+  production:
+    branch: master
+    commands:
+      - bash install-dependencies.sh
+      - apex deploy
