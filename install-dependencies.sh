@@ -1,5 +1,6 @@
 #!/bin/sh
 
+echo "Installing Apex"
 install () {
 
 set -eu
