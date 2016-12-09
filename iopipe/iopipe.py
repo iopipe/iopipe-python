@@ -237,7 +237,7 @@ class IOpipe(object):
 
         if key in self.report['events']:
             # the key exists, merge the data
-            if isinstance(self.report['events'][key], []):
+            if isinstance(self.report['events'][key], list):
                 self.report['events'][key].append(value)
             else:
                 self.report['events'][key] = \
@@ -255,7 +255,7 @@ class IOpipe(object):
         }
         if 'errors' not in self.report:
             self.report['errors'] = err_details
-        elif not isinstance(self.report['errors'], []):
+        elif not isinstance(self.report['errors'], list):
             self.report['errors'] = [self.report['errors']]
         else:
             self.report['errors'].append(err_details)
