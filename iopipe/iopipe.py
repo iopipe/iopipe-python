@@ -58,14 +58,11 @@ class IOpipe(object):
             }
         })
 
-        self._sent = False
-
     def __del__(self):
         """
         Send the report if it hasn't already been sent
         """
-        if not self._sent:
-            self.send()
+        self.send()
 
     def _add_aws_lambda_data(self, context):
         """
@@ -307,7 +304,6 @@ class IOpipe(object):
                 headers={"Content-Type": "application/json"})
             if self._debug:
                 print('POST response: {}'.format(response))
-            self._sent = True
         except Exception as err:
             print('Error reporting metrics to IOpipe. {}'.format(err))
         finally:
@@ -321,8 +317,8 @@ class IOpipe(object):
                 result = fun(event, context)
             except Exception as err:
                 self.err(err)
-                self.send(context)
                 raise err
-            self.send(context)
+            finally:
+                self.send(context)
             return result
         return wrapped
