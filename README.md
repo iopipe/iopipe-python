@@ -62,21 +62,26 @@ The following may be set as kwargs to the IOpipe class initializer:
 ## Advanced Usage
 
 Instantiate an ```iopipe.IOpipe``` object inside of your function, then
-call .err(Exception) and .send() as necessary.
+call .err(Exception) and .send() to report data and exceptions.
+
+We recommend using our handy decorator instead.
 
 ```python
-import iopipe.iopipe
+from iopipe.iopipe import IOpipe
 
 def handler(event, context):
-  report = iopipe.IOpipe(CLIENT_ID, context)
-  pass
+  iopipe = IOpipe(CLIENT_ID)
+  timestamp = time.time()
+
+  try:
+    # do some things
+  except e:
+    iopipe.err(e)
+
+  iopipe.send(context, timestamp)
 ```
 
 If you want to report on multiple functions, you can simply pass the IOpipe object from function to function.
-
-### Explicitly Sending Data
-
-When the IOpipe object is destroyed, it will send the data upstream. You can explicitly send the data upstream by calling the `.send()` method of the object. Provide the AWS Lambda context as a parameter to `.send()`, to report AWS Lambda specific metrics.
 
 ### Reporting Exceptions
 
