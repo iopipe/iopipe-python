@@ -44,14 +44,15 @@ elif [ "$UNAME" = "OpenBSD" ] ; then
 fi
 
 LATEST=$(curl -s https://api.github.com/repos/apex/apex/tags | grep -Eo '"name":.*?[^\\]",'  | head -n 1 | sed 's/[," ]//g' | cut -d ':' -f 2)
-URL="https://github.com/apex/apex/releases/download/$LATEST/apex_$PLATFORM"
+URL="https://github.com/apex/apex/releases/download/v0.10.3/apex_linux_amd64"
 DEST=${DEST:-/usr/local/bin/apex}
 
 if [ -z $LATEST ] ; then
   echo "Error requesting. Download binary from https://github.com/apex/apex/releases"
   exit 1
 else
-  curl -sL https://github.com/apex/apex/releases/download/$LATEST/apex_$PLATFORM -o $DEST
+  echo "downloading apex"
+  wget -sL https://github.com/apex/apex/releases/download/$LATEST/apex_$PLATFORM -o $DEST
   chmod +x $DEST
 fi
 }
