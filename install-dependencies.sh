@@ -6,6 +6,8 @@ install () {
 set -eu
 
 UNAME=$(uname)
+
+echo $UNAME
 if [ "$UNAME" != "Linux" -a "$UNAME" != "Darwin" -a "$UNAME" != "OpenBSD" ] ; then
     echo "Sorry, OS not supported: ${UNAME}. Download binary from https://github.com/apex/apex/releases"
     exit 1
