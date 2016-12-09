@@ -1,9 +1,8 @@
 #!/bin/sh
 
 echo "Installing Apex"
-wget https://github.com/apex/apex/archive/v0.11.0.tar.gz
-tar xvzf v0.11.0.tar.gz
-cd apex-0.11.0 && make
+wget https://github.com/apex/apex/releases/download/v0.11.0/apex_linux_amd64
+ls
 
 for func in $(ls functions); do
   if [ -f functions/${func}/package.json ]; then
