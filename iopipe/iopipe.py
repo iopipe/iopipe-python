@@ -14,6 +14,18 @@ DEFAULT_ENDPOINT_URL = "https://metrics-api.iopipe.com"
 VERSION = "0.1.4"
 
 
+def get_pid_stat(pid):
+    with open("/proc/%s/stat" % (pid,)) as stat_file:
+        stat = stat_file.readline().split(" ")
+        return {
+            'utime': int(stat[13]),
+            'stime': int(stat[13]),
+            'cutime': int(stat[15]),
+            'cstime': int(stat[16]),
+            'rss': int(stat[23])
+        }
+
+
 class IOpipe(object):
     def __init__(self,
                  client_id=None,
@@ -31,11 +43,20 @@ class IOpipe(object):
                     'linux': {
                         'cpu': {},
                         'mem': {},
+                        'pid': {
+                            'self': {}
+                        }
                     }
                 },
                 'python': {}
             }
         }
+
+        self.report['environment']['os']['linux']['pid'].update({
+            'self': {
+                'stat_start': get_pid_stat('self')
+            }
+        })
 
         self._sent = False
 
@@ -72,6 +93,25 @@ class IOpipe(object):
                     context.get_remaining_time_in_millis()
             except Exception:
                 pass  # @TODO handle this more gracefully
+
+    def _add_pid_data(self, pid):
+        self.report['environment']['os']['linux']['pid'][pid] = \
+            self.report['environment']['os']['linux']['pid'][pid] or {}
+
+        self.report['environment']['os']['linux']['pid'][pid]['stat'] = \
+            get_pid_stat(pid)
+
+        with open("/proc/%s/status" % (pid,)) as status_file:
+            status = {}
+            for row in status_file:
+                line = row.split(":")
+                status_value = line[1].rstrip("\t\n kB").lstrip()
+                try:
+                    status[line[0]] = int(status_value)
+                except ValueError:
+                    status[line[0]] = status_value
+            self.report['environment']['os']['linux']['pid'][pid]['status'] \
+                = status
 
     def _add_os_host_data(self):
         """
@@ -228,6 +268,8 @@ class IOpipe(object):
         Send the current report to IOpipe
         """
         json_report = None
+
+        self._add_pid_data('self')
 
         # Duration of execution.
         duration = time.time() - self._time_start
