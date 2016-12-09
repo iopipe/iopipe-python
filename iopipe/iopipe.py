@@ -33,7 +33,6 @@ class IOpipe(object):
                  debug=False):
         self._url = url
         self._debug = debug
-        self._time_start = time.time()
         self.client_id = client_id
         self.report = {
             'client_id': self.client_id,
@@ -257,7 +256,7 @@ class IOpipe(object):
         # add the full local python data as well
         self._add_python_local_data(get_all=True)
 
-    def send(self, context=None):
+    def send(self, context=None, time_start=None):
         """
         Send the current report to IOpipe
         """
@@ -266,12 +265,12 @@ class IOpipe(object):
         self._add_pid_data('self')
 
         # Duration of execution.
-        duration = time.time() - self._time_start
-        self.report['duration'] = \
-            int(duration * 1000000000)
-        self.report['time_sec'] = int(duration)
-        self.report['time_nanosec'] = \
-            int((duration - int(duration)) * 1000000000)
+        duration = time.time() - (time_start or time.time())
+        self.report.update({
+            'duration': int(duration * 1000000000),
+            'time_sec': int(duration),
+            'time_nanosec': int((duration - int(duration)) * 1000000000)
+        })
 
         self.report['environment'].update(
             {
@@ -312,12 +311,13 @@ class IOpipe(object):
     def decorator(self, fun):
         def wrapped(event, context):
             err = None
+            start_time = time.time()
             try:
                 result = fun(event, context)
             except Exception as err:
                 self.err(err)
                 raise err
             finally:
-                self.send(context)
+                self.send(context, start_time)
             return result
         return wrapped
