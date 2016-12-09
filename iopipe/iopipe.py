@@ -49,7 +49,8 @@ class IOpipe(object):
                     }
                 },
                 'python': {}
-            }
+            },
+            "events": {}
         }
 
         self.report['environment']['os']['linux']['pid'].update({
@@ -231,10 +232,6 @@ class IOpipe(object):
         """
         Add custom data to the report
         """
-        # make sure the namespace exists
-        if 'events' not in self.report:
-            self.report['events'] = {}
-
         if key in self.report['events']:
             # the key exists, merge the data
             if isinstance(self.report['events'][key], list):
@@ -313,6 +310,8 @@ class IOpipe(object):
         finally:
             if self._debug:
                 print(json_report)
+            # Clear events between invocations!
+            self.report['events'] = {}
 
     def decorator(self, fun):
         def wrapped(event, context):
