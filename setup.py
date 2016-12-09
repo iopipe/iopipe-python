@@ -9,9 +9,9 @@ reqs = [str(ir.req) for ir in install_reqs]
 
 setup(name='iopipe',
       version='0.1.5',
-      description='IOpipe Collector for serverless Application Performance Monitoring',
-      author='Eric Windisch',
-      author_email='eric@iopipe.com',
+      description='IOpipe agent for serverless Application Performance Monitoring',
+      author='IOpipe',
+      author_email='support@iopipe.com',
       url='https://github.com/iopipe/iopipe-python',
       packages=['iopipe'],
       install_requires=reqs,
