@@ -1,7 +1,7 @@
 from iopipe.iopipe import IOpipe
 from .MockContext import MockContext
 
-iopipe = IOpipe('test-suite', 'https://metrics-api.iopipe.com', False)
+iopipe = IOpipe('test-suite', 'https://metrics-api.iopipe.com', True)
 context = MockContext('handler', '$LATEST')
 
 
