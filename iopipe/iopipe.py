@@ -234,8 +234,8 @@ class IOpipe(object):
 
         # Add numerical values to report
         if (isinstance(value, int) or
-            isinstance(value, float) or
-            isinstance(value, long)):
+                isinstance(value, float) or
+                isinstance(value, long)):
             event['n'] = value
         else:
             event['s'] = str(value)
