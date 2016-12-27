@@ -49,7 +49,7 @@ class IOpipe(object):
                 },
                 'python': {}
             },
-            "events": {}
+            "custom_metrics": []
         }
 
         self.report['environment']['os']['linux']['pid'].update({
@@ -228,15 +228,18 @@ class IOpipe(object):
         """
         Add custom data to the report
         """
-        if key in self.report['events']:
-            # the key exists, merge the data
-            if isinstance(self.report['events'][key], list):
-                self.report['events'][key].append(value)
-            else:
-                self.report['events'][key] = \
-                    [self.report['events'][key], value]
+        event = {
+            'name': str(key)
+        }
+
+        # Add numerical values to report
+        if (isinstance(value, int) or
+            isinstance(value, float) or
+            isinstance(value, long)):
+            event['n'] = value
         else:
-            self.report['events'][key] = value
+            event['s'] = str(value)
+        self.report['custom_metrics'].append(event)
 
     def err(self, err):
         """
