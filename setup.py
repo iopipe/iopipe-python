@@ -16,11 +16,15 @@ setup(name='iopipe',
       packages=['iopipe'],
       install_requires=reqs,
       setup_requires=[
-          "flake8"
+          'flake8',
+          'pytest-runner'
       ],
       extras_require={
           'dev': [
               'flake8'
           ]
-      }
+      },
+      tests_require=[
+          'pytest'
+      ]
      )
