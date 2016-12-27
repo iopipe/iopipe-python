@@ -87,9 +87,9 @@ If you want to report on multiple functions, you can simply pass the IOpipe obje
 
 If you want to trace exceptions thrown in your case, you can use the `.err(err)` function. This will add the exception to the current report.
 
-### Logging additional data (ALPHA)
+### Custom Metrics
 
-You can add a custom namespace to the data sent upstream to IOpipe using the following syntax;
+You can log custom values in the data sent upstream to IOpipe using the following syntax:
 
 ```python
 from iopipe.iopipe import IOpipe
@@ -97,11 +97,13 @@ iopipe = IOpipe()
 
 @iopipe.decorator
 def handler(event, context):
-  iopipe.log("key", "value")
+  # the name of the metric must be a string
+  # numerical (int, long, float) and string types supported for values
+  iopipe.log("my_metric", 42)
   pass
 ```
 
-This makes it easy to add custom data and telemetry.
+This makes it easy to add custom data and telemetry within your function.
 
 ## Copyright
 
