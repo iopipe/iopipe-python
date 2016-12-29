@@ -4,14 +4,16 @@ import socket
 import sys
 import time
 
+import constants
+
 try:
     import requests
 except:
     from botocore.vendored import requests
 
-TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
-DEFAULT_ENDPOINT_URL = "https://metrics-api.iopipe.com"
-VERSION = "0.1.7"
+TIMESTAMP_FORMAT = constants.TIMESTAMP_FORMAT
+DEFAULT_ENDPOINT_URL = constants.DEFAULT_ENDPOINT_URL
+VERSION = constants.VERSION
 
 
 def get_pid_stat(pid):
