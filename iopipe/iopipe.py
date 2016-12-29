@@ -11,10 +11,6 @@ try:
 except:
     from botocore.vendored import requests
 
-TIMESTAMP_FORMAT = constants.TIMESTAMP_FORMAT
-DEFAULT_ENDPOINT_URL = constants.DEFAULT_ENDPOINT_URL
-VERSION = constants.VERSION
-
 
 def get_pid_stat(pid):
     with open("/proc/%s/stat" % (pid,)) as stat_file:
@@ -31,7 +27,7 @@ def get_pid_stat(pid):
 class IOpipe(object):
     def __init__(self,
                  client_id=None,
-                 url=DEFAULT_ENDPOINT_URL,
+                 url=constants.DEFAULT_ENDPOINT_URL,
                  debug=False):
         self._url = url
         self._debug = debug
@@ -246,7 +242,7 @@ class IOpipe(object):
         """
         err_details = {
             'exception': '{}'.format(err),
-            'time_reported': datetime.datetime.now().strftime(TIMESTAMP_FORMAT)
+            'time_reported': datetime.datetime.now().strftime(constants.TIMESTAMP_FORMAT)
         }
         if 'errors' not in self.report:
             self.report['errors'] = err_details
@@ -278,7 +274,7 @@ class IOpipe(object):
             {
                 'agent': {
                   'runtime': "python",
-                  'version': VERSION
+                  'version': constants.VERSION
                 }
             })
 
