@@ -37,4 +37,4 @@ setup(name='iopipe',
       tests_require=[
           'pytest'
       ]
-     )
+      )
