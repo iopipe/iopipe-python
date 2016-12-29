@@ -11,7 +11,7 @@ except:
 
 TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 DEFAULT_ENDPOINT_URL = "https://metrics-api.iopipe.com"
-VERSION = "0.1.6"
+VERSION = "0.1.7"
 
 
 def get_pid_stat(pid):
