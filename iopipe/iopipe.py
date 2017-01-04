@@ -245,7 +245,8 @@ class IOpipe(object):
         """
         err_details = {
             'exception': '{}'.format(err),
-            'time_reported': datetime.datetime.now().strftime(constants.TIMESTAMP_FORMAT)
+            'time_reported': datetime.datetime.now()
+            .strftime(constants.TIMESTAMP_FORMAT)
         }
         if 'errors' not in self.report:
             self.report['errors'] = err_details
