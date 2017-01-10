@@ -1,0 +1,8 @@
+deploy:
+  provider: pypi
+  user: pselle
+  password:
+    secure: c/hjz6mhbvD7hNCH5igjUIsmH0hd2z+YkEXzMKk4KYk+YKYtFts34cH+amw29IQ3S4NttzvmiAos+CYRG5oVJ642q1jZT4AnGI6m1siNQ/dftxXrManVLI8sQ0cHAM3LDieJeAoAzlffm44XOjznMFZJAuOCcp/rtkGHgLxKvfcesChxy/qMDf0yu8kgyT+nP5EODClfIkKO03WY+atdb9z1605osGP23Qk9ov0vOBj7wdZH461+RfYR/bqyz6qOTMiO06fkMObUjm/sTRMGhHSZB3LxBfn2AydH7xI4R96W1tdo2lvXnuneJAzbR7ltvcWAUAGdZNx2XIoGMu7u+r3KTCL5Jbs6i+hSLpvjnwnR9V3AMbPufvwJUEosKBqVEkmV9Ik5ZXnQ8pdu1ETiM1bUcSlFDi62eu01MPEAOM6GBwQ8mQ08TeaSBp779Wuw0dw1CaoqDkkrgdxgk4aRMt3eIj3yQOis3vE6sxanJbkczJQY8JRF8zubrrX1q+PlG8sUTJJglsr2Z5j0096QuLYlB6VJXLXeUgshfSZwqf1Ij+aZPXgpvOGm5IDJcadthmH1ZUdTn8tlN1E5hUtryCpgyFtien3vpGMPpNuQgxj3RXxx7RdThY605c/tnYJU4if5Wrwvke5CYG6lAiMAA5jmbAiI8wnBMs5mrt+kMwg=
+  on:
+    repo: iopipe/iopipe-python
+    tags: true
