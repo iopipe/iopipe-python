@@ -1,7 +1,7 @@
 #!/bin/sh
 
 echo "Installing Apex"
-wget https://github.com/apex/apex/releases/download/v0.11.0/apex_linux_amd64 -P /usr/local/bin/apex
+wget https://github.com/apex/apex/releases/download/v0.11.0/apex_linux_amd64 -P apex
 ls
 ls /usr/local/bin/apex
 
