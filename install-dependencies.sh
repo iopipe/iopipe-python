@@ -2,8 +2,8 @@
 
 echo "Installing Apex"
 wget https://github.com/apex/apex/releases/download/v0.11.0/apex_linux_amd64 -P apex
+chmod +x apex
 ls
-ls /usr/local/bin/apex
 
 for func in $(ls functions); do
   if [ -f functions/${func}/package.json ]; then
