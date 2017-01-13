@@ -26,3 +26,7 @@ deployment:
     branch: master
     commands:
       - bash install-dependencies.sh
+
+test:
+  override:
+    - echo "No tests as yet"
