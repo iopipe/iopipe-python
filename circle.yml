@@ -18,6 +18,7 @@ dependencies:
       if [[ ! -e ~/.yarn/bin/yarn ]]; then
         echo "Download and install Apex."
         curl -sL https://github.com/apex/apex/releases/download/v0.12.0/apex_linux_amd64 > $HOME/.apex/apex
+        chmod +x ~/.apex/apex
       else
         echo "Apex is installed."
       fi
