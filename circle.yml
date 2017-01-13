@@ -4,7 +4,7 @@ machine:
     - mkdir -p ~/.apex
   environment:
     YARN_VERSION: 0.17.8
-    PATH: "${PATH}:${HOME}/.yarn/bin:${HOME}/.apex/bin"
+    PATH: "${PATH}:${HOME}/.yarn/bin:${HOME}/.apex"
 
 dependencies:
   pre:
