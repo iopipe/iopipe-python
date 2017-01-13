@@ -15,12 +15,11 @@ dependencies:
       else
         echo "The correct version of Yarn is already installed."
       fi
-      if [[ ! -e ~/.yarn/bin/yarn ]]; then
+      if [[ ! -e ~/.apex/apex ]]; then
         echo "Download and install Apex."
         curl -sL https://github.com/apex/apex/releases/download/v0.12.0/apex_linux_amd64 > $HOME/.apex/apex
         chmod +x ~/.apex/apex
       else
-        chmod +x ~/.apex/apex
         echo "Apex is installed."
       fi
   cache_directories:
