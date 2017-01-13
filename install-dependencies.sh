@@ -1,16 +1,5 @@
 #!/bin/sh
 
-echo "Installing Apex"
-mkdir bin
-wget https://github.com/apex/apex/releases/download/v0.11.0/apex_linux_amd64 -P bin/apex
-chmod +x bin/apex
-echo "installed apex"
-ls -la
-echo $PATH
-export PATH="${PATH}:${HOME}/bin/"
-echo $PATH
-
-
 for func in $(ls functions); do
   if [ -f functions/${func}/package.json ]; then
     cd functions/${func}/

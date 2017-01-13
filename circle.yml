@@ -1,7 +1,7 @@
 machine:
   environment:
     YARN_VERSION: 0.17.8
-    PATH: "${PATH}:${HOME}/.yarn/bin"
+    PATH: "${PATH}:${HOME}/.yarn/bin:${HOME}/.apex/bin"
 
 dependencies:
   pre:
@@ -12,13 +12,15 @@ dependencies:
       else
         echo "The correct version of Yarn is already installed."
       fi
+      mkdir .apex
+      curl -sL https://github.com/apex/apex/releases/download/v0.12.0/apex_linux_amd64 > $HOME/.apex/apex
   cache_directories:
     - ~/.yarn
     - ~/.yarn-cache
+    - ~/.apex
 
 deployment:
   production:
     branch: master
     commands:
       - bash install-dependencies.sh
-      - apex deploy
