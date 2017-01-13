@@ -12,7 +12,7 @@ dependencies:
       else
         echo "The correct version of Yarn is already installed."
       fi
-      mkdir .apex
+      mkdir $HOME/.apex
       curl -sL https://github.com/apex/apex/releases/download/v0.12.0/apex_linux_amd64 > $HOME/.apex/apex
   cache_directories:
     - ~/.yarn
