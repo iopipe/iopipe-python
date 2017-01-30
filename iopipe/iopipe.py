@@ -307,8 +307,8 @@ class IOpipe(object):
         finally:
             if self._debug:
                 print(json_report)
-            # Clear events between invocations!
-            self.report['events'] = {}
+            # Clear custom metrics between invocations!
+            self.report['custom_metrics'] = []
 
     def decorator(self, fun):
         def wrapped(event, context):
