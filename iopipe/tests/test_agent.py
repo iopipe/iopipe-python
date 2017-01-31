@@ -28,7 +28,8 @@ def test_function_name_from_context():
     assert iopipe.report['aws']['functionName'] == 'handler'
 
 
-def test_reporting_custom_metrics():
+def test_custom_metrics():
     handlerWithEvents(None, context)
-    assert len(iopipe.report['custom_metrics']) == 2
-    assert iopipe.report['custom_metrics'][0]['name'] == 'somekey'
+    # custom metrics are cleared after an invocations
+    # TODO modify reporting scheme so we can inspect metrics
+    assert len(iopipe.report['custom_metrics']) == 0
