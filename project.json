@@ -5,5 +5,6 @@
   "memory": 128,
   "timeout": 5,
   "role": "arn:aws:iam::554407330061:role/qa-events_lambda_function",
+  "runtime": "nodejs4.3",
   "environment": {}
 }
