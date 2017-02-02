@@ -8,5 +8,5 @@ deployment:
     tag: /v[0-9]+(\.[0-9]+)*/
     owner: iopipe
     commands:
-      - python setup.py bdist
+      - python setup.py sdist
       - twine upload dist/* -u $PYPI_USERNAME -p "$PYPI_PASSWORD"
