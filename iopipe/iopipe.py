@@ -2,7 +2,6 @@ import datetime
 import json
 import platform
 import socket
-import sys
 import time
 
 import constants
@@ -169,7 +168,8 @@ class IOpipe(object):
         """
         Add the python sys attributes relevant to AWS Lambda execution
         """
-        self.report['environment']['python']['version'] = platform.python_version()
+        self.report['environment']['python']['version'] = \
+            platform.python_version()
 
     def log(self, key, value):
         """
