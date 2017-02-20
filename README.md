@@ -62,29 +62,34 @@ The following may be set as kwargs to the IOpipe class initializer:
 ## Advanced Usage
 
 Instantiate an ```iopipe.IOpipe``` object inside of your function, then
-call .err(Exception) and .send() as necessary.
+call .err(Exception) and .send() to report data and exceptions.
+
+We recommend using our handy decorator instead.
 
 ```python
-import iopipe.iopipe
+from iopipe.iopipe import IOpipe
 
 def handler(event, context):
-  report = iopipe.IOpipe(CLIENT_ID, context)
-  pass
+  iopipe = IOpipe(CLIENT_ID)
+  timestamp = time.time()
+
+  try:
+    # do some things
+  except e:
+    iopipe.err(e)
+
+  iopipe.send(context, timestamp)
 ```
 
 If you want to report on multiple functions, you can simply pass the IOpipe object from function to function.
-
-### Explicitly Sending Data
-
-When the IOpipe object is destroyed, it will send the data upstream. You can explicitly send the data upstream by calling the `.send()` method of the object. Provide the AWS Lambda context as a parameter to `.send()`, to report AWS Lambda specific metrics.
 
 ### Reporting Exceptions
 
 If you want to trace exceptions thrown in your case, you can use the `.err(err)` function. This will add the exception to the current report.
 
-### Logging additional data (ALPHA)
+### Custom Metrics
 
-You can add a custom namespace to the data sent upstream to IOpipe using the following syntax;
+You can log custom values in the data sent upstream to IOpipe using the following syntax:
 
 ```python
 from iopipe.iopipe import IOpipe
@@ -92,11 +97,13 @@ iopipe = IOpipe()
 
 @iopipe.decorator
 def handler(event, context):
-  iopipe.log("key", "value")
+  # the name of the metric must be a string
+  # numerical (int, long, float) and string types supported for values
+  iopipe.log("my_metric", 42)
   pass
 ```
 
-This makes it easy to add custom data and telemetry.
+This makes it easy to add custom data and telemetry within your function.
 
 ## Copyright
 

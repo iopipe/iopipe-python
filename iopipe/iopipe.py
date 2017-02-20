@@ -4,16 +4,16 @@ import socket
 import sys
 import time
 
+import constants
+
 try:
     import requests
 except:
     from botocore.vendored import requests
 
-TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
-DEFAULT_ENDPOINT_URL = "https://metrics-api.iopipe.com"
+
 MODULE_LOAD_TIME = time.time() * 1000
 COLDSTART = True
-VERSION = "0.1.5"
 
 
 def get_pid_stat(pid):
@@ -31,11 +31,10 @@ def get_pid_stat(pid):
 class IOpipe(object):
     def __init__(self,
                  client_id=None,
-                 url=DEFAULT_ENDPOINT_URL,
+                 url=constants.DEFAULT_ENDPOINT_URL,
                  debug=False):
         self._url = url
         self._debug = debug
-        self._time_start = time.time()
         self.client_id = client_id
         self.report = {
             'client_id': self.client_id,
@@ -52,7 +51,7 @@ class IOpipe(object):
                 },
                 'python': {}
             },
-            "events": {}
+            "custom_metrics": []
         }
 
         self.report['environment']['os']['linux']['pid'].update({
@@ -231,15 +230,18 @@ class IOpipe(object):
         """
         Add custom data to the report
         """
-        if key in self.report['events']:
-            # the key exists, merge the data
-            if isinstance(self.report['events'][key], list):
-                self.report['events'][key].append(value)
-            else:
-                self.report['events'][key] = \
-                    [self.report['events'][key], value]
+        event = {
+            'name': str(key)
+        }
+
+        # Add numerical values to report
+        if (isinstance(value, int) or
+                isinstance(value, float) or
+                isinstance(value, long)):
+            event['n'] = value
         else:
-            self.report['events'][key] = value
+            event['s'] = str(value)
+        self.report['custom_metrics'].append(event)
 
     def err(self, err):
         """
@@ -247,7 +249,8 @@ class IOpipe(object):
         """
         err_details = {
             'exception': '{}'.format(err),
-            'time_reported': datetime.datetime.now().strftime(TIMESTAMP_FORMAT)
+            'time_reported': datetime.datetime.now()
+            .strftime(constants.TIMESTAMP_FORMAT)
         }
         if 'errors' not in self.report:
             self.report['errors'] = err_details
@@ -259,7 +262,7 @@ class IOpipe(object):
         # add the full local python data as well
         self._add_python_local_data(get_all=True)
 
-    def send(self, context=None):
+    def send(self, context=None, time_start=None):
         """
         Send the current report to IOpipe
         """
@@ -268,18 +271,18 @@ class IOpipe(object):
         self._add_pid_data('self')
 
         # Duration of execution.
-        duration = time.time() - self._time_start
-        self.report['duration'] = \
-            int(duration * 1000000000)
-        self.report['time_sec'] = int(duration)
-        self.report['time_nanosec'] = \
-            int((duration - int(duration)) * 1000000000)
+        duration = time.time() - (time_start or time.time())
+        self.report.update({
+            'duration': int(duration * 1000000000),
+            'time_sec': int(duration),
+            'time_nanosec': int((duration - int(duration)) * 1000000000)
+        })
 
         self.report['environment'].update(
             {
                 'agent': {
                   'runtime': "python",
-                  'version': VERSION,
+                  'version': constants.VERSION
                   'load_time': MODULE_LOAD_TIME
                 },
                 'coldstart': COLDSTART
@@ -313,18 +316,19 @@ class IOpipe(object):
         finally:
             if self._debug:
                 print(json_report)
-            # Clear events between invocations!
-            self.report['events'] = {}
+            # Clear custom metrics between invocations!
+            self.report['custom_metrics'] = []
 
     def decorator(self, fun):
         def wrapped(event, context):
             err = None
+            start_time = time.time()
             try:
                 result = fun(event, context)
             except Exception as err:
                 self.err(err)
                 raise err
             finally:
-                self.send(context)
+                self.send(context, start_time)
             return result
         return wrapped
