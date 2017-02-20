@@ -266,6 +266,7 @@ class IOpipe(object):
         """
         Send the current report to IOpipe
         """
+        global COLDSTART
         json_report = None
 
         self._add_pid_data('self')
