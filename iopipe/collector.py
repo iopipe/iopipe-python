@@ -1,0 +1,9 @@
+def get_collector_url(region='us-east-1'):
+    return {
+        'ap-southeast-2': 'https://metrics-api.ap-southeast-2.iopipe.com',
+        'eu-west-1': 'https://metrics-api.eu-west-1.iopipe.com',
+        'us-east-2': 'https://metrics-api.us-east-2.iopipe.com',
+        'us-west-1': 'https://metrics-api.us-west-1.iopipe.com',
+        'us-west-2': 'https://metrics-api.us-west-2.iopipe.com',
+        'us-east-1': 'https://metrics-api.iopipe.com'
+    }.get(region, 'https://metrics-api.iopipe.com')
