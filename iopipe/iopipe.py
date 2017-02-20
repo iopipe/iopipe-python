@@ -3,8 +3,10 @@ import json
 import socket
 import sys
 import time
+import os
 
 import constants
+from collector import get_collector_url
 
 try:
     import requests
@@ -27,7 +29,7 @@ def get_pid_stat(pid):
 class IOpipe(object):
     def __init__(self,
                  client_id=None,
-                 url=constants.DEFAULT_ENDPOINT_URL,
+                 url=get_collector_url(os.getenv('AWS_REGION')),
                  debug=False):
         self._url = url
         self._debug = debug
