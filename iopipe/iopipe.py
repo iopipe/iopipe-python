@@ -282,7 +282,7 @@ class IOpipe(object):
             {
                 'agent': {
                   'runtime': "python",
-                  'version': constants.VERSION
+                  'version': constants.VERSION,
                   'load_time': MODULE_LOAD_TIME
                 },
                 'coldstart': COLDSTART
