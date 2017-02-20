@@ -1,7 +1,7 @@
 import datetime
 import json
+import platform
 import socket
-import sys
 import time
 import os
 
@@ -166,63 +166,12 @@ class IOpipe(object):
                 self.report['environment']['os']['linux']['mem']['MemFree']
         })
 
-    def _add_python_local_data(self, get_all=False):
+    def _add_python_local_data(self):
         """
         Add the python sys attributes relevant to AWS Lambda execution
         """
-        sys_attr = {}
-        if get_all:  # full set of data
-            sys_attr = {
-                # lower_ case to align with python standards
-                'argv': 'argv',
-                'byte_order': 'byteorder',
-                'builtin_module_names': 'builtin_module_names',
-                'executable': 'executable',
-                'flags': 'flags',
-                'float_info': 'float_info',
-                'float_repr_style': 'float_repr_style',
-                'hex_version': 'hexversion',
-                'long_info': 'long_info',
-                'max_int': 'maxint',
-                'max_size': 'maxsize',
-                'max_unicode': 'maxunicode',
-                'meta_path': 'meta_path',
-                'path': 'path',
-                'platform': 'platform',
-                'prefix': 'prefix',
-                'traceback_limit': 'tracebacklimit',
-                'version': 'version',
-                'api_version': 'api_version',
-                'version_info': 'version_info',
-            }
-        else:  # reduced set of data for common cases
-            sys_attr = {
-                # lower_ case to align with python standards
-                'argv': 'argv',
-                'path': 'path',
-                'platform': 'platform',
-                'version': 'version',
-                'api_version': 'api_version',
-            }
-
-        # get the sys attributes first
-        for k, v in sys_attr.items():
-            if v in dir(sys):
-                self.report['environment']['python']["sys_"+k] = \
-                    "{}".format(getattr(sys, v))
-
-        # now the sys functions
-        if get_all:
-            for k, v in {
-                # lower_ case to align with python standards
-                'check_interval': 'getcheckinterval',
-                'default_encoding': 'getdefaultencoding',
-                'dl_open_flags': 'getdlopenflags',
-                'file_system_encoding': 'getfilesystemencoding',
-            }.items():
-                if v in dir(sys):
-                    self.report['environment']['python']['sys_'+k] = \
-                        "{}".format(getattr(sys, v)())
+        self.report['environment']['python']['version'] = \
+            platform.python_version()
 
     def log(self, key, value):
         """
@@ -257,8 +206,7 @@ class IOpipe(object):
         else:
             self.report['errors'].append(err_details)
 
-        # add the full local python data as well
-        self._add_python_local_data(get_all=True)
+        self._add_python_local_data()
 
     def send(self, context=None, time_start=None):
         """
