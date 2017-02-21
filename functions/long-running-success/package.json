@@ -1,5 +1,5 @@
 {
   "dependencies": {
-    "iopipe": "0.1.2"
+    "iopipe": "^0.2.0"
   }
 }
