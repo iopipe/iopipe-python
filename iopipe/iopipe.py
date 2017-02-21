@@ -14,6 +14,10 @@ except:
     from botocore.vendored import requests
 
 
+MODULE_LOAD_TIME = time.time() * 1000
+COLDSTART = True
+
+
 def get_pid_stat(pid):
     with open("/proc/%s/stat" % (pid,)) as stat_file:
         stat = stat_file.readline().split(" ")
@@ -212,6 +216,7 @@ class IOpipe(object):
         """
         Send the current report to IOpipe
         """
+        global COLDSTART
         json_report = None
 
         self._add_pid_data('self')
@@ -228,9 +233,14 @@ class IOpipe(object):
             {
                 'agent': {
                   'runtime': "python",
-                  'version': constants.VERSION
-                }
+                  'version': constants.VERSION,
+                  'load_time': MODULE_LOAD_TIME
+                },
+                'coldstart': COLDSTART
             })
+
+        if COLDSTART:
+            COLDSTART = False
 
         if context:
             self._add_aws_lambda_data(context)
