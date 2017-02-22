@@ -288,7 +288,7 @@ class IOpipe(object):
         self._add_os_host_data()
 
         try:
-            json_report = json.dumps(self.report, indent=2)
+            json_report = json.dumps(self.report)
         except Exception as err:
             print("Could not convert the report to JSON."
                   "Threw exception: {}".format(err))
