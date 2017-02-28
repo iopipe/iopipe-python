@@ -226,8 +226,12 @@ class IOpipe(object):
         self.report.update({
             'duration': int(duration * 1000000000),
             'time_sec': int(duration),
-            'time_nanosec': int((duration - int(duration)) * 1000000000)
+            'time_nanosec': int((duration - int(duration)) * 1000000000),
+            'coldstart': COLDSTART
         })
+
+        if COLDSTART:
+            COLDSTART = False
 
         self.report['environment'].update(
             {
@@ -235,12 +239,8 @@ class IOpipe(object):
                   'runtime': "python",
                   'version': constants.VERSION,
                   'load_time': MODULE_LOAD_TIME
-                },
-                'coldstart': COLDSTART
+                }
             })
-
-        if COLDSTART:
-            COLDSTART = False
 
         if context:
             self._add_aws_lambda_data(context)
