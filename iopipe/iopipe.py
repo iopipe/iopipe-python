@@ -4,6 +4,7 @@ import platform
 import socket
 import time
 import os
+import traceback
 
 import constants
 from collector import get_collector_url
@@ -199,7 +200,9 @@ class IOpipe(object):
         Add the details of an error to the report
         """
         err_details = {
-            'exception': '{}'.format(err),
+            'name': type(err).__name__,
+            'message': '{}'.format(err),
+            'stack': traceback.format_exc(),
             'time_reported': datetime.datetime.now()
             .strftime(constants.TIMESTAMP_FORMAT)
         }

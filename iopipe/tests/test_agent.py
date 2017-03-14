@@ -16,6 +16,11 @@ def handlerWithEvents(event, context):
     iopipe.log('anotherkey', 'qualitative value')
 
 
+@iopipe.decorator
+def handlerThatErrors(event, context):
+    raise ValueError("Behold, a value error")
+
+
 def setup_function():
     handler(None, context)
 
@@ -33,3 +38,12 @@ def test_custom_metrics():
     # custom metrics are cleared after an invocations
     # TODO modify reporting scheme so we can inspect metrics
     assert len(iopipe.report['custom_metrics']) == 0
+
+
+def test_erroring():
+    try:
+        handlerThatErrors(None, context)
+    except:
+        pass
+    assert iopipe.report['errors']['name'] == 'ValueError'
+    assert iopipe.report['errors']['message'] == 'Behold, a value error'
