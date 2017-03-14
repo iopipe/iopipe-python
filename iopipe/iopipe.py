@@ -43,8 +43,8 @@ class IOpipe(object):
             'environment': {
                 'host': {},
                 'os': {
+                    'cpus': [],
                     'linux': {
-                        'cpu': {},
                         'mem': {},
                         'pid': {
                             'self': {}
@@ -125,16 +125,19 @@ class IOpipe(object):
                 cpu_stat = line.split(" ")
                 if cpu_stat[0][:3] != "cpu":
                     break
-                self.report['environment']['os']['linux']['cpu'][cpu_stat[0]] \
-                    = {
+                # First cpu line is aggregation of following lines, skip it
+                if len(cpu_stat[0]) == 3:
+                    continue
+                self.report['environment']['os']['cpus'].append({
+                    'name': cpu_stat[0],
+                    'times': {
                         'user': cpu_stat[1],
                         'nice': cpu_stat[2],
-                        'system': cpu_stat[3],
+                        'sys': cpu_stat[3],
                         'idle': cpu_stat[4],
-                        'iowait': cpu_stat[5],
-                        'irq': cpu_stat[6],
-                        'softirq': cpu_stat[7]
-                }
+                        'irq': cpu_stat[6]
+                    }
+                })
 
         with open("/proc/uptime") as uptime_file:
             utf = uptime_file.readline().split(" ")
