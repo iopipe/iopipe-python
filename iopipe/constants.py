@@ -1,2 +1,2 @@
 TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
-VERSION = "0.3.1"
+VERSION = "0.4.0"
