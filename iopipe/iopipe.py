@@ -211,10 +211,6 @@ class IOpipe(object):
         }
         if 'errors' not in self.report:
             self.report['errors'] = err_details
-        elif not isinstance(self.report['errors'], list):
-            self.report['errors'] = [self.report['errors']]
-        else:
-            self.report['errors'].append(err_details)
 
         self._add_python_local_data()
 
@@ -273,8 +269,10 @@ class IOpipe(object):
         finally:
             if self._debug:
                 print(json_report)
-            # Clear custom metrics between invocations!
+            # Clear custom metrics & error data between invocations!
             self.report['custom_metrics'] = []
+            if 'errors' in self.report:
+                del self.report['errors']
 
     def decorator(self, fun):
         def wrapped(event, context):
