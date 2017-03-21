@@ -17,6 +17,7 @@ except:
 
 MODULE_LOAD_TIME = time.time() * 1000
 COLDSTART = True
+REQUESTS_SESSION = requests.Session()
 
 
 def get_pid_stat(pid):
@@ -258,7 +259,7 @@ class IOpipe(object):
             return
 
         try:
-            response = requests.post(
+            response = REQUESTS_SESSION.post(
                 self._url + '/v0/event',
                 data=json_report,
                 headers={"Content-Type": "application/json"})
