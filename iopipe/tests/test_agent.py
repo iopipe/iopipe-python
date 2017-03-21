@@ -26,24 +26,22 @@ def setup_function():
 
 
 def test_client_id_is_configured():
-    assert iopipe.report['client_id'] == 'test-suite'
+    assert iopipe.report.client_id == 'test-suite'
 
 
 def test_function_name_from_context():
-    assert iopipe.report['aws']['functionName'] == 'handler'
+    assert iopipe.report.aws['functionName'] == 'handler'
 
 
 def test_custom_metrics():
     handlerWithEvents(None, context)
-    # custom metrics are cleared after an invocations
-    # TODO modify reporting scheme so we can inspect metrics
-    assert len(iopipe.report['custom_metrics']) == 0
+    assert len(iopipe.report.custom_metrics) == 2
 
-# TODO: update report so report can be inpected (same note as custom metrics)
-# def test_erroring():
-#     try:
-#         handlerThatErrors(None, context)
-#     except:
-#         pass
-#     assert iopipe.report['errors']['name'] == 'ValueError'
-#     assert iopipe.report['errors']['message'] == 'Behold, a value error'
+
+def test_erroring():
+    try:
+        handlerThatErrors(None, context)
+    except:
+        pass
+    assert iopipe.report.errors['name'] == 'ValueError'
+    assert iopipe.report.errors['message'] == 'Behold, a value error'
