@@ -1,5 +1,8 @@
 from iopipe.iopipe import IOpipe
 from .MockContext import MockContext
+import time
+global advancedUsage
+global advancedUsageErr
 
 iopipe = IOpipe('test-suite', 'https://metrics-api.iopipe.com', True)
 context = MockContext('handler', '$LATEST')
@@ -46,10 +49,8 @@ def test_erroring():
     assert iopipe.report.errors['name'] == 'ValueError'
     assert iopipe.report.errors['message'] == 'Behold, a value error'
 
-# Advanced reporting
 
-global advancedUsage
-import time
+# Advanced reporting
 def advancedHandler(event, context):
     # make reference for testing
     global advancedUsage
@@ -59,16 +60,17 @@ def advancedHandler(event, context):
     iopipe.start_report(timestamp, context)
     try:
         pass
-    except:
+    except Exception as e:
         iopipe.err(e)
     iopipe.send()
+
 
 def test_advanced_reporting():
     new_context = MockContext('advancedHandler', '1')
     advancedHandler(None, new_context)
     assert(advancedUsage.report.aws['functionName']) == 'advancedHandler'
 
-global advancedUsageErr
+
 def advancedHandlerWithErr(event, context):
     global advancedUsageErr
     iopipe = IOpipe('test-suite2')
@@ -81,6 +83,7 @@ def advancedHandlerWithErr(event, context):
     except Exception as e:
         iopipe.err(e)
     iopipe.send()
+
 
 def test_advanced_erroring():
     try:
