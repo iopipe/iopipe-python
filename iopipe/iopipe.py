@@ -37,6 +37,20 @@ class IOpipe(object):
         self._debug = debug
         self.client_id = client_id
 
+    def start_report(self, start_time, context):
+        """
+        Used in advanced usage to manually set the report start_report
+        """
+        global COLDSTART
+        self.report = Report(self.client_id, get_pid_stat('self'), MODULE_LOAD_TIME)
+        try:
+            self.report.update_data(context, COLDSTART, start_time)
+            COLDSTART = False
+        except Exception as err:
+            self.report.retain_err(err)
+            self.send()
+            raise err
+
     def log(self, key, value):
         """
         Add custom data to the report
@@ -54,14 +68,19 @@ class IOpipe(object):
             event['s'] = str(value)
         self.report.custom_metrics.append(event)
 
-    def send(self, report, time_start=None):
+    def err(self, err):
+        self.report.retain_err(err)
+        self.send()
+        raise err
+
+    def send(self):
         """
         Send the current report to IOpipe
         """
         json_report = None
 
         try:
-            json_report = json.dumps(report, default=lambda o: o.__dict__)
+            json_report = json.dumps(self.report, default=lambda o: o.__dict__)
         except Exception as err:
             print("Could not convert the report to JSON. "
                   "Threw exception: {}".format(err))
@@ -83,23 +102,16 @@ class IOpipe(object):
 
     def decorator(self, fun):
         def wrapped(event, context):
-            global COLDSTART
             err = None
             start_time = time.time()
-            invocation_report = Report(self.client_id,
-                                       get_pid_stat('self'),
-                                       MODULE_LOAD_TIME)
-            self.report = invocation_report
-            self.start_time = start_time
+            self.start_report(start_time, context)
             try:
                 result = fun(event, context)
-                invocation_report.update_data(context, COLDSTART, start_time)
-                COLDSTART = False
             except Exception as err:
-                invocation_report.retain_err(err)
-                self.send(self.report, self.start_time)
+                self.report.retain_err(err)
+                self.send()
                 raise err
             finally:
-                self.send(invocation_report, start_time)
+                self.send()
             return result
         return wrapped

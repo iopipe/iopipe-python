@@ -56,12 +56,11 @@ def handler(event, context):
 The following may be set as kwargs to the IOpipe class initializer:
 
 - client_id: your client_id (register at [www.iopipe.com](https://www.iopipe.com)
-- debug: enable debug logging.
-- url: custom URL for reporting metrics
+- debug: enable debug logging by setting this to `True`
 
 ## Advanced Usage
 
-Instantiate an ```iopipe.IOpipe``` object inside of your function, then
+Instantiate an `iopipe.IOpipe` object inside of your function, then
 call .err(Exception) and .send() to report data and exceptions.
 
 We recommend using our handy decorator instead.
@@ -72,13 +71,14 @@ from iopipe.iopipe import IOpipe
 def handler(event, context):
   iopipe = IOpipe(CLIENT_ID)
   timestamp = time.time()
+  iopipe.start_report(timestamp, context)
 
   try:
     # do some things
-  except e:
+  except Exception as e:
     iopipe.err(e)
 
-  iopipe.send(context, timestamp)
+  iopipe.send()
 ```
 
 If you want to report on multiple functions, you can simply pass the IOpipe object from function to function.
@@ -109,4 +109,4 @@ This makes it easy to add custom data and telemetry within your function.
 
 Provided under the Apache-2.0 license. See LICENSE for details.
 
-Copyright 2016, IOpipe, Inc.
+Copyright 2017, IOpipe, Inc.

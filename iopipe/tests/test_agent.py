@@ -45,3 +45,47 @@ def test_erroring():
         pass
     assert iopipe.report.errors['name'] == 'ValueError'
     assert iopipe.report.errors['message'] == 'Behold, a value error'
+
+# Advanced reporting
+
+global advancedUsage
+import time
+def advancedHandler(event, context):
+    # make reference for testing
+    global advancedUsage
+    iopipe = IOpipe('test-suite')
+    advancedUsage = iopipe
+    timestamp = time.time()
+    iopipe.start_report(timestamp, context)
+    try:
+        pass
+    except:
+        iopipe.err(e)
+    iopipe.send()
+
+def test_advanced_reporting():
+    new_context = MockContext('advancedHandler', '1')
+    advancedHandler(None, new_context)
+    assert(advancedUsage.report.aws['functionName']) == 'advancedHandler'
+
+global advancedUsageErr
+def advancedHandlerWithErr(event, context):
+    global advancedUsageErr
+    iopipe = IOpipe('test-suite2')
+    advancedUsageErr = iopipe
+    timestamp = time.time()
+    iopipe.start_report(timestamp, context)
+    iopipe.log('name', 'foo')
+    try:
+        raise TypeError('Type error raised!')
+    except Exception as e:
+        iopipe.err(e)
+    iopipe.send()
+
+def test_advanced_erroring():
+    try:
+        advancedHandlerWithErr(None, context)
+    except:
+        pass
+    assert advancedUsageErr.report.errors['name'] == 'TypeError'
+    assert advancedUsageErr.report.errors['message'] == 'Type error raised!'
