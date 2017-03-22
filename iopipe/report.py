@@ -19,7 +19,9 @@ def get_pid_stat(pid):
 
 
 class Report(object):
-    """docstring for ."""
+    """
+    The report of system status
+    """
     def __init__(self, client_id, stat_start, load_time):
         self.client_id = client_id
         self.environment = {
