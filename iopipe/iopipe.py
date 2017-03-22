@@ -42,7 +42,9 @@ class IOpipe(object):
         Used in advanced usage to manually set the report start_report
         """
         global COLDSTART
-        self.report = Report(self.client_id, get_pid_stat('self'), MODULE_LOAD_TIME)
+        self.report = Report(self.client_id,
+                             get_pid_stat('self'),
+                             MODULE_LOAD_TIME)
         try:
             self.report.update_data(context, COLDSTART, start_time)
             COLDSTART = False
