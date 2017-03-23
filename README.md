@@ -109,4 +109,4 @@ This makes it easy to add custom data and telemetry within your function.
 
 Provided under the Apache-2.0 license. See LICENSE for details.
 
-Copyright 2017, IOpipe, Inc.
+Copyright 2016-2017, IOpipe, Inc.
