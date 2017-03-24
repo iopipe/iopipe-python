@@ -26,6 +26,7 @@ deployment:
     commands:
       - bash install-dependencies.sh
       - apex deploy
+      - npm run funcDependencies
       - npm run deploy
 
 test:

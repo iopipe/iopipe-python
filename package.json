@@ -7,6 +7,7 @@
   },
   "scripts": {
     "test": "echo \"No test specified\"",
+    "funcDependencies": "cd nodejs && npm install",
     "deploy": "serverless deploy"
   },
   "repository": {
