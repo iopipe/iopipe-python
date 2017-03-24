@@ -29,7 +29,7 @@ functions:
     events:
       - schedule: rate(5 minutes)
   customEvents:
-    handler: nodejs/handler.simpleFailure
+    handler: nodejs/handler.customEvents
     events:
       - schedule: rate(1 minute)
   thrownFailure:
