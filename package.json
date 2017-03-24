@@ -1,0 +1,17 @@
+{
+  "name": "qa-events",
+  "version": "1.0.0",
+  "description": "QA/Demo events",
+  "dependencies": {
+    "serverless": "^1.9.0"
+  },
+  "scripts": {
+    "test": "echo \"No test specified\"",
+    "deploy": "serverless deploy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iopipe/qa-events.git"
+  },
+  "author": "IOpipe"
+}

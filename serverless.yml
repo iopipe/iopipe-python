@@ -1,0 +1,38 @@
+service: qa-events
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  stage: prod
+  region: us-east-1
+
+functions:
+  simpleSuccess:
+    handler: nodejs/handler.simpleSuccess
+    events:
+      - schedule: rate(1 minute)
+  node43SimpleSuccess:
+    handler: nodejs/handler.simpleSuccess
+    runtime: nodejs4.3
+    events:
+      - schedule: rate(5 minutes)
+  simpleFailure:
+    handler: nodejs/handler.simpleFailure
+    events:
+      - schedule: rate(1 minute)
+  randomSuccessError:
+    handler: nodejs/handler.randomSuccessError
+    events:
+      - schedule: rate(2 minutes)
+  longRunningSuccess:
+    handler: nodejs/handler.longRunningSuccess
+    events:
+      - schedule: rate(5 minutes)
+  customEvents:
+    handler: nodejs/handler.simpleFailure
+    events:
+      - schedule: rate(1 minute)
+  thrownFailure:
+    handler: nodejs/handler.thrownFailure
+    events:
+      - schedule: rate(5 minutes)
