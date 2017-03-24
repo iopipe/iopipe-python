@@ -7,7 +7,9 @@
   },
   "scripts": {
     "test": "echo \"No test specified\"",
-    "funcDependencies": "cd nodejs && npm install",
+    "installNodeDeps": "cd nodejs && npm install",
+    "installPythonDeps": "pip install -r requirements.txt -t .",
+    "installDeps": "npm run installNodeDeps && npm run installPythonDeps",
     "deploy": "serverless deploy"
   },
   "repository": {

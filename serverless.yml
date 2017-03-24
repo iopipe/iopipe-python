@@ -36,3 +36,18 @@ functions:
     handler: nodejs/handler.thrownFailure
     events:
       - schedule: rate(5 minutes)
+  pySimpleSuccess:
+    handler: python/main.simpleSuccess
+    runtime: python2.7
+    events:
+      - schedule: rate(1 minute)
+  pyForcedFailure:
+    handler: python/main.forcedFailure
+    runtime: python2.7
+    events:
+      - schedule: rate(1 minute)
+  pyLongRunning:
+    handler: python/main.longRunning
+    runtime: python2.7
+    events:
+      - schedule: rate(5 minutes)

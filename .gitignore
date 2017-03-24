@@ -4,3 +4,9 @@ jspm_packages
 
 # Serverless directories
 .serverless
+
+# Python
+env
+# Python dependencies
+iopipe*
+requests*

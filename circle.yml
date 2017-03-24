@@ -1,32 +1,18 @@
 machine:
-  pre:
-    - mkdir -p ~/.apex
   environment:
-    PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin:${HOME}/.apex"
+    PATH: "${PATH}:${HOME}/${CIRCLE_PROJECT_REPONAME}/node_modules/.bin"
 
 dependencies:
   cache_directories:
     - ~/.cache/yarn
-    - ~/.apex
   override:
     - yarn
-  pre:
-    - |
-      if [[ ! -e ~/.apex/apex ]]; then
-        echo "Download and install Apex."
-        curl -sL https://github.com/apex/apex/releases/download/v0.12.0/apex_linux_amd64 > $HOME/.apex/apex
-        chmod +x ~/.apex/apex
-      else
-        echo "Apex is installed."
-      fi
 
 deployment:
   production:
     branch: master
     commands:
-      - bash install-dependencies.sh
-      - apex deploy
-      - npm run funcDependencies
+      - npm run installDeps
       - npm run deploy
 
 test:
