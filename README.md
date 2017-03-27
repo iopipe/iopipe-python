@@ -72,14 +72,14 @@ from iopipe.iopipe import IOpipe
 def handler(event, context):
   iopipe = IOpipe(CLIENT_ID)
   timestamp = time.time()
-  iopipe.start_report(timestamp, context)
+  report = iopipe.create_report(timestamp, context)
 
   try:
     # do some things
   except Exception as e:
     iopipe.err(e)
 
-  iopipe.send()
+  report.send()
 ```
 
 If you want to report on multiple functions, you can simply pass the IOpipe object from function to function.
