@@ -1,19 +1,8 @@
-import json
 import time
 import os
 
 from report import Report
 from collector import get_collector_url
-
-try:
-    import requests
-except:
-    from botocore.vendored import requests
-
-
-MODULE_LOAD_TIME = time.time() * 1000
-COLDSTART = True
-REQUESTS_SESSION = requests.Session()
 
 
 def get_pid_stat(pid):
@@ -33,21 +22,21 @@ class IOpipe(object):
                  client_id=None,
                  url=get_collector_url(os.getenv('AWS_REGION')),
                  debug=False):
-        self._url = url
-        self._debug = debug
-        self.client_id = client_id
+        self.config = {
+            'url': url,
+            'debug': debug,
+            'client_id': client_id
+        }
 
-    def start_report(self, start_time, context):
+    def create_report(self, start_time, context):
         """
         Used in advanced usage to manually set the report start_report
         """
-        global COLDSTART
-        self.report = Report(self.client_id,
-                             get_pid_stat('self'),
-                             MODULE_LOAD_TIME)
+        self.report = Report(self.config,
+                             get_pid_stat('self'))
         try:
-            self.report.update_data(context, COLDSTART, start_time)
-            COLDSTART = False
+            self.report.update_data(context, start_time)
+            return self.report
         except Exception as err:
             self.report.retain_err(err)
             self.send()
@@ -75,45 +64,19 @@ class IOpipe(object):
         self.send()
         raise err
 
-    def send(self):
-        """
-        Send the current report to IOpipe
-        """
-        json_report = None
-
-        try:
-            json_report = json.dumps(self.report, default=lambda o: o.__dict__)
-        except Exception as err:
-            print("Could not convert the report to JSON. "
-                  "Threw exception: {}".format(err))
-            print('Report: {}'.format(self.report))
-            return
-
-        try:
-            response = REQUESTS_SESSION.post(
-                self._url + '/v0/event',
-                data=json_report,
-                headers={"Content-Type": "application/json"})
-            if self._debug:
-                print('POST response: {}'.format(response))
-        except Exception as err:
-            print('Error reporting metrics to IOpipe. {}'.format(err))
-        finally:
-            if self._debug:
-                print(json_report)
-
     def decorator(self, fun):
         def wrapped(event, context):
             err = None
             start_time = time.time()
-            self.start_report(start_time, context)
+
+            self.report = self.create_report(start_time, context)
             try:
                 result = fun(event, context)
             except Exception as err:
                 self.report.retain_err(err)
-                self.send()
+                self.report.send()
                 raise err
             finally:
-                self.send()
+                self.report.send()
             return result
         return wrapped

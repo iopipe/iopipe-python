@@ -28,6 +28,13 @@ def setup_function():
     handler(None, context)
 
 
+# N.B. this must be the first test!
+def test_coldstarts():
+    assert iopipe.report.coldstart
+    handler(None, context)
+    assert not iopipe.report.coldstart
+
+
 def test_client_id_is_configured():
     assert iopipe.report.client_id == 'test-suite'
 
@@ -57,12 +64,12 @@ def advancedHandler(event, context):
     iopipe = IOpipe('test-suite')
     advancedUsage = iopipe
     timestamp = time.time()
-    iopipe.start_report(timestamp, context)
+    report = iopipe.create_report(timestamp, context)
     try:
         pass
     except Exception as e:
         iopipe.err(e)
-    iopipe.send()
+    report.send()
 
 
 def test_advanced_reporting():
@@ -76,13 +83,13 @@ def advancedHandlerWithErr(event, context):
     iopipe = IOpipe('test-suite2')
     advancedUsageErr = iopipe
     timestamp = time.time()
-    iopipe.start_report(timestamp, context)
+    report = iopipe.create_report(timestamp, context)
     iopipe.log('name', 'foo')
     try:
         raise TypeError('Type error raised!')
     except Exception as e:
         iopipe.err(e)
-    iopipe.send()
+    report.send()
 
 
 def test_advanced_erroring():

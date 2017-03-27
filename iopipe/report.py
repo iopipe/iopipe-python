@@ -4,6 +4,14 @@ import platform
 import traceback
 import datetime
 import socket
+import json
+
+try:
+    import requests
+except:
+    from botocore.vendored import requests
+
+REQUESTS_SESSION = requests.Session()
 
 
 def get_pid_stat(pid):
@@ -22,13 +30,15 @@ class Report(object):
     """
     The report of system status
     """
-    def __init__(self, client_id, stat_start, load_time):
-        self.client_id = client_id
+    def __init__(self, config, stat_start):
+        self.client_id = config['client_id']
+        self._debug = config['debug']
+        self._url = config['url']
         self.environment = {
             'agent': {
               'runtime': "python",
               'version': constants.VERSION,
-              'load_time': load_time
+              'load_time': constants.MODULE_LOAD_TIME
             },
             'host': {},
             'os': {
@@ -152,7 +162,7 @@ class Report(object):
             except Exception:
                 pass  # @TODO handle this more gracefully
 
-    def update_data(self, context, coldstart, start_time):
+    def update_data(self, context, start_time):
         self._add_pid_data('self')
 
         # Duration of execution.
@@ -160,7 +170,8 @@ class Report(object):
         self.duration = int(duration * 1000000000)
         self.time_sec = int(duration)
         self.time_nanosec = int((duration - int(duration)) * 1000000000),
-        self.coldstart = coldstart
+        self.coldstart = constants.COLDSTART
+        constants.COLDSTART = False
 
         if context:
             self._add_aws_lambda_data(context)
@@ -178,3 +189,30 @@ class Report(object):
             .strftime(constants.TIMESTAMP_FORMAT)
         }
         self.errors = err_details
+
+    def send(self):
+        """
+        Send the current report to IOpipe
+        """
+        json_report = None
+
+        try:
+            json_report = json.dumps(self, default=lambda o: o.__dict__)
+        except Exception as err:
+            print("Could not convert the report to JSON. "
+                  "Threw exception: {}".format(err))
+            print('Report: {}'.format(self))
+            return
+
+        try:
+            response = REQUESTS_SESSION.post(
+                self._url + '/v0/event',
+                data=json_report,
+                headers={"Content-Type": "application/json"})
+            if self._debug:
+                print('POST response: {}'.format(response))
+        except Exception as err:
+            print('Error reporting metrics to IOpipe. {}'.format(err))
+        finally:
+            if self._debug:
+                print(json_report)
