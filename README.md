@@ -57,6 +57,7 @@ The following may be set as kwargs to the IOpipe class initializer:
 
 - client_id: your client_id (register at [www.iopipe.com](https://www.iopipe.com)
 - debug: enable debug logging by setting this to `True`
+- url: custom URL for reporting metrics
 
 ## Advanced Usage
 
