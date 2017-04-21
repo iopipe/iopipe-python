@@ -5,7 +5,7 @@ provider:
   runtime: nodejs6.10
   stage: prod
   region: us-east-1
-  role: arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+  role: arn:aws:iam::554407330061:role/lambda_basic_vpc_execution
 
 functions:
   simpleSuccess:
