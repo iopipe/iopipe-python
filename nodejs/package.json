@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "iopipe": "^0.2.1"
+    "iopipe": "^0.3.0"
   }
 }
