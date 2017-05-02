@@ -5,8 +5,8 @@ machine:
 dependencies:
   cache_directories:
     - ~/.cache/yarn
-  override:
-    - yarn
+#  override:
+#    - yarn
 
 deployment:
   production:
