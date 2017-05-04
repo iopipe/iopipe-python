@@ -15,7 +15,7 @@ functions:
   simpleSuccessStaging:
     handler: nodejs/handler.simpleSuccessStaging
     events:
-      - schedule: rate(5 minutes)
+      - schedule: rate(1 minute)
   node43SimpleSuccess:
     handler: nodejs/handler.simpleSuccess
     runtime: nodejs4.3
