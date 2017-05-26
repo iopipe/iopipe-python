@@ -2,6 +2,10 @@
 
 This package provides a Python object to send telemetry to the IOpipe platform for application performance monitoring, analytics, and distributed tracing.
 
+## Maintenance Notice
+
+This project is on hiatus so that we at IOpipe can focus on our core functionality until such time as we have the resources to devote to giving our users a truly top-notch Python agent. This module will remain *in alpha state* until that time. We will still accept issue reports/pull requests, and will respond as quickly as we can to either. We appreciate your patience.
+
 ## Installation
 
 We expect you will import this library into an existing (or new) Python project
