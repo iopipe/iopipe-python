@@ -1,10 +1,11 @@
 import time
-import constants
 import platform
 import traceback
 import datetime
 import socket
 import json
+
+from . import constants
 
 try:
     import requests

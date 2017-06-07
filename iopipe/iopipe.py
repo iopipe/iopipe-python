@@ -1,8 +1,8 @@
 import time
 import os
 
-from report import Report
-from collector import get_collector_url
+from .report import Report
+from .collector import get_collector_url
 
 
 def get_pid_stat(pid):
