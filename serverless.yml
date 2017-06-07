@@ -56,3 +56,19 @@ functions:
     runtime: python2.7
     events:
       - schedule: rate(5 minutes)
+  py3SimpleSuccess:
+    handler: python/main.simpleSuccess
+    runtime: python3.6
+    events:
+      - schedule: rate(1 minute)
+  py3ForcedFailure:
+    handler: python/main.forcedFailure
+    runtime: python3.6
+    events:
+      - schedule: rate(1 minute)
+  py3LongRunning:
+    handler: python/main.longRunning
+    runtime: python3.6
+    events:
+      - schedule: rate(5 minutes)
+
