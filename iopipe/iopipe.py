@@ -1,3 +1,4 @@
+import sys
 import time
 import os
 
@@ -15,7 +16,6 @@ def get_pid_stat(pid):
             'cstime': int(stat[16]),
             'rss': int(stat[23])
         }
-
 
 class IOpipe(object):
     def __init__(self,
@@ -52,8 +52,8 @@ class IOpipe(object):
 
         # Add numerical values to report
         if (isinstance(value, int) or
-                isinstance(value, float) or
-                isinstance(value, long)):
+          isinstance(value, float) or
+          isinstance(value, long) if (sys.version_info[0] < 3) else False):
             event['n'] = value
         else:
             event['s'] = str(value)
