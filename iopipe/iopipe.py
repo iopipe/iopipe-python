@@ -17,6 +17,7 @@ def get_pid_stat(pid):
             'rss': int(stat[23])
         }
 
+
 class IOpipe(object):
     def __init__(self,
                  client_id=None,
@@ -52,9 +53,9 @@ class IOpipe(object):
 
         # Add numerical values to report
         if (isinstance(value, int) or
-          isinstance(value, float) or
-          isinstance(value, long) if (sys.version_info[0] < 3) else False):
-            event['n'] = value
+            isinstance(value, float) or
+           (isinstance(value, long) if (sys.version_info[0] < 3) else False)):
+                event['n'] = value
         else:
             event['s'] = str(value)
         self.report.custom_metrics.append(event)
