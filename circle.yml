@@ -1,3 +1,7 @@
+machine:
+  post:
+    - pyenv global 2.7.12 3.6.1
+
 dependencies:
   pre:
     - pip install twine==1.8.1

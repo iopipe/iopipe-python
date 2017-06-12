@@ -1,3 +1,4 @@
+import sys
 import time
 import os
 
@@ -52,9 +53,9 @@ class IOpipe(object):
 
         # Add numerical values to report
         if (isinstance(value, int) or
-                isinstance(value, float) or
-                isinstance(value, long)):
-            event['n'] = value
+            isinstance(value, float) or
+           (isinstance(value, long) if (sys.version_info[0] < 3) else False)):
+                event['n'] = value
         else:
             event['s'] = str(value)
         self.report.custom_metrics.append(event)

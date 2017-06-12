@@ -37,9 +37,9 @@ class Report(object):
         self._url = config['url']
         self.environment = {
             'agent': {
-              'runtime': "python",
-              'version': constants.VERSION,
-              'load_time': constants.MODULE_LOAD_TIME
+                'runtime': "python",
+                'version': constants.VERSION,
+                'load_time': constants.MODULE_LOAD_TIME
             },
             'host': {},
             'os': {
