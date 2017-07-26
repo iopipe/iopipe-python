@@ -2,6 +2,8 @@ import sys
 import time
 import os
 
+import monotonic
+
 from .report import Report
 from .collector import get_collector_url
 
@@ -68,7 +70,7 @@ class IOpipe(object):
     def decorator(self, fun):
         def wrapped(event, context):
             err = None
-            start_time = time.time()
+            start_time = monotonic.monotonic()
 
             self.report = self.create_report(start_time, context)
             try:
