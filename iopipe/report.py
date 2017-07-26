@@ -5,6 +5,8 @@ import datetime
 import socket
 import json
 
+import monotonic
+
 from . import constants
 
 try:
@@ -167,7 +169,7 @@ class Report(object):
         self._add_pid_data('self')
 
         # Duration of execution.
-        duration = time.time() - (start_time or time.time())
+        duration = monotonic.monotonic() - (start_time or 0)
         self.duration = int(duration * 1000000000)
         self.time_sec = int(duration)
         self.time_nanosec = int((duration - int(duration)) * 1000000000),
