@@ -8,18 +8,6 @@ from .report import Report
 from .collector import get_collector_url
 
 
-def get_pid_stat(pid):
-    with open("/proc/%s/stat" % (pid,)) as stat_file:
-        stat = stat_file.readline().split(" ")
-        return {
-            'utime': int(stat[13]),
-            'stime': int(stat[13]),
-            'cutime': int(stat[15]),
-            'cstime': int(stat[16]),
-            'rss': int(stat[23])
-        }
-
-
 class IOpipe(object):
     def __init__(self,
                  client_id=None,
@@ -35,15 +23,8 @@ class IOpipe(object):
         """
         Used in advanced usage to manually set the report start_report
         """
-        self.report = Report(self.config,
-                             get_pid_stat('self'))
-        try:
-            self.report.update_data(context, start_time)
-            return self.report
-        except Exception as err:
-            self.report.retain_err(err)
-            self.send()
-            raise err
+        self.report = Report(self.config)
+        return self.report
 
     def log(self, key, value):
         """
@@ -64,22 +45,27 @@ class IOpipe(object):
 
     def err(self, err):
         self.report.retain_err(err)
-        self.send()
+        self.report.send()
         raise err
 
     def decorator(self, fun):
         def wrapped(event, context):
             err = None
             start_time = monotonic.monotonic()
+            self.create_report(start_time, context)
 
-            self.report = self.create_report(start_time, context)
             try:
                 result = fun(event, context)
             except Exception as err:
                 self.report.retain_err(err)
-                self.report.send()
                 raise err
             finally:
-                self.report.send()
+                try:
+                    self.report.update_data(context, start_time)
+                except Exception as err:
+                    self.report.retain_err(err)
+                    raise err
+                finally:
+                    self.report.send()
             return result
         return wrapped

@@ -33,7 +33,8 @@ class Report(object):
     """
     The report of system status
     """
-    def __init__(self, config, stat_start):
+    def __init__(self, config):
+        stat_start = get_pid_stat('self')
         self.client_id = config['client_id']
         self._debug = config['debug']
         self._url = config['url']
@@ -165,11 +166,11 @@ class Report(object):
             except Exception:
                 pass  # @TODO handle this more gracefully
 
-    def update_data(self, context, start_time):
+    def update_data(self, context, start_time=0):
         self._add_pid_data('self')
 
         # Duration of execution.
-        duration = monotonic.monotonic() - (start_time or 0)
+        duration = monotonic.monotonic() - start_time
         self.duration = int(duration * 1e9)
         self.time_sec = int(duration)
         self.time_nanosec = int((duration - int(duration)) * 1e9),
