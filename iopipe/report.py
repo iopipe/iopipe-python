@@ -170,9 +170,9 @@ class Report(object):
 
         # Duration of execution.
         duration = monotonic.monotonic() - (start_time or 0)
-        self.duration = int(duration * 1000000000)
+        self.duration = int(duration * 1e9)
         self.time_sec = int(duration)
-        self.time_nanosec = int((duration - int(duration)) * 1000000000),
+        self.time_nanosec = int((duration - int(duration)) * 1e9),
         self.coldstart = constants.COLDSTART
         constants.COLDSTART = False
 
