@@ -1,4 +1,3 @@
-import time
 import platform
 import traceback
 import datetime
