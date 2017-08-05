@@ -17,10 +17,6 @@ setup(name='iopipe',
       url='https://github.com/iopipe/iopipe-python',
       packages=['iopipe'],
       install_requires=reqs,
-      setup_requires=[
-          'flake8',
-          'pytest-runner'
-      ],
       extras_require={
           'dev': [
               'flake8'
