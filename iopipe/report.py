@@ -1,8 +1,8 @@
-import platform
-import traceback
 import datetime
-import socket
 import json
+import platform
+import socket
+import traceback
 
 import monotonic
 
@@ -10,7 +10,7 @@ from . import constants
 
 try:
     import requests
-except:
+except ImportError:
     from botocore.vendored import requests
 
 REQUESTS_SESSION = requests.Session()
@@ -32,11 +32,12 @@ class Report(object):
     """
     The report of system status
     """
+
     def __init__(self, config):
         stat_start = get_pid_stat('self')
         self.client_id = config['client_id']
         self._debug = config['debug']
-        self._url = config['url']
+        self._url = 'https://{host}{path}'.format(**config)
         self.environment = {
             'agent': {
                 'runtime': "python",
@@ -209,7 +210,7 @@ class Report(object):
 
         try:
             response = REQUESTS_SESSION.post(
-                self._url + '/v0/event',
+                self._url,
                 data=json_report,
                 headers={"Content-Type": "application/json"})
             if self._debug:

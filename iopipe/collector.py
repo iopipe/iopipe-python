@@ -1,9 +1,45 @@
-def get_collector_url(region='us-east-1'):
-    return {
-        'ap-southeast-2': 'https://metrics-api.ap-southeast-2.iopipe.com',
-        'eu-west-1': 'https://metrics-api.eu-west-1.iopipe.com',
-        'us-east-2': 'https://metrics-api.us-east-2.iopipe.com',
-        'us-west-1': 'https://metrics-api.us-west-1.iopipe.com',
-        'us-west-2': 'https://metrics-api.us-west-2.iopipe.com',
-        'us-east-1': 'https://metrics-api.iopipe.com'
-    }.get(region, 'https://metrics-api.iopipe.com')
+import os
+
+from posixpath import join as urljoin
+
+try:
+    from urlparse import urlparse
+except ImportError:
+    from urllib.parse import urlparse
+
+SUPPORTED_REGIONS = [
+    'ap-southeast-2',
+    'eu-west-1',
+    'us-east-2',
+    'us-west-1',
+    'us-west-2'
+]
+
+
+def get_collector_path(base_url=None):
+    """
+    Returns the IOpipe collector's path. By default this is `/v0/event`.
+    """
+    if not base_url:
+        return '/v0/event'
+    event_url = urlparse(base_url)
+    event_path = urljoin(event_url.path, 'v0/event')
+    if not event_path.startswith('/'):
+        event_path = '/%s' % event_path
+    if event_url.query:
+        event_path = '?'.join([event_path, event_url.query])
+    return event_path
+
+
+def get_hostname(config_url=None):
+    """
+    REturns the IOpipe collector's hostname. If `AWS_REGION` is not set or
+    unsupported then `us-east-1` will be used.
+    """
+    region_string = ''
+    if config_url:
+        return urlparse(config_url).hostname
+    aws_region = os.getenv('AWS_REGION')
+    if aws_region and aws_region in SUPPORTED_REGIONS:
+        region_string = '.%s' % aws_region
+    return 'metrics-api%s.iopipe.com' % region_string
