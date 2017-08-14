@@ -1,10 +1,11 @@
-import sys
+import decimal
+import numbers
 import os
 
 import monotonic
 
-from .report import Report
 from .collector import get_collector_url
+from .report import Report
 
 
 class IOpipe(object):
@@ -34,10 +35,10 @@ class IOpipe(object):
         }
 
         # Add numerical values to report
-        if (isinstance(value, int) or
-            isinstance(value, float) or
-           (isinstance(value, long) if (sys.version_info[0] < 3) else False)):
-                event['n'] = value
+        # We typecast decimals as strings as they're not JSON serializable and
+        if isinstance(value, numbers.Number) and \
+                not isinstance(value, decimal.Decimal):
+            event['n'] = value
         else:
             event['s'] = str(value)
         self.report.custom_metrics.append(event)
