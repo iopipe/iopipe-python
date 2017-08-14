@@ -12,6 +12,14 @@ def setup_function():
         del os.environ['AWS_REGION']
 
 
+def test_get_collector_path_no_arguments():
+    assert get_collector_path() == '/v0/event'
+
+
+def test_get_collector_path_with_base_url():
+    assert get_collector_path('https://metric-api.iopipe.com/foo') == '/foo/v0/event'
+
+
 def test_get_hostname_no_arguments():
     assert get_hostname() == 'metrics-api.iopipe.com'
 
