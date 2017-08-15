@@ -8,6 +8,7 @@ except ImportError:
     from urllib.parse import urlparse
 
 SUPPORTED_REGIONS = [
+    'ap-northeast-1',
     'ap-southeast-2',
     'eu-west-1',
     'us-east-2',

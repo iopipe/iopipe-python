@@ -25,6 +25,9 @@ def test_get_hostname_no_arguments():
 
 
 def test_get_hostname_with_regions():
+    os.environ['AWS_REGION'] = 'ap-northeast-1'
+    assert get_hostname() == 'metrics-api.ap-northeast-1.iopipe.com'
+
     os.environ['AWS_REGION'] = 'ap-southeast-2'
     assert get_hostname() == 'metrics-api.ap-southeast-2.iopipe.com'
 
