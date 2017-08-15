@@ -1,6 +1,9 @@
-from iopipe.iopipe import IOpipe
-from .MockContext import MockContext
 import time
+
+from iopipe.iopipe import IOpipe
+
+from .MockContext import MockContext
+
 global advancedUsage
 global advancedUsageErr
 

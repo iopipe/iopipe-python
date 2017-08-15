@@ -1,23 +1,23 @@
 import decimal
 import numbers
-import os
+import warnings
 
 import monotonic
 
-from .collector import get_collector_url
+from .config import set_config
 from .report import Report
 
 
 class IOpipe(object):
-    def __init__(self,
-                 client_id=None,
-                 url=get_collector_url(os.getenv('AWS_REGION')),
-                 debug=False):
-        self.config = {
-            'url': url,
-            'debug': debug,
-            'client_id': client_id
-        }
+    def __init__(self, client_id=None, url=None, debug=None, **options):
+        if client_id is not None:
+            options['client_id'] = client_id
+        if url is not None:
+            options['url'] = url
+        if debug is not None:
+            options['debug'] = debug
+
+        self.config = set_config(**options)
 
     def create_report(self, start_time, context):
         """
@@ -35,10 +35,8 @@ class IOpipe(object):
         }
 
         # Add numerical values to report
-        # We typecast decimals as strings as they're not JSON serializable and
-        # casting them to floats can result in rounding errors
-        if isinstance(value, numbers.Number) and \
-                not isinstance(value, decimal.Decimal):
+        # We typecast decimals as strings: not JSON serializable and casting to floats can result in rounding errors.
+        if isinstance(value, numbers.Number) and not isinstance(value, decimal.Decimal):
             event['n'] = value
         else:
             event['s'] = str(value)
@@ -51,6 +49,9 @@ class IOpipe(object):
 
     def decorator(self, fun):
         def wrapped(event, context):
+            if not self.config['client_id']:
+                warnings.warn('Your function is decorated with iopipe, but a valid token was not found.')
+
             err = None
             start_time = monotonic.monotonic()
             self.create_report(start_time, context)
