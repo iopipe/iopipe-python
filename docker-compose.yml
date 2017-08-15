@@ -1,0 +1,11 @@
+version: '2'
+services:
+  python2:
+    build:
+      context: .
+      dockerfile: Dockerfile.python2
+
+  python3:
+    build:
+      context: .
+      dockerfile: Dockerfile.python3
