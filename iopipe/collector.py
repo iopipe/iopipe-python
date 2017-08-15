@@ -33,8 +33,9 @@ def get_collector_path(base_url=None):
 
 def get_hostname(config_url=None):
     """
-    REturns the IOpipe collector's hostname. If `AWS_REGION` is not set or
-    unsupported then `us-east-1` will be used.
+    Returns the IOpipe collector's hostname. If  the `AWS_REGION` environment
+    variable is not set or unsupported then `us-east-1` will be used by
+    default. In this case, `us-east-1` is `metrics-api.iopipe.com`.
     """
     region_string = ''
     if config_url:

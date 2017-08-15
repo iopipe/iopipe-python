@@ -35,10 +35,8 @@ class IOpipe(object):
         }
 
         # Add numerical values to report
-        # We typecast decimals as strings as they're not JSON serializable and
-        # casting them to floats can result in rounding errors
-        if isinstance(value, numbers.Number) and \
-                not isinstance(value, decimal.Decimal):
+        # We typecast decimals as strings: not JSON serializable and casting to floats can result in rounding errors.
+        if isinstance(value, numbers.Number) and not isinstance(value, decimal.Decimal):
             event['n'] = value
         else:
             event['s'] = str(value)
