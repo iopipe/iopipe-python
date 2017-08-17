@@ -1,6 +1,6 @@
 import time
 
 TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
-VERSION = "0.6.1"
+VERSION = "0.7.0"
 MODULE_LOAD_TIME = time.time() * 1000
 COLDSTART = True
