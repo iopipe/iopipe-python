@@ -4,9 +4,6 @@ RUN mkdir -p /var/lib/iopipe
 
 WORKDIR /var/lib/iopipe
 
-RUN pip install pytest
-
 COPY . /var/lib/iopipe
 
-RUN python setup.py install
-RUN pytest
+RUN python setup.py test

@@ -22,7 +22,6 @@ setup(name='iopipe',
               'flake8'
           ]
       },
-      tests_require=[
-          'pytest'
-      ]
+      setup_requires=['pytest-runner'],
+      tests_require=['pytest']
       )
