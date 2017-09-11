@@ -1,4 +1,5 @@
 import decimal
+import functools
 import numbers
 import warnings
 
@@ -16,7 +17,6 @@ class IOpipe(object):
             options['url'] = url
         if debug is not None:
             options['debug'] = debug
-
         self.config = set_config(**options)
 
     def create_report(self, start_time, context):
@@ -47,7 +47,8 @@ class IOpipe(object):
         self.report.send()
         raise err
 
-    def decorator(self, fun):
+    def __call__(self, func):
+        @functools.wraps(func)
         def wrapped(event, context):
             # if env var IOPIPE_ENABLED is set to False skip reporting
             if self.config['enabled'] is False:
@@ -61,7 +62,7 @@ class IOpipe(object):
             self.create_report(start_time, context)
 
             try:
-                result = fun(event, context)
+                result = func(event, context)
             except Exception as err:
                 self.report.retain_err(err)
                 raise err
@@ -75,3 +76,5 @@ class IOpipe(object):
                     self.report.send()
             return result
         return wrapped
+
+    decorator = __call__

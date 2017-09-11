@@ -1,31 +1,21 @@
 import datetime
 import json
+import logging
 import platform
 import socket
 import traceback
 
 import monotonic
 
-from . import constants
+from . import constants, system
 
 try:
     import requests
 except ImportError:
     from botocore.vendored import requests
 
+logger = logging.getLogger(__name__)
 REQUESTS_SESSION = requests.Session()
-
-
-def get_pid_stat(pid):
-    with open("/proc/%s/stat" % (pid,)) as stat_file:
-        stat = stat_file.readline().split(" ")
-        return {
-            'utime': int(stat[13]),
-            'stime': int(stat[13]),
-            'cutime': int(stat[15]),
-            'cstime': int(stat[16]),
-            'rss': int(stat[23])
-        }
 
 
 class Report(object):
@@ -34,13 +24,13 @@ class Report(object):
     """
 
     def __init__(self, config):
-        stat_start = get_pid_stat('self')
+        stat_start = system.get_pid_stat('self')
         self.client_id = config['client_id']
         self._debug = config['debug']
         self._url = 'https://{host}{path}'.format(**config)
         self.environment = {
             'agent': {
-                'runtime': "python",
+                'runtime': 'python',
                 'version': constants.VERSION,
                 'load_time': constants.MODULE_LOAD_TIME
             },
@@ -67,8 +57,7 @@ class Report(object):
         Add os field to payload
         """
         uptime = None
-
-        with open("/proc/stat") as stat_file:
+        with open('/proc/stat') as stat_file:
             for line in stat_file:
                 cpu_stat = line.split(" ")
                 if cpu_stat[0][:3] != "cpu":
@@ -87,16 +76,16 @@ class Report(object):
                     }
                 })
 
-        with open("/proc/uptime") as uptime_file:
+        with open('/proc/uptime') as uptime_file:
             utf = uptime_file.readline().split(" ")
             uptime = int(float(utf[0]))
 
-        with open("/proc/sys/kernel/random/boot_id") as bootid_file:
+        with open('/proc/sys/kernel/random/boot_id') as bootid_file:
             self.environment['host'].update({
                 'container_id': bootid_file.readline()
             })
 
-        with open("/proc/meminfo") as meminfo:
+        with open('/proc/meminfo') as meminfo:
             linux_mem = {}
             for row in meminfo:
                 line = row.split(":")
@@ -126,7 +115,7 @@ class Report(object):
             self.environment['os']['linux']['pid'][pid] or {}
 
         self.environment['os']['linux']['pid'][pid]['stat'] = \
-            get_pid_stat(pid)
+            system.get_pid_stat(pid)
 
         with open("/proc/%s/status" % (pid,)) as status_file:
             status = {}
@@ -202,21 +191,22 @@ class Report(object):
 
         try:
             json_report = json.dumps(self, default=lambda o: o.__dict__)
-        except Exception as err:
-            print("Could not convert the report to JSON. "
-                  "Threw exception: {}".format(err))
-            print('Report: {}'.format(self))
+        except Exception as e:
+            logger.error('Could not convert the report to JSON')
+            logger.exception(e)
+            logger.debug('Report: %s' % self)
             return
 
         try:
             response = REQUESTS_SESSION.post(
                 self._url,
                 data=json_report,
-                headers={"Content-Type": "application/json"})
+                headers=[('Content-Type', 'application/json')])
             if self._debug:
-                print('POST response: {}'.format(response))
-        except Exception as err:
-            print('Error reporting metrics to IOpipe. {}'.format(err))
+                logger.debug('POST response: %s' % response)
+        except Exception as e:
+            logger.error('Error reporting metrics to IOpipe')
+            logger.exception(e)
         finally:
             if self._debug:
-                print(json_report)
+                logger.debug(json_report)

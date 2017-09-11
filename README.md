@@ -1,10 +1,6 @@
 # IOpipe Telemetry Agent for Python
 
-This package provides a Python object to send telemetry to the IOpipe platform for application performance monitoring, analytics, and distributed tracing.
-
-## Maintenance Notice
-
-This project is on hiatus so that we at IOpipe can focus on our core functionality until such time as we have the resources to devote to giving our users a truly top-notch Python agent. This module will remain *in alpha state* until that time. We will still accept issue reports/pull requests, and will respond as quickly as we can to either. We appreciate your patience.
+This package provides a Python decorator to send telemetry to the IOpipe platform for application performance monitoring, analytics, and distributed tracing.
 
 ## Installation
 
@@ -47,10 +43,11 @@ More details about lambda deployments are available in the [AWS documentation](h
 Simply use our decorator to report metrics:
 
 ```python
-from iopipe.iopipe import IOpipe
+from iopipe import IOpipe
+
 iopipe = IOpipe("your-client-id")
 
-@iopipe.decorator
+@iopipe
 def handler(event, context):
   pass
 ```
@@ -71,7 +68,7 @@ call .err(Exception) and .send() to report data and exceptions.
 We recommend using our handy decorator instead.
 
 ```python
-from iopipe.iopipe import IOpipe
+from iopipe import IOpipe
 
 def handler(event, context):
   iopipe = IOpipe(CLIENT_ID)
@@ -97,10 +94,11 @@ If you want to trace exceptions thrown in your case, you can use the `.err(err)`
 You can log custom values in the data sent upstream to IOpipe using the following syntax:
 
 ```python
-from iopipe.iopipe import IOpipe
+from iopipe import IOpipe
+
 iopipe = IOpipe()
 
-@iopipe.decorator
+@iopipe
 def handler(event, context):
   # the name of the metric must be a string
   # numerical (int, long, float) and string types supported for values
