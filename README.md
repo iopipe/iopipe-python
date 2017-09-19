@@ -110,6 +110,12 @@ def handler(event, context):
 
 This makes it easy to add custom data and telemetry within your function.
 
+### Disabling IOpipe
+
+If you need to disable IOpipe monitoring during development or in any other situation you can set `IOPIPE_ENABLED` environment variable to `False`.
+
+Default for `IOPIPE_ENABLED` environment variable is `True`.
+
 ## Copyright
 
 Provided under the Apache-2.0 license. See LICENSE for details.
