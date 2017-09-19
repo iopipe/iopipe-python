@@ -50,7 +50,7 @@ def is_enabled():
     Default is True.
     Useful for running function locally.
 
-    :returns: True if enabled
+    :returns: True if enabled, False if disabled
     :rtype: bool
     """
     env_var = os.getenv('IOPIPE_ENABLED')
