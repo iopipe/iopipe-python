@@ -49,6 +49,10 @@ class IOpipe(object):
 
     def decorator(self, fun):
         def wrapped(event, context):
+            # if env var IOPIPE_ENABLED is set to False skip reporting
+            if self.config['enabled'] is False:
+                return fun(event, context)
+
             if not self.config['client_id']:
                 warnings.warn('Your function is decorated with iopipe, but a valid token was not found.')
 
