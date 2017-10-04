@@ -1,3 +1,4 @@
+from distutils.util import strtobool
 import os
 
 from .collector import get_collector_path, get_hostname
@@ -14,6 +15,7 @@ def set_config(**config):
     config.setdefault('network_timeout', 5000)
     config.setdefault('timeout_window', os.getenv('IOPIPE_TIMEOUT_WINDOW', 150))
     config.setdefault('install_method', 'manual')
+    config.setdefault('enabled', bool(strtobool(os.getenv('IOPIPE_ENABLED', 'true'))))
     config.setdefault('plugins', [])
 
     if 'url' in config:
