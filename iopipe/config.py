@@ -15,7 +15,7 @@ def set_config(**config):
     config.setdefault('network_timeout', 5000)
     config.setdefault('timeout_window', os.getenv('IOPIPE_TIMEOUT_WINDOW', 150))
     config.setdefault('install_method', 'manual')
-    config.setdefault('enabled', is_enabled())
+    config.setdefault('enabled', bool(strtobool(os.getenv('IOPIPE_ENABLED', 'true'))))
     config.setdefault('plugins', [])
 
     if 'url' in config:
@@ -41,20 +41,3 @@ def set_config(**config):
         config['timeout_window'] = 150
 
     return config
-
-
-def is_enabled():
-    """
-    Check if IOPIPE_ENABLED environment variable is set to False.
-    If so, IOpipe reporting will be skipped.
-    Default is True.
-    Useful for running function locally.
-
-    :returns: True if enabled, False if disabled
-    :rtype: bool
-    """
-    env_var = os.getenv('IOPIPE_ENABLED')
-    if env_var:
-        return bool(strtobool(env_var))
-    else:
-        return True

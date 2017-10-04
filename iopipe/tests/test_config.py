@@ -1,27 +1,22 @@
 import os
 
-from iopipe.config import is_enabled
+from iopipe.config import set_config
 
 
-def test_is_enabled_default():
-    assert is_enabled() is True
+def test_set_config__iopipe_enabled__default():
+    config = set_config()
+    assert config['enabled'] is True
 
 
-def test_is_enabled_small_caps_true():
-    os.environ['IOPIPE_ENABLED'] = 'true'
-    assert is_enabled() is True
-
-
-def test_is_enabled_title_case_true():
-    os.environ['IOPIPE_ENABLED'] = 'True'
-    assert is_enabled() is True
-
-
-def test_is_enabled_small_caps_false():
-    os.environ['IOPIPE_ENABLED'] = 'false'
-    assert is_enabled() is False
-
-
-def test_is_enabled_title_case_false():
+def test_set_config__iopipe_enabled__disabled():
     os.environ['IOPIPE_ENABLED'] = 'False'
-    assert is_enabled() is False
+
+    config = set_config()
+    assert config['enabled'] is False
+
+
+def test_set_config__iopipe_enabled__enabled():
+    os.environ['IOPIPE_ENABLED'] = 'True'
+
+    config = set_config()
+    assert config['enabled'] is True
