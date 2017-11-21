@@ -8,29 +8,45 @@ def test_set_config__iopipe_enabled__default():
     assert config['enabled'] is True
 
 
-def test_set_config__iopipe_enabled__title_case_true():
-    os.environ['IOPIPE_ENABLED'] = 'True'
+def test_set_config__iopipe_enabled__title_case_true(monkeypatch):
+    def mock_getenv(key, default=None):
+        if key == 'IOPIPE_ENABLED':
+            return 'True'
+        return os.environ.get(key, default)
 
+    monkeypatch.setattr(os, 'getenv', mock_getenv)
     config = set_config()
     assert config['enabled'] is True
 
 
-def test_set_config__iopipe_enabled__small_caps_true():
-    os.environ['IOPIPE_ENABLED'] = 'true'
+def test_set_config__iopipe_enabled__small_caps_true(monkeypatch):
+    def mock_getenv(key, default=None):
+        if key == 'IOPIPE_ENABLED':
+            return 'true'
+        return os.environ.get(key, default)
 
+    monkeypatch.setattr(os, 'getenv', mock_getenv)
     config = set_config()
     assert config['enabled'] is True
 
 
-def test_set_config__iopipe_enabled__title_case_false():
-    os.environ['IOPIPE_ENABLED'] = 'False'
+def test_set_config__iopipe_enabled__title_case_false(monkeypatch):
+    def mock_getenv(key, default=None):
+        if key == 'IOPIPE_ENABLED':
+            return 'False'
+        return os.environ.get(key, default)
 
+    monkeypatch.setattr(os, 'getenv', mock_getenv)
     config = set_config()
     assert config['enabled'] is False
 
 
-def test_set_config__iopipe_enabled__small_caps_false():
-    os.environ['IOPIPE_ENABLED'] = 'false'
+def test_set_config__iopipe_enabled__small_caps_false(monkeypatch):
+    def mock_getenv(key, default=None):
+        if key == 'IOPIPE_ENABLED':
+            return 'false'
+        return os.environ.get(key, default)
 
+    monkeypatch.setattr(os, 'getenv', mock_getenv)
     config = set_config()
     assert config['enabled'] is False
