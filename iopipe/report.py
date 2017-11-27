@@ -1,21 +1,21 @@
 import datetime
-import json
 import logging
 import platform
-import socket
+import sys
+import time
 import traceback
 
 import monotonic
 
-from . import constants, system
+from . import constants
+from .send_report import send_report
 
-try:
-    import requests
-except ImportError:
-    from botocore.vendored import requests
+if sys.platform == 'linux2':
+    from . import system
+else:
+    from . import mock_system as system
 
 logger = logging.getLogger(__name__)
-REQUESTS_SESSION = requests.Session()
 
 
 class Report(object):
@@ -23,118 +23,64 @@ class Report(object):
     The report of system status
     """
 
-    def __init__(self, config):
-        stat_start = system.get_pid_stat('self')
-        self.client_id = config['client_id']
-        self._debug = config['debug']
-        self._url = 'https://{host}{path}'.format(**config)
-        self.environment = {
-            'agent': {
-                'runtime': 'python',
-                'version': constants.VERSION,
-                'load_time': constants.MODULE_LOAD_TIME
+    def __init__(self, instance):
+        """
+        Instantiates a new report.
+
+        :param instance: An IOpipe agent instance.
+        """
+        self.sent = False
+
+        self.config = instance.config or {}
+        self.context = instance.context or {}
+        self.debug = self.config.get('debug', False)
+        self.metrics = instance.metrics or []
+        self.plugins = instance.plugins or []
+        self.start_time = instance.start_time or monotonic.monotonic()
+        self.stat_start = instance.stat_start or {}
+
+        self.report = {
+            'aws': {},
+            'client_id': self.config.get('client_id'),
+            'coldstart': constants.COLDSTART,
+            'custom_metrics': self.metrics,
+            'duration': None,
+            'environment': {
+                'agent': {
+                    'runtime': 'python',
+                    'version': constants.VERSION,
+                    'load_time': constants.MODULE_LOAD_TIME,
+                },
+                'python': {
+                    'version': platform.python_version(),
+                    'memoryUsage': None,
+                },
+                'host': {
+                    'container_id': None,
+                },
+                'os': {
+                    'arch': system.read_arch(),
+                    'cpus': [],
+                    'linux': {},
+                },
             },
-            'host': {},
-            'os': {
-                'cpus': [],
-                'linux': {
-                    'mem': {},
-                    'pid': {
-                        'self': {
-                            'stat_start': stat_start
-                        },
-                    }
-                }
-            },
-            'python': {
-                'version': platform.python_version()
-            }
+            'errors': {},
+            'installMethod': self.config.get('install_method'),
+            'plugins': self.plugins,
+            'processId': constants.PROCESS_ID,
         }
-        self.custom_metrics = []
 
-    def _add_os_host_data(self):
+        constants.COLDSTART = False
+
+    def extract_context_data(self, context):
         """
-        Add os field to payload
+        Returns the contents of a AWS LAmbda context.
+
+        :param context: The AWS Lambda context object.
+        :returns: A dict of relevant context data.
+        :rtype: dict
         """
-        uptime = None
-        with open('/proc/stat') as stat_file:
-            for line in stat_file:
-                cpu_stat = line.split(" ")
-                if cpu_stat[0][:3] != "cpu":
-                    break
-                # First cpu line is aggregation of following lines, skip it
-                if len(cpu_stat[0]) == 3:
-                    continue
-                self.environment['os']['cpus'].append({
-                    'name': cpu_stat[0],
-                    'times': {
-                        'user': cpu_stat[1],
-                        'nice': cpu_stat[2],
-                        'sys': cpu_stat[3],
-                        'idle': cpu_stat[4],
-                        'irq': cpu_stat[6]
-                    }
-                })
-
-        with open('/proc/uptime') as uptime_file:
-            utf = uptime_file.readline().split(" ")
-            uptime = int(float(utf[0]))
-
-        with open('/proc/sys/kernel/random/boot_id') as bootid_file:
-            self.environment['host'].update({
-                'container_id': bootid_file.readline()
-            })
-
-        with open('/proc/meminfo') as meminfo:
-            linux_mem = {}
-            for row in meminfo:
-                line = row.split(":")
-                # Example content:
-                # MemTotal:                3801016 kB
-                # MemFree:                 1840972 kB
-                # MemAvailable:        3287752 kB
-                # HugePages_Total:             0
-                linux_mem[line[0]] = \
-                    int(line[1].lstrip().rstrip(" kB\n"))
-            self.environment['os']['linux']['mem'].update(linux_mem)
-
-        self.environment['os'].update({
-            'hostname': socket.gethostname(),
-            'uptime': uptime,
-            'freemem':
-                self.environment['os']['linux']['mem']['MemFree'],
-            'totalmem':
-                self.environment['os']['linux']['mem']['MemTotal'],
-            'usedmem':
-                self.environment['os']['linux']['mem']['MemTotal'] -
-                self.environment['os']['linux']['mem']['MemFree']
-        })
-
-    def _add_pid_data(self, pid):
-        self.environment['os']['linux']['pid'][pid] = \
-            self.environment['os']['linux']['pid'][pid] or {}
-
-        self.environment['os']['linux']['pid'][pid]['stat'] = \
-            system.get_pid_stat(pid)
-
-        with open("/proc/%s/status" % (pid,)) as status_file:
-            status = {}
-            for row in status_file:
-                line = row.split(":")
-                status_value = line[1].rstrip("\t\n kB").lstrip()
-                try:
-                    status[line[0]] = int(status_value)
-                except ValueError:
-                    status[line[0]] = status_value
-            self.environment['os']['linux']['pid'][pid]['status'] \
-                = status
-
-    def _add_aws_lambda_data(self, context):
-        """
-        Add AWS Lambda specific data to the report
-        """
-        self.aws = {}
-
+        data = {}
         for k, v in {
             # camel case names in the report to align with AWS standards
             'functionName': 'function_name',
@@ -145,68 +91,75 @@ class Report(object):
             'logGroupName': 'log_group_name',
             'logStreamName': 'log_stream_name',
         }.items():
-            if v in dir(context):
-                self.aws[k] = getattr(context, v)
+            if hasattr(context, v):
+                data[k] = getattr(context, v)
+        if hasattr(context, 'get_remaining_time_in_millis') and callable(context.get_remaining_time_in_millis):
+            data['getRemainingTimeInMillis'] = context.get_remaining_time_in_millis()
+        return data
 
-        if context and 'get_remaining_time_in_millis' in dir(context):
-            try:
-                self.aws['getRemainingTimeInMillis'] = \
-                    context.get_remaining_time_in_millis()
-            except Exception:
-                pass  # @TODO handle this more gracefully
-
-    def update_data(self, context, start_time=0):
-        self._add_pid_data('self')
-
-        # Duration of execution.
-        duration = monotonic.monotonic() - start_time
-        self.duration = int(duration * 1e9)
-        self.time_sec = int(duration)
-        self.time_nanosec = int((duration - int(duration)) * 1e9),
-        self.coldstart = constants.COLDSTART
-        constants.COLDSTART = False
-
-        if context:
-            self._add_aws_lambda_data(context)
-        self._add_os_host_data()
-
-    def retain_err(self, err):
+    def retain_error(self, error):
         """
-        Add the details of an error to the report
+        Adds details of an error to the report.
+
+        :param error: The error exception to add to the report.
         """
-        err_details = {
-            'name': type(err).__name__,
-            'message': '{}'.format(err),
+        details = {
+            'name': type(error).__name__,
+            'message': '{}'.format(error),
             'stack': traceback.format_exc(),
-            'time_reported': datetime.datetime.now()
-            .strftime(constants.TIMESTAMP_FORMAT)
+            'time_reported': datetime.datetime.now().strftime(constants.TIMESTAMP_FORMAT),
         }
-        self.errors = err_details
+        self.report['errors'] = details
 
-    def send(self):
+    def send(self, error=None):
         """
         Send the current report to IOpipe
+
+        :param error: An optional error to add to report.
         """
-        json_report = None
-
-        try:
-            json_report = json.dumps(self, default=lambda o: o.__dict__)
-        except Exception as e:
-            logger.error('Could not convert the report to JSON')
-            logger.exception(e)
-            logger.debug('Report: %s' % self)
+        if self.sent:
             return
+        self.sent = True
 
-        try:
-            response = REQUESTS_SESSION.post(
-                self._url,
-                data=json_report,
-                headers=[('Content-Type', 'application/json')])
-            if self._debug:
-                logger.debug('POST response: %s' % response)
-        except Exception as e:
-            logger.error('Error reporting metrics to IOpipe')
-            logger.exception(e)
-        finally:
-            if self._debug:
-                logger.debug(json_report)
+        if error:
+            self.retain_error(error)
+
+        duration = monotonic.monotonic() - self.start_time
+
+        self.report['environment']['host']['boot_id'] = \
+            self.report['environment']['host']['container_id'] = \
+            system.read_bootid()
+
+        self.report['environment']['os']['linux']['mem'] = meminfo = system.read_meminfo()
+
+        self.report.update({
+            'aws': system.read_aws_lambda(self.context),
+            'coldstart': constants.COLDSTART,
+            'duration': int(duration * 1e9),
+            'environment': {
+                'os': {
+                    'cpus': system.read_stat(),
+                    'freemem': meminfo['MemFree'],
+                    'hostname': system.read_hostname(),
+                    'linux': {
+                        'pid': {
+                            'self': {
+                                'stat': system.read_pid_stat('self'),
+                                'stat_start': self.stat_start,
+                                'status': system.read_status(),
+                            },
+                        },
+                    },
+                    'totalmem': meminfo['MemTotal'],
+                    'uptime': system.read_uptime(),
+                    'usedmem': meminfo['MemTotal'] - meminfo['MemFree'],
+                },
+            },
+            'time_sec': int(duration),
+            'time_nanosec': int((duration - int(duration)) * 1e9),
+            'timestamp': int(time.time() * 1000),
+        })
+
+        constants.COLDSTART = False
+
+        send_report(self.report, self.config)
