@@ -3,8 +3,6 @@ import functools
 import numbers
 import warnings
 
-import monotonic
-
 from .config import set_config
 from .report import Report
 
@@ -18,18 +16,14 @@ class IOpipe(object):
         if debug is not None:
             options['debug'] = debug
         self.config = set_config(**options)
-
-    def create_report(self, start_time, context):
-        """
-        Used in advanced usage to manually set the report start_report
-        """
-        self.report = Report(self.config)
-        return self.report
+        self.report = None
 
     def log(self, key, value):
-        """
-        Add custom data to the report
-        """
+        if self.report is None:
+            warnings.warn('Attempting to log metrics before function decorated with IOpipe. '
+                          'This metric will not be recorded.')
+            return
+
         event = {
             'name': str(key)
         }
@@ -40,40 +34,42 @@ class IOpipe(object):
             event['n'] = value
         else:
             event['s'] = str(value)
+
         self.report.custom_metrics.append(event)
 
-    def err(self, err):
-        self.report.retain_err(err)
-        self.report.send()
-        raise err
+    def error(self, error):
+        if self.report is None:
+            warnings.warn('An exception occurred before function was decorated with IOpipe. '
+                          'This exceptionwill not be recorded.')
+            raise error
+
+        self.report.send(error)
+        raise error
+
+    err = error
 
     def __call__(self, func):
         @functools.wraps(func)
         def wrapped(event, context):
             # if env var IOPIPE_ENABLED is set to False skip reporting
             if self.config['enabled'] is False:
-                return fun(event, context)
+                return func(event, context)
 
+            # If a token is not present, skip reporting
             if not self.config['client_id']:
-                warnings.warn('Your function is decorated with iopipe, but a valid token was not found.')
+                warnings.warn('Your function is decorated with iopipe, but a valid token was not found. '
+                              'Set the IOPIPE_TOKEN environment variable with your IOpipe token.')
+                return func(event, context)
 
-            err = None
-            start_time = monotonic.monotonic()
-            self.create_report(start_time, context)
+            self.report = Report(self.config, context)
 
             try:
                 result = func(event, context)
-            except Exception as err:
-                self.report.retain_err(err)
-                raise err
+            except Exception as e:
+                self.report.send(e)
+                raise e
             finally:
-                try:
-                    self.report.update_data(context, start_time)
-                except Exception as err:
-                    self.report.retain_err(err)
-                    raise err
-                finally:
-                    self.report.send()
+                self.report.send()
             return result
         return wrapped
 

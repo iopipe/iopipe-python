@@ -72,7 +72,7 @@ def read_pid_stat(pid):
     }
 
 
-def read_pid_Status(pid):
+def read_pid_status(pid):
     """
     Returns the system process sstatus.
 

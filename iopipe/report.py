@@ -23,27 +23,28 @@ class Report(object):
     The report of system status
     """
 
-    def __init__(self, instance):
+    def __init__(self, config, context):
         """
         Instantiates a new report.
 
-        :param instance: An IOpipe agent instance.
+        :param config: The IOpipe agent config.
+        :param context: The AWS Lambda context.
         """
         self.sent = False
+        self.start_time = monotonic.monotonic()
+        self.stat_start = system.read_pid_stat('self')
 
-        self.config = instance.config or {}
-        self.context = instance.context or {}
-        self.debug = self.config.get('debug', False)
-        self.metrics = instance.metrics or []
-        self.plugins = instance.plugins or []
-        self.start_time = instance.start_time or monotonic.monotonic()
-        self.stat_start = instance.stat_start or {}
+        self.config = config
+        self.context = context
+        self.custom_metrics = []
+        self.debug = config.get('debug', False)
+        self.plugins = config.get('plugins', [])
 
         self.report = {
             'aws': {},
             'client_id': self.config.get('client_id'),
             'coldstart': constants.COLDSTART,
-            'custom_metrics': self.metrics,
+            'custom_metrics': self.custom_metrics,
             'duration': None,
             'environment': {
                 'agent': {
@@ -72,11 +73,10 @@ class Report(object):
 
         constants.COLDSTART = False
 
-    def extract_context_data(self, context):
+    def extract_context_data(self):
         """
         Returns the contents of a AWS LAmbda context.
 
-        :param context: The AWS Lambda context object.
         :returns: A dict of relevant context data.
         :rtype: dict
         """
@@ -91,10 +91,11 @@ class Report(object):
             'logGroupName': 'log_group_name',
             'logStreamName': 'log_stream_name',
         }.items():
-            if hasattr(context, v):
-                data[k] = getattr(context, v)
-        if hasattr(context, 'get_remaining_time_in_millis') and callable(context.get_remaining_time_in_millis):
-            data['getRemainingTimeInMillis'] = context.get_remaining_time_in_millis()
+            if hasattr(self.context, v):
+                data[k] = getattr(self.context, v)
+        if hasattr(self.context, 'get_remaining_time_in_millis') and \
+                callable(self.context.get_remaining_time_in_millis):
+            data['getRemainingTimeInMillis'] = self.context.get_remaining_time_in_millis()
         return data
 
     def retain_error(self, error):
@@ -113,7 +114,7 @@ class Report(object):
 
     def send(self, error=None):
         """
-        Send the current report to IOpipe
+        Send the current report to IOpipe.
 
         :param error: An optional error to add to report.
         """
@@ -133,8 +134,7 @@ class Report(object):
         self.report['environment']['os']['linux']['mem'] = meminfo = system.read_meminfo()
 
         self.report.update({
-            'aws': system.read_aws_lambda(self.context),
-            'coldstart': constants.COLDSTART,
+            'aws': self.extract_context_data(),
             'duration': int(duration * 1e9),
             'environment': {
                 'os': {
@@ -146,7 +146,7 @@ class Report(object):
                             'self': {
                                 'stat': system.read_pid_stat('self'),
                                 'stat_start': self.stat_start,
-                                'status': system.read_status(),
+                                'status': system.read_pid_status('self'),
                             },
                         },
                     },
@@ -159,7 +159,5 @@ class Report(object):
             'time_nanosec': int((duration - int(duration)) * 1e9),
             'timestamp': int(time.time() * 1000),
         })
-
-        constants.COLDSTART = False
 
         send_report(self.report, self.config)
