@@ -40,7 +40,7 @@ class IOpipe(object):
     def error(self, error):
         if self.report is None:
             warnings.warn('An exception occurred before function was decorated with IOpipe. '
-                          'This exceptionwill not be recorded.')
+                          'This exception will not be recorded.')
             raise error
 
         self.report.send(error)

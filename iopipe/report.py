@@ -75,7 +75,7 @@ class Report(object):
 
     def extract_context_data(self):
         """
-        Returns the contents of a AWS LAmbda context.
+        Returns the contents of a AWS Lambda context.
 
         :returns: A dict of relevant context data.
         :rtype: dict
