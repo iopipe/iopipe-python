@@ -1,4 +1,5 @@
 import datetime
+import json
 import logging
 import platform
 import sys
@@ -159,5 +160,9 @@ class Report(object):
             'time_nanosec': int((duration - int(duration)) * 1e9),
             'timestamp': int(time.time() * 1000),
         })
+
+        if self.debug:
+            logger.debug('Sending report to IOpipe:')
+            logger.debug(json.dumps(self.report, indent=2))
 
         send_report(self.report, self.config)

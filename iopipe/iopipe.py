@@ -1,10 +1,13 @@
 import decimal
 import functools
+import logging
 import numbers
 import warnings
 
 from .config import set_config
 from .report import Report
+
+logger = logging.getLogger(__name__)
 
 
 class IOpipe(object):
@@ -15,7 +18,9 @@ class IOpipe(object):
             options['url'] = url
         if debug is not None:
             options['debug'] = debug
+
         self.config = set_config(**options)
+        self.debug = self.config['debug']
         self.report = None
 
     def log(self, key, value):
@@ -51,8 +56,12 @@ class IOpipe(object):
     def __call__(self, func):
         @functools.wraps(func)
         def wrapped(event, context):
+            if self.debug:
+                logger.debug('%s wrapped with IOpipe decorator' % func)
+
             # if env var IOPIPE_ENABLED is set to False skip reporting
             if self.config['enabled'] is False:
+                logger.debug('IOpipe agent disabled, skipping reporting')
                 return func(event, context)
 
             # If a token is not present, skip reporting
