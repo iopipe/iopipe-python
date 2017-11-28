@@ -38,8 +38,8 @@ class Report(object):
         self.config = config
         self.context = context
         self.custom_metrics = []
-        self.debug = config.get('debug', False)
-        self.plugins = config.get('plugins', [])
+        self.debug = config['debug']
+        self.plugins = config['plugins']
 
         self.report = {
             'aws': {},
