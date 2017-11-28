@@ -7,8 +7,9 @@ import warnings
 from .config import set_config
 from .report import Report
 
+logging.basicConfig()
+
 logger = logging.getLogger(__name__)
-logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.INFO)
 
 
@@ -60,7 +61,7 @@ class IOpipe(object):
     def __call__(self, func):
         @functools.wraps(func)
         def wrapped(event, context):
-            logger.debug('%s wrapped with IOpipe decorator' % func)
+            logger.debug('%s.%s wrapped with IOpipe decorator' % (func.__module__, func.__name__))
 
             # if env var IOPIPE_ENABLED is set to False skip reporting
             if self.config['enabled'] is False:
