@@ -1,2 +1,2 @@
 include *.py *.md *.txt LICENSE
-recursive-include iopipe
+recursive-include iopipe *.py

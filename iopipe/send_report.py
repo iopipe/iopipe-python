@@ -21,6 +21,7 @@ def send_report(report, config):
     try:
         response = session.post(url, json=report)
         response.raise_for_status()
+        logger.debug('Report sent to IOpipe successfully')
     except Exception as e:
         logger.error('Error sending report to IOpipe: %s' % e)
         logger.exception(e)

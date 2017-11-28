@@ -8,6 +8,8 @@ from .config import set_config
 from .report import Report
 
 logger = logging.getLogger(__name__)
+logger.addHandler(logging.StreamHandler())
+logger.setLevel(logging.INFO)
 
 
 class IOpipe(object):
@@ -20,8 +22,10 @@ class IOpipe(object):
             options['debug'] = debug
 
         self.config = set_config(**options)
-        self.debug = self.config['debug']
         self.report = None
+
+        if self.config['debug']:
+            logger.setLevel(logging.DEBUG)
 
     def log(self, key, value):
         if self.report is None:
@@ -56,8 +60,7 @@ class IOpipe(object):
     def __call__(self, func):
         @functools.wraps(func)
         def wrapped(event, context):
-            if self.debug:
-                logger.debug('%s wrapped with IOpipe decorator' % func)
+            logger.debug('%s wrapped with IOpipe decorator' % func)
 
             # if env var IOPIPE_ENABLED is set to False skip reporting
             if self.config['enabled'] is False:

@@ -38,7 +38,6 @@ class Report(object):
         self.config = config
         self.context = context
         self.custom_metrics = []
-        self.debug = config['debug']
         self.plugins = config['plugins']
 
         self.report = {
@@ -161,8 +160,7 @@ class Report(object):
             'timestamp': int(time.time() * 1000),
         })
 
-        if self.debug:
-            logger.debug('Sending report to IOpipe:')
-            logger.debug(json.dumps(self.report, indent=2))
+        logger.debug('Sending report to IOpipe:')
+        logger.debug(json.dumps(self.report, indent=2))
 
         send_report(self.report, self.config)
