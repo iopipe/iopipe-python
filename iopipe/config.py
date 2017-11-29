@@ -8,22 +8,24 @@ def set_config(**config):
     """
     Returns IOpipe configuration options, setting defaults as necessary.
     """
-    config.setdefault('host', get_hostname())
-    config.setdefault('path', get_collector_path())
-    config.setdefault('client_id', os.getenv('IOPIPE_TOKEN') or os.getenv('IOPIPE_CLIENTID') or '')
-    config.setdefault('debug', os.getenv('IOPIPE_DEBUG', False))
-    config.setdefault('network_timeout', 5000)
-    config.setdefault('timeout_window', os.getenv('IOPIPE_TIMEOUT_WINDOW', 150))
-    config.setdefault('install_method', 'manual')
+    config.setdefault('debug', bool(strtobool(os.getenv('IOPIPE_DEBUG', 'false'))))
     config.setdefault('enabled', bool(strtobool(os.getenv('IOPIPE_ENABLED', 'true'))))
+    config.setdefault('host', get_hostname())
+    config.setdefault('install_method', 'manual')
+    config.setdefault('network_timeout', 5000)
+    config.setdefault('path', get_collector_path())
     config.setdefault('plugins', [])
+    config.setdefault('timeout_window', os.getenv('IOPIPE_TIMEOUT_WINDOW', 150))
+    config.setdefault('token', os.getenv('IOPIPE_TOKEN') or os.getenv('IOPIPE_CLIENTID') or '')
+
+    if 'client_id' in config:
+        config['token'] = config.pop('client_id')
 
     if 'url' in config:
-        config['host'] = get_hostname(config['url'])
-        config['path'] = get_collector_path(config['url'])
+        url = config.pop('url')
 
-    if 'token' in config:
-        config['client_id'] = config['token']
+        config['host'] = get_hostname(url)
+        config['path'] = get_collector_path(url)
 
     try:
         config['debug'] = bool(config['debug'])

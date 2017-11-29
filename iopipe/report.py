@@ -26,7 +26,7 @@ class Report(object):
 
     def __init__(self, config, context):
         """
-        Instantiates a new report.
+        Instantiates a new IOpipe report.
 
         :param config: The IOpipe agent config.
         :param context: The AWS Lambda context.
@@ -42,7 +42,7 @@ class Report(object):
 
         self.report = {
             'aws': {},
-            'client_id': self.config.get('client_id'),
+            'client_id': self.config['token'],
             'coldstart': constants.COLDSTART,
             'custom_metrics': self.custom_metrics,
             'duration': None,
@@ -54,7 +54,6 @@ class Report(object):
                 },
                 'python': {
                     'version': platform.python_version(),
-                    'memoryUsage': None,
                 },
                 'host': {
                     'container_id': None,

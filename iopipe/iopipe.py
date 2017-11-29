@@ -14,9 +14,9 @@ logger.setLevel(logging.INFO)
 
 
 class IOpipe(object):
-    def __init__(self, client_id=None, url=None, debug=None, **options):
-        if client_id is not None:
-            options['client_id'] = client_id
+    def __init__(self, token=None, url=None, debug=None, **options):
+        if token is not None:
+            options['token'] = token
         if url is not None:
             options['url'] = url
         if debug is not None:
@@ -69,9 +69,9 @@ class IOpipe(object):
                 return func(event, context)
 
             # If a token is not present, skip reporting
-            if not self.config['client_id']:
+            if not self.config['token']:
                 warnings.warn('Your function is decorated with iopipe, but a valid token was not found. '
-                              'Set the IOPIPE_TOKEN environment variable with your IOpipe token.')
+                              'Set the IOPIPE_TOKEN environment variable with your IOpipe project token.')
                 return func(event, context)
 
             self.report = Report(self.config, context)
