@@ -20,6 +20,10 @@ SUPPORTED_REGIONS = [
 def get_collector_path(base_url=None):
     """
     Returns the IOpipe collector's path. By default this is `/v0/event`.
+
+    :param base_url: An optional base URL to use.
+    :returns: The collector's path.
+    :rtype: str
     """
     if not base_url:
         return '/v0/event'
@@ -37,6 +41,10 @@ def get_hostname(config_url=None):
     Returns the IOpipe collector's hostname. If  the `AWS_REGION` environment
     variable is not set or unsupported then `us-east-1` will be used by
     default. In this case, `us-east-1` is `metrics-api.iopipe.com`.
+
+    :param config_url: A optional config URL to use.
+    :returns: The collector's hostname.
+    :rtype: str
     """
     region_string = ''
     if config_url:

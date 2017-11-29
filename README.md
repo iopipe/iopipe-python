@@ -1,44 +1,34 @@
-# IOpipe Telemetry Agent for Python
+# IOpipe Analytics & Distributed Tracing Agent for Python
 
-This package provides a Python object to send telemetry to the IOpipe platform for application performance monitoring, analytics, and distributed tracing.
-
-## Maintenance Notice
-
-This project is on hiatus so that we at IOpipe can focus on our core functionality until such time as we have the resources to devote to giving our users a truly top-notch Python agent. This module will remain *in alpha state* until that time. We will still accept issue reports/pull requests, and will respond as quickly as we can to either. We appreciate your patience.
+This package provides analytics and distributed tracing for event-driven applications running on AWS Lambda.
 
 ## Installation
 
-We expect you will import this library into an existing (or new) Python project
-intended to be run on AWS Lambda.  On Lambda, functions are expected to include
-module dependencies within their project paths, thus we use `-t $PWD`. Users
-building projects with a requirements.txt file may simply add `iopipe` to their
-dependencies.
+We expect you will import this library into an existing (or new) Python project intended to be run on AWS Lambda.  On Lambda, functions are expected to include module dependencies within their project paths, thus we use `-t $PWD`. Users building projects with a requirements.txt file may simply add `iopipe` to their dependencies.
 
 From your project directory:
 
-```
+```bash
 $ pip install iopipe -t .
 
 # If running locally or in other environments _besides_ AWS Lambda:
-$ pip install requests -t iopipe/requests
+$ pip install requests -t .
 ```
 
-Your folder structure for the function should look similar to;
+Your folder structure for the function should look similar to:
 
 ```
 index.py # contains your lambda handler
   /iopipe
     - __init__.py
     - iopipe.py
-    /requests
-      - __init__.py
-      - api.py
-      - ...
+  /requests
+    - __init__.py
+    - api.py
+    - ...
 ```
 
-Installation of the requests library is necessary for local dev/test, but not
-when running on AWS Lambda as this library is part of the default environment
-via the botocore library.
+Installation of the requests library is necessary for local dev/test, but not when running on AWS Lambda as this library is part of the default environment via the botocore library.
 
 More details about lambda deployments are available in the [AWS documentation](https://docs.aws.amazon.com/lambda/latest/dg/lambda-python-how-to-create-deployment-package.html).
 
@@ -47,10 +37,11 @@ More details about lambda deployments are available in the [AWS documentation](h
 Simply use our decorator to report metrics:
 
 ```python
-from iopipe.iopipe import IOpipe
-iopipe = IOpipe("your-client-id")
+from iopipe import IOpipe
 
-@iopipe.decorator
+iopipe = IOpipe("your project token here")
+
+@iopipe
 def handler(event, context):
   pass
 ```
@@ -59,65 +50,64 @@ def handler(event, context):
 
 The following may be set as kwargs to the IOpipe class initializer:
 
-- client_id: your client_id (register at [www.iopipe.com](https://www.iopipe.com)
-- debug: enable debug logging by setting this to `True`
-- url: custom URL for reporting metrics
+#### `token` (string: required)
 
-## Advanced Usage
+Your IOpipe project token. If not supplied, the environment variable `$IOPIPE_TOKEN` will be used if present. [Find your project token](https://dashboard.iopipe.com/install)
 
-Instantiate an `iopipe.IOpipe` object inside of your function, then
-call .err(Exception) and .send() to report data and exceptions.
+#### `debug` (bool: optional = False)
 
-We recommend using our handy decorator instead.
+Debug mode will log all data sent to IOpipe servers. This is also a good way to evaluate the sort of data that IOpipe is receiving from your application. If not supplied, the environment variable `IOPIPE_DEBUG` will be used if present.
 
-```python
-from iopipe.iopipe import IOpipe
+#### `enabled` (bool: optional = True)
 
-def handler(event, context):
-  iopipe = IOpipe(CLIENT_ID)
-  timestamp = time.time()
-  report = iopipe.create_report(timestamp, context)
-
-  try:
-    # do some things
-  except Exception as e:
-    iopipe.err(e)
-
-  report.send()
-```
-
-If you want to report on multiple functions, you can simply pass the IOpipe object from function to function.
+Conditionally enable/disable the agent. For example, you will likely want to disabled the agent during development. The environment variable `$IOPIPE_ENABLED` will also be checked.
 
 ### Reporting Exceptions
 
-If you want to trace exceptions thrown in your case, you can use the `.err(err)` function. This will add the exception to the current report.
+The IOpipe decorator will automatically catch, trace and reraise any uncaught exceptions in your function. If you want to trace exceptions raised in your case, you can use the `.error(exception)` method. This will add the exception to the current report.
+
+```python
+from iopipe import IOpipe
+
+iopipe = IOpipe()
+
+# Example 1: uncaught exceptions
+
+@iopipe
+def handler(event, context):
+  raise Exception('This exception will be added to the IOpipe report automatically')
+
+# Example 2: caught exceptions
+
+@iopipe
+def handler(event, context):
+  try:
+    raise Exception('This exception is being caught by your function')
+  except Exception as e:
+    # Makes sure the exception is added to the report
+    iopipe.error(e)
+```
+
+It is important to note that a report is sent to IOpipe when `error()` is called. So you should only record exceptions this way for failure states. For caught exceptions that are not a failure state, it is recommended to use custom metrics (see below).
 
 ### Custom Metrics
 
 You can log custom values in the data sent upstream to IOpipe using the following syntax:
 
 ```python
-from iopipe.iopipe import IOpipe
+from iopipe import IOpipe
+
 iopipe = IOpipe()
 
-@iopipe.decorator
+@iopipe
 def handler(event, context):
   # the name of the metric must be a string
   # numerical (int, long, float) and string types supported for values
   iopipe.log("my_metric", 42)
-  pass
 ```
 
 This makes it easy to add custom data and telemetry within your function.
 
-### Disabling IOpipe
+## License
 
-If you need to disable IOpipe monitoring during development or in any other situation you can set `IOPIPE_ENABLED` environment variable to `False`.
-
-Default for `IOPIPE_ENABLED` environment variable is `True`.
-
-## Copyright
-
-Provided under the Apache-2.0 license. See LICENSE for details.
-
-Copyright 2016-2017, IOpipe, Inc.
+Apache 2.0
