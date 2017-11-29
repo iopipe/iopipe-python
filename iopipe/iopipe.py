@@ -9,7 +9,7 @@ from .report import Report
 
 logging.basicConfig()
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('iopipe')
 logger.setLevel(logging.INFO)
 
 
