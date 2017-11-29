@@ -91,25 +91,6 @@ class Report(object):
             data['getRemainingTimeInMillis'] = self.context.get_remaining_time_in_millis()
         return data
 
-    def merge_report(self, a, b):
-        """
-        Merges two dicts together to build a report.
-
-        :param a: The base dict to be merge into.
-        :param b: The dict to merge into the base.
-        :returns: A merged dict. Note that a is also mutated.
-        :rtype: dict
-        """
-        for key in b:
-            if key in a:
-                if isinstance(a[key], dict) and isinstance(b[key], dict):
-                    self.merge_report(a[key], b[key])
-                else:
-                    a[key] = b[key]
-            else:
-                a[key] = b[key]
-        return a
-
     def retain_error(self, error):
         """
         Adds details of an error to the report.
@@ -145,33 +126,31 @@ class Report(object):
 
         self.report['environment']['os']['linux']['mem'] = meminfo = system.read_meminfo()
 
-        self.merge_report(self.report, {
+        self.report.update({
             'aws': self.extract_context_data(),
             'duration': int(duration * 1e9),
-            'environment': {
-                'os': {
-                    'arch': system.read_arch(),
-                    'cpus': system.read_stat(),
-                    'freemem': meminfo['MemFree'],
-                    'hostname': system.read_hostname(),
-                    'linux': {
-                        'pid': {
-                            'self': {
-                                'stat': system.read_pid_stat('self'),
-                                'stat_start': self.stat_start,
-                                'status': system.read_pid_status('self'),
-                            },
-                        },
-                    },
-                    'totalmem': meminfo['MemTotal'],
-                    'uptime': system.read_uptime(),
-                    'usedmem': meminfo['MemTotal'] - meminfo['MemFree'],
-                },
-            },
             'time_sec': int(duration),
             'time_nanosec': int((duration - int(duration)) * 1e9),
             'timestamp': int(time.time() * 1000),
         })
+
+        self.report['environment']['os'].update({
+            'arch': system.read_arch(),
+            'cpus': system.read_stat(),
+            'freemem': meminfo['MemFree'],
+            'hostname': system.read_hostname(),
+            'totalmem': meminfo['MemTotal'],
+            'uptime': system.read_uptime(),
+            'usedmem': meminfo['MemTotal'] - meminfo['MemFree'],
+        })
+
+        self.report['environment']['os']['linux']['pid'] = {
+            'self': {
+                'stat': system.read_pid_stat('self'),
+                'stat_start': self.stat_start,
+                'status': system.read_pid_status('self'),
+            },
+        }
 
         logger.debug('Sending report to IOpipe:')
         logger.debug(json.dumps(self.report, indent=2, sort_keys=True))
