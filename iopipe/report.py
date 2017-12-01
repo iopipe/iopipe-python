@@ -11,7 +11,7 @@ import monotonic
 from . import constants
 from .send_report import send_report
 
-if sys.platform == 'linux2':
+if sys.platform.startswith('linux'):
     from . import system
 else:
     from . import mock_system as system
