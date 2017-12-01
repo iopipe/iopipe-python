@@ -1,0 +1,116 @@
+{
+  "aws": {
+    "awsRequestId": "s",
+    "functionName": "s",
+    "functionVersion": "s",
+    "getRemainingTimeInMillis": "n",
+    "invokedFunctionArn": "s",
+    "logGroupName": "s",
+    "logStreamName": "s",
+    "memoryLimitInMB": "n",
+    "traceId": "s"
+  },
+  "client_id": "s",
+  "coldstart": "b",
+  "custom_metrics": [
+    {
+      "n": "n",
+      "name": "s",
+      "s": "s"
+    }
+  ],
+  "duration": "i",
+  "environment": {
+    "agent": {
+      "load_time": "n",
+      "runtime": "s",
+      "version": "s"
+    },
+    "host": {
+      "boot_id": "s"
+    },
+    "nodejs": {
+      "memoryUsage": {
+        "rss": "n"
+      },
+      "version": "s"
+    },
+    "os": {
+      "cpus": [
+        {
+          "times": {
+            "idle": "n",
+            "irq": "n",
+            "nice": "n",
+            "sys": "n",
+            "user": "n"
+          }
+        }
+      ],
+      "freemem": "n",
+      "hostname": "s",
+      "linux": {
+        "pid": {
+          "self": {
+            "stat": {
+              "cstime": "n",
+              "cutime": "n",
+              "stime": "n",
+              "utime": "n"
+            },
+            "stat_start": {
+              "cstime": "n",
+              "cutime": "n",
+              "stime": "n",
+              "utime": "n"
+            },
+            "status": {
+              "FDSize": "n",
+              "Threads": "n",
+              "VmRSS": "n"
+            }
+          }
+        }
+      },
+      "totalmem": "n",
+      "usedmem": "n"
+    },
+    "python": {
+      "version": "s"
+    }
+  },
+  "errors": {
+    "count": "n",
+    "message": "s",
+    "name": "s",
+    "stack": "s",
+    "stackHash": "s"
+  },
+  "installMethod": "s",
+  "memory": {
+    "rssMiB": "n",
+    "rssTotalPercentage": "n",
+    "totalMiB": "n"
+  },
+  "performanceEntries": [
+    {
+      "duration": "n",
+      "entryType": "s",
+      "name": "s",
+      "startTime": "n",
+      "timestamp": "n"
+    }
+  ],
+  "plugins": [
+    {
+      "enabled": "b",
+      "homepage": "s",
+      "name": "s",
+      "version": "s"
+    }
+  ],
+  "processId": "s",
+  "projectId": "s",
+  "timestamp": "n",
+  "timestampEnd": "n"
+}

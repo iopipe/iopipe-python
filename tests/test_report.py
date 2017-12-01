@@ -1,6 +1,10 @@
+import json
+import numbers
+import os
+import sys
+
 import mock
 import pytest
-import sys
 
 from iopipe.config import set_config
 from iopipe.report import Report
@@ -8,8 +12,40 @@ from iopipe.report import Report
 from .mock_context import MockContext
 
 
+def assert_valid_schema(obj, schema=None, path=None):
+    """Asserts that an object matches the schema"""
+
+    if not schema:
+        schema_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'schema.json')
+        with open(schema_path) as f:
+            schema = json.loads(f.read())
+
+    if not path:
+        path = []
+
+    for key in obj:
+        if key not in schema:
+            continue
+
+        if isinstance(obj[key], dict):
+            assert_valid_schema(obj[key], schema[key], path + [key])
+        elif isinstance(obj[key], list):
+            for item in obj[key]:
+                assert_valid_schema(item, schema[key][0], path + [key])
+        elif schema[key] == 'b':
+            assert isinstance(obj[key], bool), '%s not a boolean' % '.'.join(path + [key])
+        elif schema[key] == 'i':
+            assert isinstance(obj[key], int), '%s not a integer' % '.'.join(path + [key])
+        elif schema[key] == 'n':
+            assert isinstance(obj[key], numbers.Number), '%s not a number' % '.'.join(path + [key])
+        elif schema[key] == 's':
+            assert isinstance(obj[key], str), '%s not a string' % '.'.join(path + [key])
+
+
 @mock.patch('iopipe.report.send_report')
 def test_report_linux_system(mock_send_report):
+    """Asserts that fields collected by the system module are present in a report"""
+
     if not sys.platform.startswith('linux'):
         pytest.skip('this test requires linux, skipping')
 
@@ -41,3 +77,5 @@ def test_report_linux_system(mock_send_report):
 
     for key in ['VmRSS', 'Threads', 'FDSize']:
         assert key in report.report['environment']['os']['linux']['pid']['self']['status']
+
+    assert_valid_schema(report.report)

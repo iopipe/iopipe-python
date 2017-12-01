@@ -1,6 +1,6 @@
 class MockContext(object):
     function_version = '$LATEST'
-    aws_request_id = 0
+    aws_request_id = '0'
     log_group_name = 'mock-group'
     log_stream_name = 'mock-stream'
     memory_limit_in_mb = 500

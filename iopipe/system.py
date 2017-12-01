@@ -111,11 +111,11 @@ def read_stat():
             data.append({
                 'name': cpu_stat[0],
                 'times': {
-                    'user': cpu_stat[1],
-                    'nice': cpu_stat[2],
-                    'sys': cpu_stat[3],
-                    'idle': cpu_stat[4],
-                    'irq': cpu_stat[6]
+                    'user': int(cpu_stat[1]),
+                    'nice': int(cpu_stat[2]),
+                    'sys': int(cpu_stat[3]),
+                    'idle': int(cpu_stat[4]),
+                    'irq': int(cpu_stat[6])
                 }
             })
     return data
