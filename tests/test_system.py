@@ -8,8 +8,7 @@ from iopipe import system
 
 
 def test_read_arch():
-    arch = system.read_arch()
-    assert arch == platform.machine()
+    assert system.read_arch() == platform.machine()
 
 
 def test_read_bootid():
