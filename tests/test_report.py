@@ -5,20 +5,22 @@ import sys
 
 import mock
 import pytest
+import requests
 
 from iopipe.config import set_config
 from iopipe.report import Report
 
 from .mock_context import MockContext
 
+SCHEMA_JSON_URL = 'https://raw.githubusercontent.com/iopipe/iopipe/master/src/schema.json'
+
 
 def assert_valid_schema(obj, schema=None, path=None):
     """Asserts that an object matches the schema"""
 
     if not schema:
-        schema_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'schema.json')
-        with open(schema_path) as f:
-            schema = json.loads(f.read())
+        r = requests.get(SCHEMA_JSON_URL)
+        schema = json.loads(r.content)
 
     if not path:
         path = []
