@@ -7,6 +7,10 @@ dependencies:
     - pip install twine==1.8.1
     - pip install flake8==3.3.0
 
+test:
+  override:
+    - tox
+
 deployment:
   release:
     # release on tagged versions
