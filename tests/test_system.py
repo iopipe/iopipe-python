@@ -13,7 +13,7 @@ def test_read_arch():
 
 
 def test_read_bootid():
-    if sys.platform != 'linux2':
+    if not sys.platform.startswith('linux'):
         pytest.skip('this test requires linux, skipping')
 
     bootid = system.read_bootid()
@@ -26,7 +26,7 @@ def test_read_hostname():
 
 
 def test_read_meminfo():
-    if sys.platform != 'linux2':
+    if not sys.platform.startswith('linux'):
         pytest.skip('this test requires linux, skipping')
 
     meminfo = system.read_meminfo()
@@ -35,7 +35,7 @@ def test_read_meminfo():
 
 
 def test_read_pid_stat():
-    if sys.platform != 'linux2':
+    if not sys.platform.startswith('linux'):
         pytest.skip('this test requires linux, skipping')
 
     stat = system.read_pid_stat('self')
@@ -44,7 +44,7 @@ def test_read_pid_stat():
 
 
 def test_read_pid_status():
-    if sys.platform != 'linux2':
+    if not sys.platform.startswith('linux'):
         pytest.skip('this test requires linux, skipping')
 
     status = system.read_pid_status('self')
@@ -53,7 +53,7 @@ def test_read_pid_status():
 
 
 def test_read_stat():
-    if sys.platform != 'linux2':
+    if not sys.platform.startswith('linux'):
         pytest.skip('this test requires linux, skipping')
 
     cpus = system.read_stat()
@@ -64,7 +64,7 @@ def test_read_stat():
 
 
 def test_read_uptime():
-    if sys.platform != 'linux2':
+    if not sys.platform.startswith('linux'):
         pytest.skip('this test requires linux, skipping')
 
     uptime = system.read_uptime()
