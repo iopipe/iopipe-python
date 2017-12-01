@@ -6,4 +6,4 @@ WORKDIR /var/lib/iopipe
 
 COPY . /var/lib/iopipe
 
-RUN python setup.py test
+RUN pip install -U setuptools && python setup.py test

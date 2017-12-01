@@ -9,7 +9,7 @@ def read_arch():
     :returns: The system architecture.
     :rtype: str
     """
-    return platform.uname()[-2]
+    return platform.machine()
 
 
 def read_bootid():
