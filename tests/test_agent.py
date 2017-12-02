@@ -47,7 +47,7 @@ def handler_that_errors(iopipe):
 def handler_that_timeouts(iopipe):
     @iopipe.decorator
     def _handler_that_timeouts(event, context):
-        time.sleep(5)
+        time.sleep(2)
         raise Exception('Should timeout before this is raised')
     return iopipe, _handler_that_timeouts
 
@@ -114,7 +114,7 @@ def test_erroring(mock_send_report, handler_that_errors, mock_context):
 def test_timeouts(mock_send_report, handler_that_timeouts, mock_context):
     """Assert that the agent timeouts before function does"""
     iopipe, handler = handler_that_timeouts
-    mock_context.set_remaining_time_in_millis(200)
+    mock_context.set_remaining_time_in_millis(2000)
 
     try:
         handler(None, mock_context)
