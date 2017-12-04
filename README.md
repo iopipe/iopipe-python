@@ -108,6 +108,28 @@ def handler(event, context):
 
 This makes it easy to add custom data and telemetry within your function.
 
+## Framework Integration
+
+### Chalice
+
+Using IOpipe with the [Chalice](https://github.com/aws/chalice) framework is easy. Just wrap your `app` like so:
+
+```python
+from chalice import Chalice
+from iopipe import IOpipe
+
+iopipe = IOpipe()
+
+app = Chalice(app_name='helloworld')
+
+@app.route("/")
+def index():
+    return {'hello': 'world'}
+
+# Do this after defining your routes
+app = iopipe(app)
+```
+
 ## License
 
 Apache 2.0

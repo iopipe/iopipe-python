@@ -1,5 +1,6 @@
 import decimal
 import functools
+import inspect
 import logging
 import numbers
 import warnings
@@ -61,7 +62,11 @@ class IOpipe(object):
     def __call__(self, func):
         @functools.wraps(func)
         def wrapped(event, context):
-            logger.debug('%s.%s wrapped with IOpipe decorator' % (func.__module__, func.__name__))
+            if hasattr(func, '__name__'):
+                func_name = func.__name__
+            elif hasattr(func, '__class__'):
+                func_name = func.__class__.__name__
+            logger.debug('%s.%s wrapped with IOpipe decorator' % (func.__module__, func_name))
 
             # if env var IOPIPE_ENABLED is set to False skip reporting
             if self.config['enabled'] is False:
