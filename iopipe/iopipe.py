@@ -1,6 +1,5 @@
 import decimal
 import functools
-import inspect
 import logging
 import numbers
 import warnings
