@@ -120,9 +120,7 @@ class Report(object):
 
         duration = monotonic.monotonic() - self.start_time
 
-        self.report['environment']['host']['boot_id'] = \
-            self.report['environment']['host']['container_id'] = \
-            system.read_bootid()
+        self.report['environment']['host']['boot_id'] = system.read_bootid()
 
         self.report['environment']['os']['linux']['mem'] = meminfo = system.read_meminfo()
 

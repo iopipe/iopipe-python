@@ -22,5 +22,5 @@ setup(name='iopipe',
           ]
       },
       setup_requires=['pytest-runner'],
-      tests_require=['pytest']
+      tests_require=['mock', 'pytest', 'requests']
       )

@@ -2,7 +2,7 @@ import pytest
 
 from iopipe import constants, IOpipe
 
-from .MockContext import MockContext
+from .mock_context import MockContext
 
 
 @pytest.fixture
@@ -40,7 +40,6 @@ def handler_that_errors(iopipe):
     return iopipe, _handler_that_errors
 
 
-# N.B. this must be the first test!
 def test_coldstarts(handler, mock_context, monkeypatch):
     monkeypatch.setattr(constants, 'COLDSTART', True)
 
