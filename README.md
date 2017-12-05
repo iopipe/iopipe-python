@@ -130,6 +130,29 @@ def index():
 app = iopipe(app)
 ```
 
+### Zappa
+
+Using IOpipe with [Zappa](https://github.com/Miserlou/Zappa) is easy. In your project add the following:
+
+```python
+from iopipe import IOpipe
+from zappa.handler import LambdaHandler
+
+iopipe = IOpipe()
+
+lambda_handler = iopipe(LambdaHandler.lambda_handler)
+```
+
+Then in your `zappa_settings.json` file include the following:
+
+```js
+{
+  "lambda_handler": "module.path.to.lambda_handler"
+}
+```
+
+Where `module-path.to.lambda_handler` is the Python module path to the `lambda_handler` you created above. For example, if you put it in `myproject.__init__.py` the path would be `myproject.lambda_handler`.
+
 ## License
 
 Apache 2.0
