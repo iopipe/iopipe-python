@@ -61,7 +61,7 @@ class IOpipe(object):
     def __call__(self, func):
         @functools.wraps(func)
         def wrapped(event, context):
-            logger.debug('%s.%s wrapped with IOpipe decorator' % (func.__module__, func.__name__))
+            logger.debug('%s wrapped with IOpipe decorator' % repr(func))
 
             # if env var IOPIPE_ENABLED is set to False skip reporting
             if self.config['enabled'] is False:
