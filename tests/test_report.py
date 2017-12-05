@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import json
 import numbers
 import sys
@@ -6,18 +5,12 @@ import sys
 import mock
 import pytest
 import requests
-=======
-import mock
-import pytest
-import sys
->>>>>>> Fix sys.platform checks, add report test to check for system fields
 
 from iopipe.config import set_config
 from iopipe.report import Report
 
 from .mock_context import MockContext
 
-<<<<<<< HEAD
 SCHEMA_JSON_URL = 'https://raw.githubusercontent.com/iopipe/iopipe/master/src/schema.json'
 
 
@@ -61,12 +54,6 @@ def assert_valid_schema(obj, schema=None, path=None, optional_fields=None):
 @mock.patch('iopipe.report.send_report')
 def test_report_linux_system_success(mock_send_report):
     """Asserts that fields collected by the system module are present in a success report"""
-
-=======
-
-@mock.patch('iopipe.report.send_report')
-def test_report_linux_system(mock_send_report):
->>>>>>> Fix sys.platform checks, add report test to check for system fields
     if not sys.platform.startswith('linux'):
         pytest.skip('this test requires linux, skipping')
 
@@ -75,7 +62,6 @@ def test_report_linux_system(mock_send_report):
     report = Report(set_config(), mock_context)
     report.send()
 
-<<<<<<< HEAD
     assert_valid_schema(report.report, optional_fields=[
         'aws.traceId',
         'environment.nodejs',
@@ -94,7 +80,6 @@ def test_report_linux_system(mock_send_report):
 @mock.patch('iopipe.report.send_report')
 def test_report_linux_system_error(mock_send_report):
     """Asserts that fields collected by the system module are present in a error report"""
-
     if not sys.platform.startswith('linux'):
         pytest.skip('this test requires linux, skipping')
 
@@ -117,28 +102,3 @@ def test_report_linux_system_error(mock_send_report):
         'performanceEntries',
         'timestampEnd',
     ])
-=======
-    assert 'aws' in report.report
-
-    for key in ['functionName', 'functionVersion', 'awsRequestId',
-                'invokedFunctionArn', 'logGroupName', 'logStreamName',
-                'memoryLimitInMB', 'getRemainingTimeInMillis']:
-        assert key in report.report['aws']
-
-    assert 'cpus' in report.report['environment']['os']
-
-    for cpu in report.report['environment']['os']['cpus']:
-        assert 'times' in cpu
-        for key in ['idle', 'irq', 'sys', 'user', 'nice']:
-            assert key in cpu['times']
-
-    assert 'freemem' in report.report['environment']['os']
-    assert 'totalmem' in report.report['environment']['os']
-
-    for key in ['utime', 'stime', 'cutime', 'cstime', 'rss']:
-        assert key in report.report['environment']['os']['linux']['pid']['self']['stat']
-        assert key in report.report['environment']['os']['linux']['pid']['self']['stat_start']
-
-    for key in ['VmRSS', 'Threads', 'FDSize']:
-        assert key in report.report['environment']['os']['linux']['pid']['self']['status']
->>>>>>> Fix sys.platform checks, add report test to check for system fields
