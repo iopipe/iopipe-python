@@ -19,7 +19,7 @@ def send_report(report, config):
     url = 'https://{host}{path}'.format(**config)
 
     try:
-        response = session.post(url, json=report)
+        response = session.post(url, json=report, timeout=config['network_timeout'])
         response.raise_for_status()
         logger.debug('Report sent to IOpipe successfully')
     except Exception as e:
