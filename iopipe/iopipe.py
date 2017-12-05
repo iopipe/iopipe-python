@@ -94,7 +94,8 @@ class IOpipe(object):
 
                 logger.debug('Setting timeout duration to %s' % timeout_duration)
 
-                # Using signal.setitimer instead of signal.alarm because the latter only accepts seconds
+                # Using signal.setitimer instead of signal.alarm because the latter only accepts integers and we want to
+                # be able to timeout at millisecond granularity
                 signal.setitimer(signal.ITIMER_REAL, timeout_duration)
 
             result = None
