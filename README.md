@@ -122,7 +122,7 @@ iopipe = IOpipe()
 
 app = Chalice(app_name='helloworld')
 
-@app.route("/")
+@app.route('/')
 def index():
     return {'hello': 'world'}
 
@@ -151,7 +151,7 @@ Then in your `zappa_settings.json` file include the following:
 }
 ```
 
-Where `module-path.to.lambda_handler` is the Python module path to the `lambda_handler` you created above. For example, if you put it in `myproject.__init__.py` the path would be `myproject.lambda_handler`.
+Where `module-path.to.lambda_handler` is the Python module path to the `lambda_handler` you created above. For example, if you put it in `myproject/__init__.py` the path would be `myproject.lambda_handler`.
 
 ## License
 
