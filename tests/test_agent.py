@@ -123,3 +123,22 @@ def test_timeouts(mock_send_report, handler_that_timeouts, mock_context):
 
     assert iopipe.report.report['errors'] == {}
     mock_send_report.assert_called_once_with(iopipe.report.report, iopipe.config)
+
+
+@mock.patch('iopipe.report.send_report', autospec=True)
+def test_timeouts_disable(mock_send_report, handler_that_timeouts, mock_context):
+    """Assert the timeout is disabled if insufficient time remaining"""
+    iopipe, handler = handler_that_timeouts
+
+    # The default is 1.5, so 1500 / 100 - 1.5 = 0
+    mock_context.set_remaining_time_in_millis(1500)
+
+    try:
+        handler(None, mock_context)
+    except Exception:
+         pass
+
+    # Exception will occur because timeout is disabled
+    assert iopipe.report.report['errors'] != {}
+    assert iopipe.report.report['errors']['name'] == 'Exception'
+    assert iopipe.report.report['errors']['message'] == 'Should timeout before this is raised'

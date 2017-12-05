@@ -80,10 +80,17 @@ class IOpipe(object):
             # Partial acts as a closure here so that a reference to the report is passed to the timeout handler
             signal.signal(signal.SIGALRM, functools.partial(self.timeout_handler, self.report))
 
-            if hasattr(context, 'get_remaining_time_in_millis') and callable(context.get_remaining_time_in_millis):
-                timeout_duration = (context.get_remaining_time_in_millis() - self.config['timeout_window']) / 1000.0
+            # Disable timeout if timeout_window <= 0, or if our context doesn't have a get_remaining_time_in_millis
+            if self.config['timeout_window'] > 0 and \
+                    hasattr(context, 'get_remaining_time_in_millis') and \
+                    callable(context.get_remaining_time_in_millis):
+                timeout_duration = (context.get_remaining_time_in_millis() / 1000.0) - self.config['timeout_window']
+
+                # The timeout_duration cannot be a negative number, disable if it is
                 timeout_duration = max([0, timeout_duration])
-                timeout_duration = min([timeout_duration, 60 * 60 * 10 - 0.1])
+
+                # Maximum execution time is 10 minutes, make sure timeout doesn't exceed that minus the timeout window
+                timeout_duration = min([timeout_duration, 60 * 60 * 10 - self.config['timeout_window']])
 
                 logger.debug('Setting timeout duration to %s' % timeout_duration)
 
