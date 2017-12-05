@@ -15,7 +15,7 @@ def set_config(**config):
     config.setdefault('network_timeout', 5)
     config.setdefault('path', get_collector_path())
     config.setdefault('plugins', [])
-    config.setdefault('timeout_window', os.getenv('IOPIPE_TIMEOUT_WINDOW', 150))
+    config.setdefault('timeout_window', os.getenv('IOPIPE_TIMEOUT_WINDOW', 1.5))
     config.setdefault('token', os.getenv('IOPIPE_TOKEN') or os.getenv('IOPIPE_CLIENTID') or '')
 
     if 'client_id' in config:
@@ -38,8 +38,8 @@ def set_config(**config):
         config['network_timeout'] = 5
 
     try:
-        config['timeout_window'] = int(config['timeout_window'])
+        config['timeout_window'] = float(config['timeout_window'])
     except ValueError:
-        config['timeout_window'] = 150
+        config['timeout_window'] = 1.5
 
     return config
