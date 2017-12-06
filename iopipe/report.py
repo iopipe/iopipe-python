@@ -6,9 +6,8 @@ import sys
 import time
 import traceback
 
-import monotonic
-
 from . import constants
+from .monotonic import monotonic
 from .send_report import send_report
 
 if sys.platform.startswith('linux'):
@@ -32,7 +31,7 @@ class Report(object):
         :param context: The AWS Lambda context.
         """
         self.sent = False
-        self.start_time = monotonic.monotonic()
+        self.start_time = monotonic()
         self.stat_start = system.read_pid_stat('self')
 
         self.config = config
@@ -118,7 +117,7 @@ class Report(object):
         if error:
             self.retain_error(error)
 
-        duration = monotonic.monotonic() - self.start_time
+        duration = monotonic() - self.start_time
 
         self.report['environment']['host']['boot_id'] = system.read_bootid()
 
