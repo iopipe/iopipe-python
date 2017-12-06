@@ -45,9 +45,7 @@ import sys
 import threading
 import time
 
-
-__all__ = ('monotonic',)
-
+__all__ = ('monotonic', )
 
 try:
     monotonic = time.monotonic
@@ -60,8 +58,8 @@ except AttributeError:
 
             class mach_timebase_info_data_t(ctypes.Structure):
                 """System timebase info. Defined in <mach/mach_time.h>."""
-                _fields_ = (('numer', ctypes.c_uint32),
-                            ('denom', ctypes.c_uint32))
+                _fields_ = (('numer', ctypes.c_uint32), ('denom',
+                                                         ctypes.c_uint32))
 
             mach_absolute_time = libc.mach_absolute_time
             mach_absolute_time.restype = ctypes.c_uint64
@@ -74,17 +72,18 @@ except AttributeError:
                 """Monotonic clock, cannot go backward."""
                 return mach_absolute_time() / ticks_per_second
 
-        elif sys.platform.startswith('win32') or sys.platform.startswith('cygwin'):
+        elif sys.platform.startswith('win32') or sys.platform.startswith(
+                'cygwin'):
             if sys.platform.startswith('cygwin'):
                 # Note: cygwin implements clock_gettime (CLOCK_MONOTONIC = 4) since
                 # version 1.7.6. Using raw WinAPI for maximum version compatibility.
 
-                # Ugly hack using the wrong calling convention (in 32-bit mode) 
-                # because ctypes has no windll under cygwin (and it also seems that 
-                # the code letting you select stdcall in _ctypes doesn't exist under 
+                # Ugly hack using the wrong calling convention (in 32-bit mode)
+                # because ctypes has no windll under cygwin (and it also seems that
+                # the code letting you select stdcall in _ctypes doesn't exist under
                 # the preprocessor definitions relevant to cygwin).
                 # This is 'safe' because:
-                # 1. The ABI of GetTickCount and GetTickCount64 is identical for 
+                # 1. The ABI of GetTickCount and GetTickCount64 is identical for
                 #    both calling conventions because they both have no parameters.
                 # 2. libffi masks the problem because after making the call it doesn't
                 #    touch anything through esp and epilogue code restores a correct
@@ -131,16 +130,18 @@ except AttributeError:
 
         else:
             try:
-                clock_gettime = ctypes.CDLL(ctypes.util.find_library('c'),
-                                            use_errno=True).clock_gettime
+                clock_gettime = ctypes.CDLL(
+                    ctypes.util.find_library('c'),
+                    use_errno=True).clock_gettime
             except Exception:
-                clock_gettime = ctypes.CDLL(ctypes.util.find_library('rt'),
-                                            use_errno=True).clock_gettime
+                clock_gettime = ctypes.CDLL(
+                    ctypes.util.find_library('rt'),
+                    use_errno=True).clock_gettime
 
             class timespec(ctypes.Structure):
                 """Time specification, as described in clock_gettime(3)."""
-                _fields_ = (('tv_sec', ctypes.c_long),
-                            ('tv_nsec', ctypes.c_long))
+                _fields_ = (('tv_sec', ctypes.c_long), ('tv_nsec',
+                                                        ctypes.c_long))
 
             if sys.platform.startswith('linux'):
                 CLOCK_MONOTONIC = 1
@@ -166,4 +167,5 @@ except AttributeError:
             raise ValueError('monotonic() is not monotonic!')
 
     except Exception as e:
-        raise RuntimeError('no suitable implementation for this system: ' + repr(e))
+        raise RuntimeError(
+            'no suitable implementation for this system: ' + repr(e))
