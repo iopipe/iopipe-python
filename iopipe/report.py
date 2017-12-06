@@ -1,4 +1,3 @@
-import datetime
 import json
 import logging
 import platform
@@ -61,6 +60,7 @@ class Report(object):
             'installMethod': self.config.get('install_method'),
             'plugins': self.plugins,
             'processId': constants.PROCESS_ID,
+            'timestamp': int(time.time() * 1000),
         }
 
         constants.COLDSTART = False
@@ -100,7 +100,6 @@ class Report(object):
             'name': type(error).__name__,
             'message': '{}'.format(error),
             'stack': traceback.format_exc(),
-            'time_reported': datetime.datetime.now().strftime(constants.TIMESTAMP_FORMAT),
         }
         self.report['errors'] = details
 
@@ -121,23 +120,19 @@ class Report(object):
 
         self.report['environment']['host']['boot_id'] = system.read_bootid()
 
-        self.report['environment']['os']['linux']['mem'] = meminfo = system.read_meminfo()
+        meminfo = system.read_meminfo()
 
         self.report.update({
             'aws': self.extract_context_data(),
             'duration': int(duration * 1e9),
-            'time_sec': int(duration),
-            'time_nanosec': int((duration - int(duration)) * 1e9),
-            'timestamp': int(time.time() * 1000),
+            'timestampEnd': int(time.time() * 1000),
         })
 
         self.report['environment']['os'].update({
-            'arch': system.read_arch(),
             'cpus': system.read_stat(),
             'freemem': meminfo['MemFree'],
             'hostname': system.read_hostname(),
             'totalmem': meminfo['MemTotal'],
-            'uptime': system.read_uptime(),
             'usedmem': meminfo['MemTotal'] - meminfo['MemFree'],
         })
 

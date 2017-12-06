@@ -27,6 +27,10 @@ def assert_valid_schema(obj, schema=None, path=None, optional_fields=None):
     if not optional_fields:
         optional_fields = []
 
+    for key in obj:
+        key_path = '.'.join(path + [key])
+        assert key in schema, "%s not in schema" % key_path
+
     for key in schema:
         key_path = '.'.join(path + [key])
 
@@ -73,7 +77,6 @@ def test_report_linux_system_success(mock_send_report):
         'memory',
         'projectId',
         'performanceEntries',
-        'timestampEnd',
     ])
 
 
@@ -100,5 +103,4 @@ def test_report_linux_system_error(mock_send_report):
         'memory',
         'projectId',
         'performanceEntries',
-        'timestampEnd',
     ])

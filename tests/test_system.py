@@ -1,14 +1,9 @@
-import platform
 import socket
 import sys
 
 import pytest
 
 from iopipe import system
-
-
-def test_read_arch():
-    assert system.read_arch() == platform.machine()
 
 
 def test_read_bootid():
@@ -38,7 +33,7 @@ def test_read_pid_stat():
 
     stat = system.read_pid_stat('self')
 
-    for key in ['utime', 'stime', 'cutime', 'cstime', 'rss']:
+    for key in ['utime', 'stime', 'cutime', 'cstime']:
         assert key in stat
 
 
@@ -63,10 +58,3 @@ def test_read_stat():
 
         for key in ['idle', 'irq', 'sys', 'user', 'nice']:
             assert key in cpu['times']
-
-
-def test_read_uptime():
-    if not sys.platform.startswith('linux'):
-        pytest.skip('this test requires linux, skipping')
-
-    assert system.read_uptime() > 0
