@@ -9,7 +9,7 @@ reqs = [str(ir.req) for ir in install_reqs]
 
 
 setup(name='iopipe',
-      version='0.9.0',
+      version='0.9.1',
       description='IOpipe agent for serverless Application Performance Monitoring',
       author='IOpipe',
       author_email='support@iopipe.com',
