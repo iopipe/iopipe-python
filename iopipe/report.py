@@ -29,10 +29,9 @@ class Report(object):
         :param config: The IOpipe agent config.
         :param context: The AWS Lambda context.
         """
-        self.sent = False
         self.start_time = monotonic()
+        self.sent = False
         self.stat_start = system.read_pid_stat('self')
-
         self.config = config
         self.context = context
         self.custom_metrics = []
@@ -116,15 +115,12 @@ class Report(object):
         if error:
             self.retain_error(error)
 
-        duration = monotonic() - self.start_time
-
         self.report['environment']['host']['boot_id'] = system.read_bootid()
 
         meminfo = system.read_meminfo()
 
         self.report.update({
             'aws': self.extract_context_data(),
-            'duration': int(duration * 1e9),
             'timestampEnd': int(time.time() * 1000),
         })
 
@@ -143,6 +139,8 @@ class Report(object):
                 'status': system.read_pid_status('self'),
             },
         }
+
+        self.report['duration'] = int((monotonic() - self.start_time) * 1e9)
 
         logger.debug('Sending report to IOpipe:')
         logger.debug(json.dumps(self.report, indent=2, sort_keys=True))
