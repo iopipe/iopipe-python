@@ -1,6 +1,22 @@
 import abc
 
 
+def is_plugin(plugin):
+    """
+    REturns true if the plugin implements the `Plugin` interface.
+
+    :param plugin: The plugin to check.
+    :returns: True if plugin, False otherwise.
+    :rtype: bool
+    """
+    try:
+        issubclass(plugin, Plugin)
+    except TypeError:
+        return False
+    else:
+        return True
+
+
 def with_metaclass(meta, *bases):
     """Python 2 and 3 compatible way to do meta classes"""
     class metaclass(meta):
@@ -9,41 +25,7 @@ def with_metaclass(meta, *bases):
     return type.__new__(metaclass, 'temporary_class', (), {})
 
 
-class PluginRegistry(object):
-    def __init__(self):
-        self.registry = {}
-
-    def register(self, plugin):
-        self.registry[plugin.name] = plugin
-
-    def keys(self):
-        return self.registry.keys()
-
-    def get(self, name, default=None):
-        try:
-            return self[name]
-        except KeyError:
-            return default
-
-    def __getitem__(self, name):
-        return self.registry[name]
-
-
-registry = PluginRegistry()
-del PluginRegistry
-
-
-class Registerable(abc.ABCMeta):
-    def __new__(cls, clsname, bases, attrs):
-        newclass = super(Registerable, cls).__new__(cls, clsname, bases, attrs)
-        registry.register(newclass)
-        return newclass
-
-
-class Plugin(with_metaclass(Registerable, object)):
-    def __init__(self):
-        pass
-
+class Plugin(with_metaclass(abc.ABCMeta, object)):
     @abc.abstractproperty
     def name(self):
         return NotImplemented
@@ -53,23 +35,23 @@ class Plugin(with_metaclass(Registerable, object)):
         return NotImplemented
 
     @abc.abstractmethod
-    def pre_setup(self):
+    def pre_setup(self, iopipe):
         return NotImplemented
 
     @abc.abstractmethod
-    def post_setup(self):
+    def post_setup(self, config):
         return NotImplemented
 
     @abc.abstractmethod
-    def pre_invoke(self):
+    def pre_invoke(self, event, context):
         return NotImplemented
 
     @abc.abstractmethod
-    def post_invoke(self):
+    def post_invoke(self, event, context):
         return NotImplemented
 
     @abc.abstractmethod
-    def pre_reporT(self):
+    def pre_reporT(self, report):
         return NotImplemented
 
     @abc.abstractmethod

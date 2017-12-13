@@ -1,11 +1,13 @@
 import decimal
 import functools
+import inspect
 import logging
 import numbers
 import signal
 import warnings
 
 from .config import set_config
+from .plugins import is_plugin
 from .report import Report
 
 logging.basicConfig()
@@ -16,6 +18,8 @@ logger.setLevel(logging.INFO)
 
 class IOpipe(object):
     def __init__(self, token=None, url=None, debug=None, **options):
+        self.call_hooks('pre_setup')
+
         if token is not None:
             options['token'] = token
         if url is not None:
@@ -24,10 +28,13 @@ class IOpipe(object):
             options['debug'] = debug
 
         self.config = set_config(**options)
+        self.config['plugins'] = self.plugin_loader(self.config['plugins'])
         self.report = None
 
         if self.config['debug']:
-            logger.setLevel(logging.DEBUG)
+        logger.setLevel(logging.DEBUG)
+
+        self.call_hooks('post_setup')
 
     def log(self, key, value):
         if self.report is None:
@@ -78,7 +85,7 @@ class IOpipe(object):
             self.report = Report(self.config, context)
 
             # Partial acts as a closure here so that a reference to the report is passed to the timeout handler
-            signal.signal(signal.SIGALRM, functools.partial(self.timeout_handler, self.report))
+            signal.signal(signal.SIGALRM, functools.partial(self.handle_timeout, self.report))
 
             # Disable timeout if timeout_window <= 0, or if our context doesn't have a get_remaining_time_in_millis
             if self.config['timeout_window'] > 0 and \
@@ -114,7 +121,27 @@ class IOpipe(object):
 
     decorator = __call__
 
-    def timeout_handler(self, report, signum, frame):
+    def call_hooks(self, name, event=None, context=None):
+        hooks = {
+            'pre_setup': lambda p: p.pre_setup(self),
+            'post_setup': lambda p: p.post_setup(self.config),
+            'pre_invoke': lambda p: p.pre_invoke(event, context),
+            'post_invoke': lambda p: p.post_invoke(event, context),
+            'pre_report': lambda p: p.pre_report(self.report),
+            'post_report': lambda p: p.post_report(),
+        }
+        if name in hooks:
+            [hooks[name](p) for p in self.plugins]
+
+    def load_plugins(self, plugins):
+        """
+        Loads plugins that match the `Plugin` interface and are instantiated.
+
+        :param plugins: A list of plugin instances.
+        """
+        self.plugins = [p for p in plugins if is_plugin(p) and not inspect.isclass(p)]
+
+    def handle_timeout(self, report, signum, frame):
         """
         Catches a timeout (SIGALRM) and sends the report before actual timeout occurs.
 
