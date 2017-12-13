@@ -1,12 +1,11 @@
-import decimal
 import functools
 import inspect
 import logging
-import numbers
 import signal
 import warnings
 
 from .config import set_config
+from .context import Context
 from .plugins import is_plugin
 from .report import Report
 
@@ -18,8 +17,6 @@ logger.setLevel(logging.INFO)
 
 class IOpipe(object):
     def __init__(self, token=None, url=None, debug=None, **options):
-        self.call_hooks('pre_setup')
-
         if token is not None:
             options['token'] = token
         if url is not None:
@@ -28,11 +25,11 @@ class IOpipe(object):
             options['debug'] = debug
 
         self.config = set_config(**options)
-        self.config['plugins'] = self.plugin_loader(self.config['plugins'])
+        self.config['plugins'] = self.load_plugins(self.config['plugins'])
         self.report = None
 
         if self.config['debug']:
-        logger.setLevel(logging.DEBUG)
+            logger.setLevel(logging.DEBUG)
 
         self.call_hooks('post_setup')
 
@@ -42,18 +39,7 @@ class IOpipe(object):
                           'This metric will not be recorded.')
             return
 
-        event = {
-            'name': str(key)
-        }
-
-        # Add numerical values to report
-        # We typecast decimals as strings: not JSON serializable and casting to floats can result in rounding errors.
-        if isinstance(value, numbers.Number) and not isinstance(value, decimal.Decimal):
-            event['n'] = value
-        else:
-            event['s'] = str(value)
-
-        self.report.custom_metrics.append(event)
+        self.report.context.iopipe.log(key, value)
 
     def error(self, error):
         if self.report is None:
@@ -61,8 +47,7 @@ class IOpipe(object):
                           'This exception will not be recorded.')
             raise error
 
-        self.report.send(error)
-        raise error
+        self.report.context.iopipe.error(error)
 
     err = error
 
@@ -82,6 +67,7 @@ class IOpipe(object):
                               'Set the IOPIPE_TOKEN environment variable with your IOpipe project token.')
                 return func(event, context)
 
+            context = Context(context, self)
             self.report = Report(self.config, context)
 
             # Partial acts as a closure here so that a reference to the report is passed to the timeout handler
