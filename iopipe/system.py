@@ -1,15 +1,4 @@
-import platform
 import socket
-
-
-def read_arch():
-    """
-    Returns the system architecture.
-
-    :returns: The system architecture.
-    :rtype: str
-    """
-    return platform.machine()
 
 
 def read_bootid():
@@ -68,7 +57,6 @@ def read_pid_stat(pid):
         'stime': int(stat[13]),
         'cutime': int(stat[15]),
         'cstime': int(stat[16]),
-        'rss': int(stat[23])
     }
 
 
@@ -85,10 +73,11 @@ def read_pid_status(pid):
         for row in status_file:
             line = row.split(":")
             status_value = line[1].rstrip("\t\n kB").lstrip()
-            try:
-                data[line[0]] = int(status_value)
-            except ValueError:
-                data[line[0]] = status_value
+            if line[0] in ['FDSize', 'Threads', 'VmRSS']:
+                try:
+                    data[line[0]] = int(status_value)
+                except ValueError:
+                    data[line[0]] = status_value
     return data
 
 
@@ -109,7 +98,6 @@ def read_stat():
             if len(cpu_stat[0]) == 3:
                 continue
             data.append({
-                'name': cpu_stat[0],
                 'times': {
                     'user': int(cpu_stat[1]),
                     'nice': int(cpu_stat[2]),
@@ -119,15 +107,3 @@ def read_stat():
                 }
             })
     return data
-
-
-def read_uptime():
-    """
-    Returns the system uptime.
-
-    :returns: The system uptime.
-    :rtype: int
-    """
-    with open('/proc/uptime') as uptime_file:
-        utf = uptime_file.readline().split(" ")
-    return int(float(utf[0]))

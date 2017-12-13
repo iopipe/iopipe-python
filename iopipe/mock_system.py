@@ -1,6 +1,6 @@
 import uuid
 
-from .system import read_arch, read_hostname  # noqa
+from .system import read_hostname  # noqa
 
 
 def read_bootid():
