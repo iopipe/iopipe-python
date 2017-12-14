@@ -17,7 +17,7 @@ def get_offset(timeline):
 
 
 def mark_data(timeline, name, start_time=None, duration=0, entry_type='mark', timestamp=None):
-    data = timeline.data
+    data = timeline.data or []
     default_time = monotonic()
     entry = Entry(
         name=name,
@@ -27,7 +27,8 @@ def mark_data(timeline, name, start_time=None, duration=0, entry_type='mark', ti
         timestamp=timestamp or int(time.time() * 1000)
     )
     data.append(entry)
-    return data.sort(key=lambda i: i.startTime)
+    data.sort(key=lambda i: i.startTime)
+    return data
 
 
 class Timeline(object):

@@ -8,7 +8,7 @@ from .util import add_timeline_measures
 class TracePlugin(Plugin):
     def __init__(self, auto_measure=False):
         self.auto_measure = auto_measure
-        self.timeline = Timeline(use_timestamp=True)
+        self.timeline = Timeline()
 
     @property
     def name(self):
@@ -31,11 +31,11 @@ class TracePlugin(Plugin):
     def post_invoke(self, event, context):
         context.iopipe.unregister('mark')
 
-    def pre_reporT(self, report):
+    def pre_report(self, report):
         self.timeline.mark('end:iopipe')
         if self.auto_measure:
             add_timeline_measures(self.timeline)
-        report.report['performanceEntries'] = [e._todict() for e in self.timeline.get_entries()]
+        report.report['performanceEntries'] = [e._asdict() for e in self.timeline.get_entries()]
 
-    def post_reporT(self):
+    def post_report(self):
         self.timeline = Timeline()

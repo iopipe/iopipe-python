@@ -58,7 +58,7 @@ class IOpipe(object):
 
             context = Context(context, self)
 
-            self.run_hooks('pre_invoke', event=event, context=context)
+            self.run_hooks('pre:invoke', event=event, context=context)
 
             # if env var IOPIPE_ENABLED is set to False skip reporting
             if self.config['enabled'] is False:
@@ -142,7 +142,7 @@ class IOpipe(object):
         Runs plugin hooks for each registered plugin.
         """
         hooks = {
-            'setup': lambda p: p.post_setup(self),
+            'setup': lambda p: p.setup(self),
             'pre:invoke': lambda p: p.pre_invoke(event, context),
             'post:invoke': lambda p: p.post_invoke(event, context),
             'pre:report': lambda p: p.pre_report(self.report),
