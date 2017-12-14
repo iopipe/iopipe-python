@@ -1,8 +1,9 @@
 import decimal
 import numbers
+import warnings
 
 
-class Context(object):
+class ContextWrapper(object):
     def __init__(self, base_context, instance):
         self.base_context = base_context
         self.instance = instance
@@ -17,6 +18,11 @@ class IOpipeContext(object):
         self.instance = instance
 
     def log(self, key, value):
+        if self.instance.report is None:
+            warnings.warn('Attempting to log metrics before function decorated with IOpipe. '
+                          'This metric will not be recorded.')
+            return
+
         event = {
             'name': str(key)
         }
@@ -31,6 +37,11 @@ class IOpipeContext(object):
         self.instance.report.custom_metrics.append(event)
 
     def error(self, error):
+        if self.instance.report is None:
+            warnings.warn('An exception occurred before function was decorated with IOpipe. '
+                          'This exception will not be recorded.')
+            raise error
+
         self.instance.report.send(error)
         raise error
 

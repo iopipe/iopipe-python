@@ -5,7 +5,7 @@ import signal
 import warnings
 
 from .config import set_config
-from .context import Context
+from .context import ContextWrapper
 from .plugins import is_plugin
 from .report import Report
 
@@ -56,7 +56,7 @@ class IOpipe(object):
         def wrapped(event, context):
             logger.debug('%s wrapped with IOpipe decorator' % repr(func))
 
-            context = Context(context, self)
+            context = ContextWrapper(context, self)
 
             self.run_hooks('pre:invoke', event=event, context=context)
 

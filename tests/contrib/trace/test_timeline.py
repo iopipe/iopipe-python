@@ -19,3 +19,9 @@ def test_timeline(timeline):
     assert len(timeline.get_entries_by_name('foo')) == 1
     assert len(timeline.get_entries_by_type('mark')) == 2
     assert len(timeline.get_entries_by_type('measure')) == 1
+
+    start_foo = timeline.get_entries_by_name('start:foo')[0]
+    end_foo = timeline.get_entries_by_name('end:foo')[0]
+    measure = timeline.get_entries_by_type('measure')[0]
+
+    assert measure.duration == end_foo.startTime - start_foo.startTime
