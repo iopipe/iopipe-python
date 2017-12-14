@@ -31,7 +31,7 @@ class IOpipe(object):
         if self.config['debug']:
             logger.setLevel(logging.DEBUG)
 
-        self.call_hooks('post_setup')
+        self.run_hooks('setup')
 
     def log(self, key, value):
         if self.report is None:
@@ -56,6 +56,10 @@ class IOpipe(object):
         def wrapped(event, context):
             logger.debug('%s wrapped with IOpipe decorator' % repr(func))
 
+            context = Context(context, self)
+
+            self.run_hooks('pre_invoke', event=event, context=context)
+
             # if env var IOPIPE_ENABLED is set to False skip reporting
             if self.config['enabled'] is False:
                 logger.debug('IOpipe agent disabled, skipping reporting')
@@ -67,7 +71,6 @@ class IOpipe(object):
                               'Set the IOPIPE_TOKEN environment variable with your IOpipe project token.')
                 return func(event, context)
 
-            context = Context(context, self)
             self.report = Report(self.config, context)
 
             # Partial acts as a closure here so that a reference to the report is passed to the timeout handler
@@ -96,36 +99,22 @@ class IOpipe(object):
             try:
                 result = func(event, context)
             except Exception as e:
+                self.run_hooks('post:invoke', event=event, context=context)
+                self.run_hooks('pre:report')
                 self.report.send(e)
                 raise e
+            else:
+                self.run_hooks('post:invoke', event=event, context=context)
+                self.run_hooks('pre:report')
+                self.report.send()
             finally:
                 signal.setitimer(signal.ITIMER_REAL, 0)
-                self.report.send()
+                self.run_hooks('post:report')
 
             return result
         return wrapped
 
     decorator = __call__
-
-    def call_hooks(self, name, event=None, context=None):
-        hooks = {
-            'pre_setup': lambda p: p.pre_setup(self),
-            'post_setup': lambda p: p.post_setup(self.config),
-            'pre_invoke': lambda p: p.pre_invoke(event, context),
-            'post_invoke': lambda p: p.post_invoke(event, context),
-            'pre_report': lambda p: p.pre_report(self.report),
-            'post_report': lambda p: p.post_report(),
-        }
-        if name in hooks:
-            [hooks[name](p) for p in self.plugins]
-
-    def load_plugins(self, plugins):
-        """
-        Loads plugins that match the `Plugin` interface and are instantiated.
-
-        :param plugins: A list of plugin instances.
-        """
-        self.plugins = [p for p in plugins if is_plugin(p) and not inspect.isclass(p)]
 
     def handle_timeout(self, report, signum, frame):
         """
@@ -139,3 +128,26 @@ class IOpipe(object):
         """
         logger.debug('Function is about to timeout, sending report')
         report.send()
+
+    def load_plugins(self, plugins):
+        """
+        Loads plugins that match the `Plugin` interface and are instantiated.
+
+        :param plugins: A list of plugin instances.
+        """
+        self.plugins = [p for p in plugins if is_plugin(p) and not inspect.isclass(p)]
+
+    def run_hooks(self, name, event=None, context=None):
+        """
+        Runs plugin hooks for each registered plugin.
+        """
+        hooks = {
+            'setup': lambda p: p.post_setup(self),
+            'pre:invoke': lambda p: p.pre_invoke(event, context),
+            'post:invoke': lambda p: p.post_invoke(event, context),
+            'pre:report': lambda p: p.pre_report(self.report),
+            'post:report': lambda p: p.post_report(),
+        }
+
+        if name in hooks:
+            [hooks[name](p) for p in self.plugins]

@@ -34,12 +34,12 @@ class Plugin(with_metaclass(abc.ABCMeta, object)):
     def version(self):
         return NotImplemented
 
-    @abc.abstractmethod
-    def pre_setup(self, iopipe):
+    @abc.abstractproperty
+    def homepage(self):
         return NotImplemented
 
     @abc.abstractmethod
-    def post_setup(self, config):
+    def setup(self, iopipe):
         return NotImplemented
 
     @abc.abstractmethod
@@ -51,9 +51,9 @@ class Plugin(with_metaclass(abc.ABCMeta, object)):
         return NotImplemented
 
     @abc.abstractmethod
-    def pre_reporT(self, report):
+    def pre_report(self, report):
         return NotImplemented
 
     @abc.abstractmethod
-    def post_reporT(self):
+    def post_report(self):
         return NotImplemented
