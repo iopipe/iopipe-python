@@ -1,6 +1,7 @@
 import pytest
 
-from iopipe.plugins import is_plugin, Plugin
+from iopipe.contrib.trace import TracePlugin
+from iopipe.plugins import get_plugin_meta, is_plugin, Plugin
 
 
 def test_plugins_incomplete_interface():
@@ -50,3 +51,22 @@ def test_plugins_incomplete_interface():
     plugin = CompletePlugin()
 
     assert is_plugin(plugin)
+
+
+def test_is_plugin():
+    class NotAPlugin(object):
+        def do_nothing(self):
+            pass
+
+    assert not is_plugin(NotAPlugin)
+    assert not is_plugin(NotAPlugin())
+    assert is_plugin(TracePlugin)
+    assert is_plugin(TracePlugin())
+
+
+def test_get_plugin_meta():
+    assert get_plugin_meta([TracePlugin()]) == [{
+        'name': 'trace',
+        'version': '0.1.0',
+        'homepage': 'https://github.com/iopipe/iopipe-python',
+    }]

@@ -1,6 +1,18 @@
 import abc
 
 
+def get_plugin_meta(plugins):
+    """
+    Returns meta data about plugins.
+
+    :param plugins: A list of plugins.
+    :type plugins: list
+    :returns: A list of dicts containing plugin meta data.
+    :rtype: list
+    """
+    return [{'name': p.name, 'version': p.version, 'homepage': p.homepage} for p in plugins if is_plugin(p)]
+
+
 def is_plugin(plugin):
     """
     REturns true if the plugin implements the `Plugin` interface.
@@ -10,11 +22,9 @@ def is_plugin(plugin):
     :rtype: bool
     """
     try:
-        issubclass(plugin, Plugin)
+        return issubclass(plugin, Plugin) or isinstance(plugin, Plugin)
     except TypeError:
         return False
-    else:
-        return True
 
 
 def with_metaclass(meta, *bases):

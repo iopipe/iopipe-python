@@ -135,7 +135,10 @@ class IOpipe(object):
 
         :param plugins: A list of plugin instances.
         """
-        self.plugins = [p for p in plugins if is_plugin(p) and not inspect.isclass(p)]
+        def instantiate(plugin):
+            return plugin() if inspect.isclass(plugin) else plugin
+
+        return [instantiate(p) for p in plugins if is_plugin(p)]
 
     def run_hooks(self, name, event=None, context=None):
         """
@@ -150,4 +153,4 @@ class IOpipe(object):
         }
 
         if name in hooks:
-            [hooks[name](p) for p in self.plugins]
+            [hooks[name](p) for p in self.config['plugins']]

@@ -9,7 +9,7 @@ from tests.util import assert_valid_schema
 def test_plugin(mock_send_report, handler_with_plugin, mock_context):
     iopipe, handler = handler_with_plugin
 
-    assert len(iopipe.plugins) == 1
+    assert len(iopipe.config['plugins']) == 1
 
     handler({}, mock_context)
 
@@ -22,7 +22,7 @@ def test_plugin(mock_send_report, handler_with_plugin, mock_context):
 def test_plugin_auto_measure(mock_send_report, handler_with_auto_measure, mock_context):
     iopipe, handler = handler_with_auto_measure
 
-    assert len(iopipe.plugins) == 1
+    assert len(iopipe.config['plugins']) == 1
 
     handler({}, mock_context)
 

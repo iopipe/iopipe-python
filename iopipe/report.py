@@ -7,6 +7,7 @@ import traceback
 
 from . import constants
 from .monotonic import monotonic
+from .plugins import get_plugin_meta
 from .send_report import send_report
 
 if sys.platform.startswith('linux'):
@@ -35,7 +36,7 @@ class Report(object):
         self.config = config
         self.context = context
         self.custom_metrics = []
-        self.plugins = config['plugins']
+        self.plugins = get_plugin_meta(config['plugins'])
 
         self.report = {
             'client_id': self.config['token'],
