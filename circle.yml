@@ -4,8 +4,7 @@ machine:
 
 dependencies:
   pre:
-    - pip install twine==1.8.1
-    - pip install flake8==3.3.0
+    - pip install -U flake8 setuptools tox twine
 
 test:
   override:
