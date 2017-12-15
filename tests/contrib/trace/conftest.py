@@ -9,13 +9,21 @@ from tests.mock_context import MockContext
 @pytest.fixture
 def iopipe_with_plugin():
     plugin = TracePlugin()
-    return IOpipe('test-suite', 'https://metrics-api.iopipe.com', True, plugins=[plugin])
+    return IOpipe(
+        token='test-suite',
+        url='https://metrics-api.iopipe.com',
+        debug=True,
+        plugins=[plugin])
 
 
 @pytest.fixture
 def iopipe_with_auto_measure():
     plugin = TracePlugin(auto_measure=True)
-    return IOpipe('test-suite', 'https://metrics-api.iopipe.com', True, plugins=[plugin])
+    return IOpipe(
+        token='test-suite',
+        url='https://metrics-api.iopipe.com',
+        debug=True,
+        plugins=[plugin])
 
 
 @pytest.fixture
