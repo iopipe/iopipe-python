@@ -1,11 +1,8 @@
 import mock
-import pytest
-
-from tests.util import assert_valid_schema
 
 
 @mock.patch('iopipe.report.send_report', autospec=True)
-def test_plugin(mock_send_report, handler_with_plugin, mock_context):
+def test__trace_plugin(mock_send_report, handler_with_plugin, mock_context):
     iopipe, handler = handler_with_plugin
 
     assert len(iopipe.config['plugins']) == 1
@@ -18,7 +15,7 @@ def test_plugin(mock_send_report, handler_with_plugin, mock_context):
 
 
 @mock.patch('iopipe.report.send_report', autospec=True)
-def test_plugin_auto_measure(mock_send_report, handler_with_auto_measure, mock_context):
+def test__trace_plugin_auto_measure(mock_send_report, handler_with_auto_measure, mock_context):
     iopipe, handler = handler_with_auto_measure
 
     assert len(iopipe.config['plugins']) == 1
@@ -31,10 +28,9 @@ def test_plugin_auto_measure(mock_send_report, handler_with_auto_measure, mock_c
 
 
 @mock.patch('iopipe.report.send_report', autospec=True)
-def test_plugin_valid_schema(mock_send_report, handler_with_auto_measure, mock_context):
-    pytest.skip('Temporarily skip this test')
-
+def test__trace_plugin__valid_schema(mock_send_report, handler_with_auto_measure, mock_context, assert_valid_schema):
     iopipe, handler = handler_with_auto_measure
+
     handler({}, mock_context)
 
     assert_valid_schema(iopipe.report.report, optional_fields=[

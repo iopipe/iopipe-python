@@ -10,7 +10,12 @@ def get_plugin_meta(plugins):
     :returns: A list of dicts containing plugin meta data.
     :rtype: list
     """
-    return [{'name': p.name, 'version': p.version, 'homepage': p.homepage} for p in plugins if is_plugin(p)]
+    return [{
+        'name': p.name,
+        'version': p.version,
+        'homepage': p.homepage,
+        'enabled': p.enabled
+    } for p in plugins if is_plugin(p)]
 
 
 def is_plugin(plugin):
@@ -46,6 +51,10 @@ class Plugin(with_metaclass(abc.ABCMeta, object)):
 
     @abc.abstractproperty
     def homepage(self):
+        return NotImplemented
+
+    @abc.abstractproperty
+    def enabled(self):
         return NotImplemented
 
     @abc.abstractmethod

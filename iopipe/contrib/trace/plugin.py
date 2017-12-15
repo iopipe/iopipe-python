@@ -22,6 +22,10 @@ class TracePlugin(Plugin):
     def homepage(self):
         return 'https://github.com/iopipe/iopipe-python'
 
+    @property
+    def enabled(self):
+        return True
+
     def setup(self, iopipe):
         self.timeline.mark('start:iopipe')
 

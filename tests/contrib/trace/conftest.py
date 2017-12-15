@@ -3,7 +3,6 @@ import pytest
 from iopipe import IOpipe
 from iopipe.contrib.trace import TracePlugin
 from iopipe.contrib.trace.timeline import Timeline
-from tests.mock_context import MockContext
 
 
 @pytest.fixture
@@ -24,11 +23,6 @@ def iopipe_with_auto_measure():
         url='https://metrics-api.iopipe.com',
         debug=True,
         plugins=[plugin])
-
-
-@pytest.fixture
-def mock_context():
-    return MockContext('handler', '$LATEST')
 
 
 @pytest.fixture

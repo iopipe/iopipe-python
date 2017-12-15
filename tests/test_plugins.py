@@ -27,6 +27,10 @@ def test_plugins_incomplete_interface():
         def homepage(self):
             return 'https://github.com/iopipe'
 
+        @property
+        def enabled(self):
+            return True
+
     with pytest.raises(TypeError) as e:
         IncompletePlugin2()
 
@@ -69,4 +73,5 @@ def test_get_plugin_meta():
         'name': 'trace',
         'version': '0.1.0',
         'homepage': 'https://github.com/iopipe/iopipe-python',
+        'enabled': True,
     }]

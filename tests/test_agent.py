@@ -23,7 +23,6 @@ def test_client_id_is_configured(mock_send_report, handler, mock_context):
     handler(None, mock_context)
 
     assert iopipe.report.report['client_id'] == 'test-suite'
-    mock_send_report.assert_called_once_with(iopipe.report.report, iopipe.config)
 
 
 @mock.patch('iopipe.report.send_report', autospec=True)
@@ -33,7 +32,6 @@ def test_function_name_from_context(mock_send_report, handler, mock_context):
     handler(None, mock_context)
 
     assert iopipe.report.report['aws']['functionName'] == 'handler'
-    mock_send_report.assert_called_once_with(iopipe.report.report, iopipe.config)
 
 
 @mock.patch('iopipe.report.send_report', autospec=True)
@@ -43,7 +41,6 @@ def test_custom_metrics(mock_send_report, handler_with_events, mock_context):
     handler(None, mock_context)
 
     assert len(iopipe.report.custom_metrics) == 2
-    mock_send_report.assert_called_once_with(iopipe.report.report, iopipe.config)
 
 
 @mock.patch('iopipe.report.send_report', autospec=True)
@@ -58,7 +55,6 @@ def test_erroring(mock_send_report, handler_that_errors, mock_context):
 
     assert iopipe.report.report['errors']['name'] == 'ValueError'
     assert iopipe.report.report['errors']['message'] == 'Behold, a value error'
-    mock_send_report.assert_called_once_with(iopipe.report.report, iopipe.config)
 
 
 @mock.patch('iopipe.report.send_report', autospec=True)
@@ -73,7 +69,6 @@ def test_timeouts(mock_send_report, handler_that_timeouts, mock_context):
          pass
 
     assert iopipe.report.report['errors'] == {}
-    mock_send_report.assert_called_once_with(iopipe.report.report, iopipe.config)
 
 
 @mock.patch('iopipe.report.send_report', autospec=True)
