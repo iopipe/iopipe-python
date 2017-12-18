@@ -67,6 +67,17 @@ functions:
     runtime: python3.6
     timeout: 2
 
+  python2-tracing:
+    events:
+      - schedule: rate(10 minutes)
+    handler: handler.tracing
+    runtime: python2.7
+  python3-tracing:
+    events:
+      - schedule: rate(10 minutes)
+    handler: handler.tracing
+    runtime: python3.6
+
   python2-uncaught-exception:
     events:
       - schedule: rate(10 minutes)
