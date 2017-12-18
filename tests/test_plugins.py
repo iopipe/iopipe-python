@@ -37,7 +37,10 @@ def test_plugins_incomplete_interface():
     assert "Can't instantiate abstract class IncompletePlugin2" in str(e.value)
 
     class CompletePlugin(IncompletePlugin2):
-        def setup(self, iopipe):
+        def pre_setup(self, iopipe):
+            pass
+
+        def post_setup(self, iopipe):
             pass
 
         def pre_invoke(self, event, context):

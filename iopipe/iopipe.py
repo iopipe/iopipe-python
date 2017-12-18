@@ -16,7 +16,12 @@ logger.setLevel(logging.INFO)
 
 
 class IOpipe(object):
-    def __init__(self, token=None, url=None, debug=None, **options):
+    def __init__(self, token=None, url=None, debug=None, plugins=None, **options):
+        self.plugins = []
+        if plugins is not None:
+            self.plugins = self.load_plugins(plugins)
+        self.run_hooks('pre:setup')
+        options['plugins'] = self.plugins
         if token is not None:
             options['token'] = token
         if url is not None:
@@ -31,20 +36,22 @@ class IOpipe(object):
         if self.config['debug']:
             logger.setLevel(logging.DEBUG)
 
-        self.run_hooks('setup')
+        self.run_hooks('post:setup')
 
     def log(self, key, value):
         if self.report is None:
-            warnings.warn('Attempting to log metrics before function decorated with IOpipe. '
-                          'This metric will not be recorded.')
+            warnings.warn(
+                'Attempting to log metrics before function decorated with IOpipe. '
+                'This metric will not be recorded.')
             return
 
         self.report.context.iopipe.log(key, value)
 
     def error(self, error):
         if self.report is None:
-            warnings.warn('An exception occurred before function was decorated with IOpipe. '
-                          'This exception will not be recorded.')
+            warnings.warn(
+                'An exception occurred before function was decorated with IOpipe. '
+                'This exception will not be recorded.')
             raise error
 
         self.report.context.iopipe.error(error)
@@ -67,28 +74,36 @@ class IOpipe(object):
 
             # If a token is not present, skip reporting
             if not self.config['token']:
-                warnings.warn('Your function is decorated with iopipe, but a valid token was not found. '
-                              'Set the IOPIPE_TOKEN environment variable with your IOpipe project token.')
+                warnings.warn(
+                    'Your function is decorated with iopipe, but a valid token was not found. '
+                    'Set the IOPIPE_TOKEN environment variable with your IOpipe project token.'
+                )
                 return func(event, context)
 
             self.report = Report(self.config, context)
 
             # Partial acts as a closure here so that a reference to the report is passed to the timeout handler
-            signal.signal(signal.SIGALRM, functools.partial(self.handle_timeout, self.report))
+            signal.signal(signal.SIGALRM,
+                          functools.partial(self.handle_timeout, self.report))
 
             # Disable timeout if timeout_window <= 0, or if our context doesn't have a get_remaining_time_in_millis
             if self.config['timeout_window'] > 0 and \
                     hasattr(context, 'get_remaining_time_in_millis') and \
                     callable(context.get_remaining_time_in_millis):
-                timeout_duration = (context.get_remaining_time_in_millis() / 1000.0) - self.config['timeout_window']
+                timeout_duration = (context.get_remaining_time_in_millis() /
+                                    1000.0) - self.config['timeout_window']
 
                 # The timeout_duration cannot be a negative number, disable if it is
                 timeout_duration = max([0, timeout_duration])
 
                 # Maximum execution time is 10 minutes, make sure timeout doesn't exceed that minus the timeout window
-                timeout_duration = min([timeout_duration, 60 * 60 * 10 - self.config['timeout_window']])
+                timeout_duration = min([
+                    timeout_duration,
+                    60 * 60 * 10 - self.config['timeout_window']
+                ])
 
-                logger.debug('Setting timeout duration to %s' % timeout_duration)
+                logger.debug(
+                    'Setting timeout duration to %s' % timeout_duration)
 
                 # Using signal.setitimer instead of signal.alarm because the latter only accepts integers and we want to
                 # be able to timeout at millisecond granularity
@@ -112,6 +127,7 @@ class IOpipe(object):
                 self.run_hooks('post:report')
 
             return result
+
         return wrapped
 
     decorator = __call__
@@ -135,6 +151,7 @@ class IOpipe(object):
 
         :param plugins: A list of plugin instances.
         """
+
         def instantiate(plugin):
             return plugin() if inspect.isclass(plugin) else plugin
 
@@ -145,7 +162,8 @@ class IOpipe(object):
         Runs plugin hooks for each registered plugin.
         """
         hooks = {
-            'setup': lambda p: p.setup(self),
+            'pre:setup': lambda p: p.pre_setup(self),
+            'post:setup': lambda p: p.post_setup(self),
             'pre:invoke': lambda p: p.pre_invoke(event, context),
             'post:invoke': lambda p: p.post_invoke(event, context),
             'pre:report': lambda p: p.pre_report(self.report),
@@ -153,4 +171,4 @@ class IOpipe(object):
         }
 
         if name in hooks:
-            [hooks[name](p) for p in self.config['plugins']]
+            [hooks[name](p) for p in self.plugins]

@@ -58,7 +58,11 @@ class Plugin(with_metaclass(abc.ABCMeta, object)):
         return NotImplemented
 
     @abc.abstractmethod
-    def setup(self, iopipe):
+    def pre_setup(self, iopipe):
+        return NotImplemented
+
+    @abc.abstractmethod
+    def post_setup(self, iopipe):
         return NotImplemented
 
     @abc.abstractmethod

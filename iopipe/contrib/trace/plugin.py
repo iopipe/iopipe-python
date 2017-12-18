@@ -26,8 +26,11 @@ class TracePlugin(Plugin):
     def enabled(self):
         return True
 
-    def setup(self, iopipe):
+    def pre_setup(self, iopipe):
         self.timeline.mark('start:iopipe')
+
+    def post_setup(self, iopipe):
+        pass
 
     def pre_invoke(self, event, context):
         context.iopipe.register('mark', Marker(self.timeline))
