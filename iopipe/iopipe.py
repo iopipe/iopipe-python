@@ -20,8 +20,10 @@ class IOpipe(object):
         self.plugins = []
         if plugins is not None:
             self.plugins = self.load_plugins(plugins)
+            options['plugins'] = self.plugins
+
         self.run_hooks('pre:setup')
-        options['plugins'] = self.plugins
+
         if token is not None:
             options['token'] = token
         if url is not None:
