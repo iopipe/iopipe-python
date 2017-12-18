@@ -171,4 +171,4 @@ class IOpipe(object):
         }
 
         if name in hooks:
-            [hooks[name](p) for p in self.plugins]
+            [hooks[name](p) for p in self.plugins if p.enabled]
