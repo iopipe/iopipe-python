@@ -1,10 +1,13 @@
 machine:
+  node:
+    version: 6.10.3
   post:
     - pyenv global 2.7.12 3.6.1
 
 dependencies:
   pre:
     - pip install -U flake8 setuptools tox twine
+    - sudo npm install -g serverless
 
 test:
   override:
@@ -18,3 +21,8 @@ deployment:
     commands:
       - python setup.py sdist
       - twine upload dist/* -u $PYPI_USERNAME -p "$PYPI_PASSWORD"
+  acceptance:
+    branch: master
+    commands:
+      - python setup.py build --build-lib acceptance/serverless
+      - cd acceptance/serverless && serverless deploy

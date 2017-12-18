@@ -1,0 +1,79 @@
+service: iopipe-python-serverless-acceptance-tests
+
+provider:
+  name: aws
+  runtime: python3.6
+  stage: prod
+  region: us-west-2
+  role: ${env:IAM_ROLE}
+  environment:
+    IOPIPE_TOKEN: ${env:IOPIPE_TOKEN}
+
+functions:
+  python2-caught-exception:
+    events:
+      - schedule: rate(10 minutes)
+    handler: handler.caught_exception
+    runtime: python2.7
+  py3-caught-exception:
+    events:
+      - schedule: rate(10 minutes)
+    handler: handler.caught_exception
+    runtime: python3.6
+
+  python2-coldstart:
+    events:
+      - schedule: rate(10 minutes)
+    handler: handler.coldstart
+    runtime: python2.7
+  py3-coldstart:
+    events:
+      - schedule: rate(10 minutes)
+    handler: handler.coldstart
+    runtime: python3.6
+
+  python2-custom-metrics:
+    events:
+      - schedule: rate(10 minutes)
+    handler: handler.custom_metrics
+    runtime: python2.7
+  py3-custom-metrics:
+    events:
+      - schedule: rate(10 minutes)
+    handler: handler.custom_metrics
+    runtime: python3.6
+
+  python2-success:
+    events:
+      - schedule: rate(10 minutes)
+    handler: handler.success
+    runtime: python2.7
+  python3-success:
+    events:
+      - schedule: rate(10 minutes)
+    handler: handler.success
+    runtime: python3.6
+
+  python2-timeout:
+    events:
+      - schedule: rate(10 minutes)
+    handler: handler.timeout
+    runtime: python2.7
+    timeout: 2
+  python3-timeout:
+    events:
+      - schedule: rate(10 minutes)
+    handler: handler.timeout
+    runtime: python3.6
+    timeout: 2
+
+  python2-uncaught-exception:
+    events:
+      - schedule: rate(10 minutes)
+    handler: handler.uncaught_exception
+    runtime: python2.7
+  py3-uncaught-exception:
+    events:
+      - schedule: rate(10 minutes)
+    handler: handler.uncaught_exception
+    runtime: python3.6
