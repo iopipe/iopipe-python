@@ -20,7 +20,7 @@ def get_plugin_meta(plugins):
 
 def is_plugin(plugin):
     """
-    REturns true if the plugin implements the `Plugin` interface.
+    Returns true if the plugin implements the `Plugin` interface.
 
     :param plugin: The plugin to check.
     :returns: True if plugin, False otherwise.
