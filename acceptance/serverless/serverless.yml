@@ -1,4 +1,4 @@
-service: iopipe-python-serverless-acceptance-tests
+service: iopipe-python-master-serverless-acceptance-tests
 
 provider:
   name: aws
