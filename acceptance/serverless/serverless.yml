@@ -10,15 +10,15 @@ provider:
     IOPIPE_TOKEN: ${env:IOPIPE_TOKEN}
 
 functions:
-  py2-caught-exception:
+  py2-caught-error:
     events:
       - schedule: rate(10 minutes)
-    handler: handler.caught_exception
+    handler: handler.caught_error
     runtime: python2.7
-  py3-caught-exception:
+  py3-caught-error:
     events:
       - schedule: rate(10 minutes)
-    handler: handler.caught_exception
+    handler: handler.caught_error
     runtime: python3.6
 
   py2-coldstart:
@@ -78,13 +78,13 @@ functions:
     handler: handler.tracing
     runtime: python3.6
 
-  py2-uncaught-exception:
+  py2-uncaught-error:
     events:
       - schedule: rate(10 minutes)
-    handler: handler.uncaught_exception
+    handler: handler.uncaught_error
     runtime: python2.7
-  py3-uncaught-exception:
+  py3-uncaught-error:
     events:
       - schedule: rate(10 minutes)
-    handler: handler.uncaught_exception
+    handler: handler.uncaught_error
     runtime: python3.6

@@ -12,7 +12,7 @@ iopipe_with_tracing = IOpipe(os.getenv('IOPIPE_TOKEN'), plugins=[trace_plugin])
 
 
 @iopipe
-def caught_exception(event, context):
+def caught_error(event, context):
     try:
         raise Exception('Caught exception')
     except Exception as e:
@@ -49,5 +49,5 @@ def tracing(event, context):
 
 
 @iopipe
-def uncaught_exception(event, context):
+def uncaught_error(event, context):
     raise Exception('Invocation uncaught exception')
