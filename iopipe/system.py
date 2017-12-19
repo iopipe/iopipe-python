@@ -3,7 +3,7 @@ import socket
 
 def read_bootid():
     """
-    REturns the system boot id.
+    Returns the system boot id.
 
     :returns: The system bood it.
     :rtype: str
@@ -14,7 +14,7 @@ def read_bootid():
 
 def read_hostname():
     """
-    REturns the system hostname.
+    Returns the system hostname.
 
     :returns: The system hostname.
     :rtype: str
@@ -24,7 +24,7 @@ def read_hostname():
 
 def read_meminfo():
     """
-    REturns system memory usage information.
+    Returns system memory usage information.
 
     :returns: The system memory usage.
     :rtype: dict
@@ -54,7 +54,7 @@ def read_pid_stat(pid):
         stat = f.readline().split(' ')
     return {
         'utime': int(stat[13]),
-        'stime': int(stat[13]),
+        'stime': int(stat[14]),
         'cutime': int(stat[15]),
         'cstime': int(stat[16]),
     }
