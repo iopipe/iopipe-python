@@ -71,8 +71,8 @@ def read_pid_status(pid):
     data = {}
     with open("/proc/%s/status" % (pid,)) as status_file:
         for row in status_file:
-            line = row.split(":")
-            status_value = line[1].rstrip("\t\n kB").lstrip()
+            line = row.split(':')
+            status_value = line[1].rstrip('\t\n kB').lstrip()
             if line[0] in ['FDSize', 'Threads', 'VmRSS']:
                 try:
                     data[line[0]] = int(status_value)
