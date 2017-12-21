@@ -61,7 +61,7 @@ def test_erroring(mock_send_report, handler_that_errors, mock_context):
 def test_timeouts(mock_send_report, handler_that_timeouts, mock_context):
     """Assert that the agent timeouts before function does"""
     iopipe, handler = handler_that_timeouts
-    mock_context.set_remaining_time_in_millis(2000)
+    mock_context.set_remaining_time_in_millis(1000)
 
     try:
         handler(None, mock_context)
@@ -76,8 +76,8 @@ def test_timeouts_disable(mock_send_report, handler_that_timeouts, mock_context)
     """Assert the timeout is disabled if insufficient time remaining"""
     iopipe, handler = handler_that_timeouts
 
-    # The default is 1.5, so 1500 / 100 - 1.5 = 0
-    mock_context.set_remaining_time_in_millis(1500)
+    # The default is 0.5, so 500 / 1000 - 0.5 = 0
+    mock_context.set_remaining_time_in_millis(500)
 
     try:
         handler(None, mock_context)

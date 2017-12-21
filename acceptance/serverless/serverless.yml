@@ -59,13 +59,13 @@ functions:
       - schedule: rate(10 minutes)
     handler: handler.timeout
     runtime: python2.7
-    timeout: 2
+    timeout: 1
   py3-timeout:
     events:
       - schedule: rate(10 minutes)
     handler: handler.timeout
     runtime: python3.6
-    timeout: 2
+    timeout: 1
 
   py2-tracing:
     events:
