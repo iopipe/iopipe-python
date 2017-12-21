@@ -36,7 +36,7 @@ def success(event, context):
 
 @iopipe
 def timeout(event, context):
-    time.sleep(4)
+    time.sleep(2)
     return {'message': 'Invocation success'}
 
 
