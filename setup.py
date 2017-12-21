@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import find_packages, setup
 
 setup(
     name='iopipe',
@@ -7,7 +7,7 @@ setup(
     author='IOpipe',
     author_email='support@iopipe.com',
     url='https://github.com/iopipe/iopipe-python',
-    packages=['iopipe'],
+    packages=find_packages(exclude=('tests', 'tests.*',)),
     extras_require={
         'dev': ['flake8', 'requests'],
     },
