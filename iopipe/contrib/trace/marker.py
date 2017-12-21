@@ -8,5 +8,8 @@ class Marker(object):
     def end(self, name):
         self.timeline.mark('end:%s' % name)
 
-    def measure(self, name, start, end):
-        self.timeline.measure('measure:%s' % name, 'start:%s' % start, 'end:%s' % end)
+    def measure(self, name, start=None, end=None):
+        self.timeline.measure(
+            'measure:%s' % name,
+            'start:%s' % (start or name),
+            'end:%s' % (end or start or name))

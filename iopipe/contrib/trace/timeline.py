@@ -50,13 +50,15 @@ class Timeline(object):
         return [d for d in self.data if d.entryType == type]
 
     def measure(self, name, start, end=None):
-        start_mark = self.get_entries_by_name(start)[-1]
+        start_mark = self.get_entries_by_name(start)
+        start_mark = start_mark[-1] if start_mark else None
         start_time = start_mark.startTime if start_mark else self.init_time - get_offset(self)
         timestamp = start_mark.timestamp if start_mark else None
 
         end_time = self.now()
         if end is not None:
-            end_mark = self.get_entries_by_name(end)[-1]
+            end_mark = self.get_entries_by_name(end)
+            end_mark = end_mark[-1] if end_mark else None
             end_time = end_mark.startTime if end_mark else end_time
 
         duration = end_time - start_time

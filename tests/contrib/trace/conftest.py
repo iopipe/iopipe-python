@@ -1,6 +1,7 @@
 import pytest
 
 from iopipe import IOpipe
+from iopipe.contrib.trace.marker import Marker
 from iopipe.contrib.trace import TracePlugin
 from iopipe.contrib.trace.timeline import Timeline
 
@@ -53,6 +54,11 @@ def handler_with_auto_measure(iopipe_with_auto_measure):
         context.iopipe.mark.start('foo')
         context.iopipe.mark.end('foo')
     return iopipe_with_auto_measure, _handler
+
+
+@pytest.fixture
+def marker(timeline):
+    return Marker(timeline)
 
 
 @pytest.fixture
