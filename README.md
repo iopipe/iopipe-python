@@ -140,11 +140,10 @@ Using IOpipe with [Zappa](https://github.com/Miserlou/Zappa) is easy. In your pr
 
 ```python
 from iopipe import IOpipe
-from zappa.handler import LambdaHandler
+from zappa.handler import lambda_handler
 
 iopipe = IOpipe()
-
-lambda_handler = iopipe(LambdaHandler.lambda_handler)
+lambda_handler = iopipe(lambda_handler)
 ```
 
 Then in your `zappa_settings.json` file include the following:
