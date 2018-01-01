@@ -31,3 +31,18 @@ def test_marker__measure_no_marks(marker):
 
     assert len(marker.timeline.get_entries()) == 1
     assert any([e.name == 'measure:foobar' for e in marker.timeline.get_entries()])
+
+
+def test_marker__context_manager(marker):
+    with marker('foobar'):
+        pass
+
+    assert len(marker.timeline.get_entries()) == 2
+
+
+def test_marker__nested_context_manager(marker):
+    with marker('foobar') as nested_marker:
+        with nested_marker('barbaz'):
+            pass
+
+    assert len(marker.timeline.get_entries()) == 4
