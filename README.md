@@ -146,7 +146,7 @@ def handler(event, context):
     context.iopipe.mark.start('expensive operation')
     # do something here
     context.iopipe.mark.end('expensive operation')
-    context.iopipe.measure('expensive operation')
+    context.iopipe.mark.measure('expensive operation')
 ```
 
 Or you can use it as a context manager:
@@ -162,7 +162,7 @@ def handler(event, context):
     with context.iopipe.mark('expensive operation'):
         # do something here
 
-    context.iopipe.measure('expensive operation')
+    context.iopipe.mark.measure('expensive operation')
 ```
 
 Any block of code wrapped with `start` and `end` or using the context manager will be traced and the data collected will be available on your IOpipe dashboard.
