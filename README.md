@@ -237,7 +237,7 @@ A plugin has the following methods defined:
 - `pre_invoke`: Is called prior to each invocation, is passed the `event` and `context` of the invocation.
 - `post_invoke`: Is called after each invocation, is passed the `event` and `context` of the invocation.
 - `pre_report`: Is called prior to each report being sent, is passed the `report` instance.
-- `post_report`: Is called after each report is sent.
+- `post_report`: Is called after each report is sent, is passed the `report` instance.
 
 ## Framework Integration
 
