@@ -42,7 +42,10 @@ class IOpipeContext(object):
                           'This exception will not be recorded.')
             raise error
 
-        self.instance.report.send(error)
+        self.instance.report.prepare(error)
+        self.instance.run_hooks('pre:report')
+        self.instance.report.send()
+        self.instance.run_hooks('post:report')
         raise error
 
     def register(self, name, value):

@@ -31,6 +31,7 @@ class Report(object):
         :param context: The AWS Lambda context.
         """
         self.start_time = monotonic()
+        self.prepared = False
         self.sent = False
         self.stat_start = system.read_pid_stat('self')
         self.config = config
@@ -103,15 +104,15 @@ class Report(object):
         }
         self.report['errors'] = details
 
-    def send(self, error=None):
+    def prepare(self, error=None):
         """
-        Send the current report to IOpipe.
+        Prepare the report to be sent to IOpipe.
 
         :param error: An optional error to add to report.
         """
-        if self.sent:
+        if self.prepared is True:
             return
-        self.sent = True
+        self.prepared = True
 
         if error:
             self.retain_error(error)
@@ -142,6 +143,14 @@ class Report(object):
         }
 
         self.report['duration'] = int((monotonic() - self.start_time) * 1e9)
+
+    def send(self):
+        """
+        Sends the report to IOpipe.
+        """
+        if self.sent is True:
+            return
+        self.sent = True
 
         logger.debug('Sending report to IOpipe:')
         logger.debug(json.dumps(self.report, indent=2, sort_keys=True))
