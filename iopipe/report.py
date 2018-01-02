@@ -31,7 +31,6 @@ class Report(object):
         :param context: The AWS Lambda context.
         """
         self.start_time = monotonic()
-        self.prepared = False
         self.sent = False
         self.stat_start = system.read_pid_stat('self')
         self.config = config
@@ -110,10 +109,6 @@ class Report(object):
 
         :param error: An optional error to add to report.
         """
-        if self.prepared is True:
-            return
-        self.prepared = True
-
         if error:
             self.retain_error(error)
 

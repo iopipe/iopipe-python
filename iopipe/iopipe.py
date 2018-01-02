@@ -115,18 +115,24 @@ class IOpipe(object):
                 result = func(event, context)
             except Exception as e:
                 self.run_hooks('post:invoke', event=event, context=context)
-                self.report.prepare(e)
-                self.run_hooks('pre:report')
-                self.report.send()
+
+                # This prevents this block from being executed a second time in the event that a timeout occurs and an
+                # exception is subsequently raised within the handler
+                if self.report.sent is False:
+                    self.report.prepare(e)
+                    self.run_hooks('pre:report')
+                    self.report.send()
+                    self.run_hooks('post:report')
+
                 raise e
             else:
                 self.run_hooks('post:invoke', event=event, context=context)
                 self.report.prepare()
                 self.run_hooks('pre:report')
                 self.report.send()
+                self.run_hooks('post:report')
             finally:
                 signal.setitimer(signal.ITIMER_REAL, 0)
-                self.run_hooks('post:report')
 
             return result
 
