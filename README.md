@@ -11,7 +11,7 @@ This package provides analytics and distributed tracing for event-driven applica
   - [Trace Plugin](#trace-plugin)
   - [Creating Plugins](#creating-plugins)
 - [Framework Integration](#framework-integration)
-  - [Chalice]{#chalice)
+  - [Chalice](#chalice)
   - [Zappa](#zappa)
 - [License](#license)
 
@@ -79,7 +79,7 @@ Conditionally enable/disable the agent. For example, you will likely want to dis
 
 By default, IOpipe will capture timeouts by exiting your function 0.5 seconds early from the AWS configured timeout, to allow time for reporting. You can disable this feature by setting `timeout_window` to `0` in your configuration. If not supplied, the environment variable `$IOPIPE_TIMEOUT_WINDOW` will be used if present.
 
-## Reporting Exceptions
+### Reporting Exceptions
 
 The IOpipe decorator will automatically catch, trace and reraise any uncaught exceptions in your function. If you want to trace exceptions raised in your case, you can use the `.error(exception)` method. This will add the exception to the current report.
 
@@ -180,7 +180,7 @@ iopipe = IOpipe(plugins=[TracePlugin(auto_measure=True)])
 
 To create an IOpipe plugin you must implement the `iopipe.plugins.Plugin` interface.
 
-Here is a barebones example:
+Here is a minimal example:
 
 ```python
 from iopipe.plugins import Plugin
