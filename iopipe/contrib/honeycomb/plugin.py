@@ -1,9 +1,11 @@
 import logging
 import os
+import copy
 import libhoney
 
 from iopipe.plugins import Plugin
 from .send_honeycomb import send_honeycomb
+from .send_honeycomb import format_report
 
 logger = logging.getLogger(__name__)
 
@@ -61,8 +63,10 @@ class HoneycombReport(Plugin):
         pass
 
     def post_report(self, report):
+        local_rep = copy.deepcopy(report.report)
+        format_report(local_rep)
         try:
-            send_honeycomb(report.report, self.config)
+            send_honeycomb(local_rep, self.config)
         except Exception as e:
             logger.debug("caught exception while sending report: {}".format(e))
         finally:
