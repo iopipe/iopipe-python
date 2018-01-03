@@ -9,6 +9,7 @@ from .send_honeycomb import format_report
 
 logger = logging.getLogger(__name__)
 
+
 class HoneycombReport(Plugin):
     def __init__(self):
         config = {}
@@ -74,7 +75,7 @@ class HoneycombReport(Plugin):
 
         responses = libhoney.responses()
         resp = responses.get()
-        if resp == None:
+        if resp is None:
             logger.info("no response from honeycomb")
         else:
             logger.debug("got response from Honeycomb: {}".format(resp))

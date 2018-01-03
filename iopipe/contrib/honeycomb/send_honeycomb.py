@@ -3,6 +3,7 @@ import libhoney
 
 logger = logging.getLogger(__name__)
 
+
 def format_report(report):
     """
     Munges the report format to be more honeycomb-friendly
@@ -54,4 +55,3 @@ def send_honeycomb(report, config):
         ev.send()
     except Exception as e:
         logger.info('Error sending report to Honeycomb: %s' % e)
-
