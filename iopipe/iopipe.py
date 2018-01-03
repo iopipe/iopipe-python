@@ -169,7 +169,7 @@ class IOpipe(object):
             'pre:invoke': lambda p: p.pre_invoke(event, context),
             'post:invoke': lambda p: p.post_invoke(event, context),
             'pre:report': lambda p: p.pre_report(self.report),
-            'post:report': lambda p: p.post_report(),
+            'post:report': lambda p: p.post_report(self.report),
         }
 
         if name in hooks:

@@ -78,5 +78,5 @@ class Plugin(with_metaclass(abc.ABCMeta, object)):
         return NotImplemented
 
     @abc.abstractmethod
-    def post_report(self):
+    def post_report(self, report):
         return NotImplemented
