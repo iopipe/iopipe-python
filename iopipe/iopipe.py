@@ -84,9 +84,7 @@ class IOpipe(object):
 
             self.report = Report(self.config, context)
 
-            # Partial acts as a closure here so that a reference to the report is passed to the timeout handler
-            signal.signal(signal.SIGALRM,
-                          functools.partial(self.handle_timeout, self.report))
+            signal.signal(signal.SIGALRM, self.handle_timeout)
 
             # Disable timeout if timeout_window <= 0, or if our context doesn't have a get_remaining_time_in_millis
             if self.config['timeout_window'] > 0 and \
@@ -117,16 +115,24 @@ class IOpipe(object):
                 result = func(event, context)
             except Exception as e:
                 self.run_hooks('post:invoke', event=event, context=context)
-                self.run_hooks('pre:report')
-                self.report.send(e)
+
+                # This prevents this block from being executed a second time in the event that a timeout occurs and an
+                # exception is subsequently raised within the handler
+                if self.report.sent is False:
+                    self.report.prepare(e)
+                    self.run_hooks('pre:report')
+                    self.report.send()
+                    self.run_hooks('post:report')
+
                 raise e
             else:
                 self.run_hooks('post:invoke', event=event, context=context)
+                self.report.prepare()
                 self.run_hooks('pre:report')
                 self.report.send()
+                self.run_hooks('post:report')
             finally:
                 signal.setitimer(signal.ITIMER_REAL, 0)
-                self.run_hooks('post:report')
 
             return result
 
@@ -134,18 +140,20 @@ class IOpipe(object):
 
     decorator = __call__
 
-    def handle_timeout(self, report, signum, frame):
+    def handle_timeout(self, signum, frame):
         """
         Catches a timeout (SIGALRM) and sends the report before actual timeout occurs.
 
         The signum and frame parameters are passed by the signal module to this handler.
 
-        :param report: The current report instance.
         :param signum: The signal number being handled.
         :param frame: The stack frame when signal was raised.
         """
         logger.debug('Function is about to timeout, sending report')
-        report.send()
+        self.report.prepare()
+        self.run_hooks('pre:report')
+        self.report.send()
+        self.run_hooks('post:report')
 
     def load_plugins(self, plugins):
         """
@@ -169,7 +177,7 @@ class IOpipe(object):
             'pre:invoke': lambda p: p.pre_invoke(event, context),
             'post:invoke': lambda p: p.post_invoke(event, context),
             'pre:report': lambda p: p.pre_report(self.report),
-            'post:report': lambda p: p.post_report(),
+            'post:report': lambda p: p.post_report(self.report),
         }
 
         if name in hooks:

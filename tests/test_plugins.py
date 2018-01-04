@@ -52,7 +52,7 @@ def test_plugins_incomplete_interface():
         def pre_report(self, report):
             pass
 
-        def post_report(self):
+        def post_report(self, report):
             pass
 
     plugin = CompletePlugin()
