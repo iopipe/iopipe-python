@@ -154,13 +154,10 @@ class IOpipe(object):
         :param frame: The stack frame when signal was raised.
         """
         logger.debug('Function is about to timeout, sending report')
-        try:
-            raise TimeoutError('Timeout Exceeded.')
-        except TimeoutError as e:
-            self.report.prepare(e, frame)
-            self.run_hooks('pre:report')
-            self.report.send()
-            self.run_hooks('post:report')
+        self.report.prepare(TimeoutError('Timeout Exceeded.'), frame)
+        self.run_hooks('pre:report')
+        self.report.send()
+        self.run_hooks('post:report')
 
     def load_plugins(self, plugins):
         """
