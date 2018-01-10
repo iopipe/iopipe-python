@@ -15,6 +15,10 @@ logger = logging.getLogger('iopipe')
 logger.setLevel(logging.INFO)
 
 
+class TimeoutError(Exception):
+    pass
+
+
 class IOpipe(object):
     def __init__(self, token=None, url=None, debug=None, plugins=None, **options):
         self.plugins = []
@@ -150,7 +154,7 @@ class IOpipe(object):
         :param frame: The stack frame when signal was raised.
         """
         logger.debug('Function is about to timeout, sending report')
-        self.report.prepare()
+        self.report.prepare(TimeoutError('Timeout Exceeded.'), frame)
         self.run_hooks('pre:report')
         self.report.send()
         self.run_hooks('post:report')

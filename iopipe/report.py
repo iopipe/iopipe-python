@@ -90,27 +90,31 @@ class Report(object):
             data['getRemainingTimeInMillis'] = self.context.get_remaining_time_in_millis()
         return data
 
-    def retain_error(self, error):
+    def retain_error(self, error, frame=None):
         """
         Adds details of an error to the report.
 
         :param error: The error exception to add to the report.
         """
+        stack = traceback.format_exc()
+        if frame is not None:
+            stack = traceback.format_stack(frame)
         details = {
             'name': type(error).__name__,
             'message': '{}'.format(error),
-            'stack': traceback.format_exc(),
+            'stack': stack,
         }
         self.report['errors'] = details
 
-    def prepare(self, error=None):
+    def prepare(self, error=None, frame=None):
         """
         Prepare the report to be sent to IOpipe.
 
         :param error: An optional error to add to report.
+        :param frame: An optional stack frame to add to report in the event of a timeout.
         """
         if error:
-            self.retain_error(error)
+            self.retain_error(error, frame)
 
         self.report['environment']['host']['boot_id'] = system.read_bootid()
 
