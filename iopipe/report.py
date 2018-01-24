@@ -48,6 +48,12 @@ class Report(object):
                     'runtime': 'python',
                     'version': constants.VERSION,
                 },
+                'runtime': {
+                    'name': platform.python_implementation(),
+                    'version': platform.python_version()
+                },
+                # DEPRECATED: the following key will be removed in favor of
+                # the 'runtime' in the future
                 'python': {
                     'version': platform.python_version(),
                 },
