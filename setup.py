@@ -12,5 +12,5 @@ setup(
         'dev': ['flake8', 'requests'],
     },
     setup_requires=['pytest-runner'],
-    tests_require=['mock', 'pytest', 'requests'],
+    tests_require=['mock', 'pytest', 'pytest-benchmark', 'requests'],
     zip_safe=True)
