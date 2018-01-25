@@ -7,14 +7,7 @@ try:
 except ImportError:
     from urllib.parse import urlparse
 
-SUPPORTED_REGIONS = [
-    'ap-northeast-1',
-    'ap-southeast-2',
-    'eu-west-1',
-    'us-east-2',
-    'us-west-1',
-    'us-west-2'
-]
+SUPPORTED_REGIONS = ['ap-northeast-1', 'ap-southeast-2', 'eu-west-1', 'us-east-2', 'us-west-1', 'us-west-2']
 
 
 def get_collector_path(base_url=None):

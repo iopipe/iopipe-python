@@ -50,7 +50,7 @@ def read_pid_stat(pid):
     :returns: The system stat information.
     :rtype: dict
     """
-    with open('/proc/%s/stat' % (pid,)) as f:
+    with open('/proc/%s/stat' % (pid, )) as f:
         stat = f.readline().split(' ')
     return {
         'utime': int(stat[13]),
@@ -69,7 +69,7 @@ def read_pid_status(pid):
     :rtype: dict
     """
     data = {}
-    with open("/proc/%s/status" % (pid,)) as status_file:
+    with open("/proc/%s/status" % (pid, )) as status_file:
         for row in status_file:
             line = row.split(':')
             status_value = line[1].rstrip('\t\n kB').lstrip()

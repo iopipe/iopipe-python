@@ -24,8 +24,7 @@ def mark_data(timeline, name, start_time=None, duration=0, entry_type='mark', ti
         startTime=start_time or time_in_millis(default_time, get_offset(timeline)),
         duration=duration,
         entryType=entry_type,
-        timestamp=timestamp or int(time.time() * 1000)
-    )
+        timestamp=timestamp or int(time.time() * 1000))
     data.append(entry)
     data.sort(key=lambda i: i.startTime)
     return data
@@ -64,13 +63,7 @@ class Timeline(object):
         duration = end_time - start_time
 
         self.data = mark_data(
-            self,
-            name=name,
-            start_time=start_time,
-            duration=duration,
-            entry_type='measure',
-            timestamp=timestamp
-        )
+            self, name=name, start_time=start_time, duration=duration, entry_type='measure', timestamp=timestamp)
 
     def clear_marks(self):
         self.data = [d for d in self.data if d['entryType'] != 'mark']

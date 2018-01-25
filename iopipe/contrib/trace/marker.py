@@ -24,7 +24,4 @@ class Marker(object):
         self.timeline.mark('end:%s' % name)
 
     def measure(self, name, start=None, end=None):
-        self.timeline.measure(
-            'measure:%s' % name,
-            'start:%s' % (start or name),
-            'end:%s' % (end or start or name))
+        self.timeline.measure('measure:%s' % name, 'start:%s' % (start or name), 'end:%s' % (end or start or name))

@@ -2,7 +2,6 @@ import os
 
 from iopipe.collector import get_collector_path, get_hostname
 
-
 saved_region = os.getenv('AWS_REGION')
 
 

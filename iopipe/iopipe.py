@@ -46,18 +46,16 @@ class IOpipe(object):
 
     def log(self, key, value):
         if self.report is None:
-            warnings.warn(
-                'Attempting to log metrics before function decorated with IOpipe. '
-                'This metric will not be recorded.')
+            warnings.warn('Attempting to log metrics before function decorated with IOpipe. '
+                          'This metric will not be recorded.')
             return
 
         self.report.context.iopipe.log(key, value)
 
     def error(self, error):
         if self.report is None:
-            warnings.warn(
-                'An exception occurred before function was decorated with IOpipe. '
-                'This exception will not be recorded.')
+            warnings.warn('An exception occurred before function was decorated with IOpipe. '
+                          'This exception will not be recorded.')
             raise error
 
         self.report.context.iopipe.error(error)
@@ -80,10 +78,8 @@ class IOpipe(object):
 
             # If a token is not present, skip reporting
             if not self.config['token']:
-                warnings.warn(
-                    'Your function is decorated with iopipe, but a valid token was not found. '
-                    'Set the IOPIPE_TOKEN environment variable with your IOpipe project token.'
-                )
+                warnings.warn('Your function is decorated with iopipe, but a valid token was not found. '
+                              'Set the IOPIPE_TOKEN environment variable with your IOpipe project token.')
                 return func(event, context)
 
             self.report = Report(self.config, context)
@@ -94,20 +90,15 @@ class IOpipe(object):
             if self.config['timeout_window'] > 0 and \
                     hasattr(context, 'get_remaining_time_in_millis') and \
                     callable(context.get_remaining_time_in_millis):
-                timeout_duration = (context.get_remaining_time_in_millis() /
-                                    1000.0) - self.config['timeout_window']
+                timeout_duration = (context.get_remaining_time_in_millis() / 1000.0) - self.config['timeout_window']
 
                 # The timeout_duration cannot be a negative number, disable if it is
                 timeout_duration = max([0, timeout_duration])
 
                 # Maximum execution time is 10 minutes, make sure timeout doesn't exceed that minus the timeout window
-                timeout_duration = min([
-                    timeout_duration,
-                    60 * 60 * 10 - self.config['timeout_window']
-                ])
+                timeout_duration = min([timeout_duration, 60 * 60 * 10 - self.config['timeout_window']])
 
-                logger.debug(
-                    'Setting timeout duration to %s' % timeout_duration)
+                logger.debug('Setting timeout duration to %s' % timeout_duration)
 
                 # Using signal.setitimer instead of signal.alarm because the latter only accepts integers and we want to
                 # be able to timeout at millisecond granularity

@@ -34,9 +34,11 @@ def is_plugin(plugin):
 
 def with_metaclass(meta, *bases):
     """Python 2 and 3 compatible way to do meta classes"""
+
     class metaclass(meta):
         def __new__(cls, name, this_bases, d):
             return meta(name, bases, d)
+
     return type.__new__(metaclass, 'temporary_class', (), {})
 
 

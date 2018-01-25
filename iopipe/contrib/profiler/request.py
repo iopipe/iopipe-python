@@ -22,14 +22,19 @@ def get_signed_request(report):
 
     try:
         logger.debug('Requesting signed request URL from %s' % url)
-        response = requests.post(url, json={
-            'arn': report.report['aws']['invokedFunctionArn'],
-            'requestId': report.report['aws']['awsRequestId'],
-            'timestamp': report.report['timestamp']
-        }, headers={'Authorization': report.report['client_id']})
+        response = requests.post(
+            url,
+            json={
+                'arn': report.report['aws']['invokedFunctionArn'],
+                'requestId': report.report['aws']['awsRequestId'],
+                'timestamp': report.report['timestamp']
+            },
+            headers={
+                'Authorization': report.report['client_id']
+            })
         response.raise_for_status()
     except Exception as e:
-       logger.debug('Error requesting signed request URL: %s' % e)
+        logger.debug('Error requesting signed request URL: %s' % e)
     else:
         logger.debug('Signed request URL received successfully')
         return response.json()
