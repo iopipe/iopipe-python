@@ -132,7 +132,7 @@ IOpipe's functionality can be extended through plugins. Plugins hook into the ag
 
 ### Profiler Plugin
 
-The IOpipe agent comes bundled with a profiler plugin that allows you to profile your functions with `cProfile`.
+The IOpipe agent comes bundled with a profiler plugin that allows you to profile your functions with [cProfile](https://docs.python.org/3/library/profile.html#module-cProfile).
 
 Here's an example of how to use the profiler plugin:
 
