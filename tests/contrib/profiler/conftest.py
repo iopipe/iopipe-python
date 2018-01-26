@@ -1,4 +1,5 @@
 import pytest
+import time
 
 from iopipe import IOpipe
 from iopipe.contrib.profiler import ProfilerPlugin
@@ -14,5 +15,6 @@ def iopipe_with_profiler():
 def handler_with_profiler(iopipe_with_profiler):
     @iopipe_with_profiler
     def _handler(event, context):
-        pass
+        time.sleep(0.1)
+
     return iopipe_with_profiler, _handler

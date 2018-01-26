@@ -38,6 +38,9 @@ def test__trace_plugin__valid_schema(mock_send_report, handler_with_trace_auto_m
         iopipe.report.report,
         optional_fields=[
             'aws.traceId',
+            'environment.runtime.vendor',
+            'environment.runtime.vmVendor',
+            'environment.runtime.vmVersion',
             'environment.nodejs',
             'errors.count',
             'errors.message',

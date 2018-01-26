@@ -11,6 +11,9 @@ def test_report_linux_system_success(mock_context, assert_valid_schema):
         report.report,
         optional_fields=[
             'aws.traceId',
+            'environment.runtime.vendor',
+            'environment.runtime.vmVendor',
+            'environment.runtime.vmVersion',
             'environment.nodejs',
             'errors.count',
             'errors.message',
@@ -36,6 +39,9 @@ def test_report_linux_system_error(mock_context, assert_valid_schema):
         report.report,
         optional_fields=[
             'aws.traceId',
+            'environment.runtime.vendor',
+            'environment.runtime.vmVendor',
+            'environment.runtime.vmVersion',
             'environment.nodejs',
             'errors.count',
             'errors.stackHash',

@@ -20,9 +20,36 @@ class ProfilerPlugin(Plugin):
     version = '0.1.0'
     homepage = 'https://github.com/iopipe/iopipe-python'
 
-    def __init__(self, enabled=False, sort_by='cumulative'):
+    def __init__(self, enabled=False, sort='cumulative', restrictions=10):
+        """
+        Instantiates the profiler plugin
+
+        :param enabled: Whether or not the profiler should be enabled for all invocations.
+                        Alternatively this plugin can be enabled/disabled via the `IOPIPE_ENABLE_PROFILER` environment
+                        variabl
+        :type enabled: bool
+        :param sort: The column(s) in which to sort the stats. One or more
+                    columns can be set in the order in which they are to
+                    be sorted. Keep in mind that each column has an
+                    implicit sort order. Refer to pstats documentation for
+                    more information.
+        :type sort: str or list
+        :param restrictions: Any restrictions to be applied to the stats.
+                             Such as limiting results by count (int),
+                             percentage (float) or by regular expression (str). One
+                             or more restrictions can be applied via a list.
+                             See pstats documentation for more information.
+                    :type restrictions: int or float or str or list
+        """
         self._enabled = enabled
-        self.sort_by = sort_by
+
+        self.sort = sort
+        if not isinstance(self.sort, (list, tuple)):
+            self.sort = [self.sort]
+
+        self.restrictions = restrictions or []
+        if not isinstance(self.restrictions, (list, tuple)):
+            self.restrictions = [self.restrictions]
 
     @property
     def enabled(self):
@@ -50,10 +77,10 @@ class ProfilerPlugin(Plugin):
 
     def post_report(self, report):
         if self.profile is not None:
-            stream = io.StringIO()
-            pstats.Stats(self.profile, stream=stream).sort_stats(self.sort_by)
+            self.stream = io.StringIO()
+            self.stats = pstats.Stats(self.profile, stream=self.stream)
+            self.stats.sort_stats(*self.sort)
+            self.stats.print_stats(*self.restrictions)
 
             signed_request = get_signed_request(report)
-            upload_profiler_report(signed_request['signedRequest'], stream)
-
-            self.profile = None
+            upload_profiler_report(signed_request['signedRequest'], self.stream)

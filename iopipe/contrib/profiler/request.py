@@ -47,6 +47,7 @@ def upload_profiler_report(url, data):
     :param url: The signed URL
     :param data: The profiler report
     """
+    data.seek(0)
     try:
         logger.debug('Uploading profiler report to IOpipe')
         response = requests.put(url, data=data)
