@@ -52,6 +52,8 @@ class ProfilerPlugin(Plugin):
         if self.profile is not None:
             stream = io.StringIO()
             pstats.Stats(self.profile, stream=stream).sort_stats(self.sort_by)
-            signed_url = get_signed_request(report)
-            upload_profiler_report(signed_url, stream)
+
+            signed_request = get_signed_request(report)
+            upload_profiler_report(signed_request['signedRequest'], stream)
+
             self.profile = None

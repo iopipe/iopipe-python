@@ -35,7 +35,7 @@ def handler_with_trace(iopipe_with_trace):
 
 
 @pytest.fixture
-def handler_with_trace_auto_measure(iopipe_with_auto_measure):
+def handler_with_trace_auto_measure(iopipe_with_trace_auto_measure):
     @iopipe_with_trace_auto_measure
     def _handler(event, context):
         assert hasattr(context, 'iopipe')

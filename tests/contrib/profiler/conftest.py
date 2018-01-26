@@ -14,13 +14,5 @@ def iopipe_with_profiler():
 def handler_with_profiler(iopipe_with_profiler):
     @iopipe_with_profiler
     def _handler(event, context):
-        assert hasattr(context, 'iopipe')
-        assert hasattr(context.iopipe, 'mark')
-        assert hasattr(context.iopipe.mark, 'start')
-        assert hasattr(context.iopipe.mark, 'end')
-        assert hasattr(context.iopipe.mark, 'measure')
-
-        context.iopipe.mark.start('foo')
-        context.iopipe.mark.end('foo')
-
+        pass
     return iopipe_with_profiler, _handler
