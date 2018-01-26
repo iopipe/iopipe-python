@@ -8,6 +8,7 @@ This package provides analytics and distributed tracing for event-driven applica
   - [Reporting Exceptions](#reporting-exceptions)
   - [Custom Metrics](#custom-metrics)
 - [Plugins](#plugins)
+  - [Profiler Plugin](#profiler-plugin)
   - [Trace Plugin](#trace-plugin)
   - [Creating Plugins](#creating-plugins)
 - [Framework Integration](#framework-integration)
@@ -128,6 +129,61 @@ This makes it easy to add custom data and telemetry within your function.
 ## Plugins
 
 IOpipe's functionality can be extended through plugins. Plugins hook into the agent lifecycle to allow you to perform additional analytics.
+
+### Profiler Plugin
+
+The IOpipe agent comes bundled with a profiler plugin that allows you to profile your functions with `cProfile`.
+
+Here's an example of how to use the profiler plugin:
+
+```python
+from iopipe import IOpipe
+from iopipe.contrib.profiler import ProfilerPlugin
+
+iopipe = IOpipe(plugins=[ProfilerPlugin()])
+
+@iopipe
+def handler(event, context):
+    # do something here
+```
+
+By default the plugin will be disabled and can be enabled at runtime by setting the `IOPIPE_ENABLE_PROFILER` environment variable to `true`/`True`.
+
+If you want to enable the plugin for all invocations:
+
+```python
+iopipe = IOpipe(plugins=[ProfilerPlugin(enabled=True)])
+```
+
+By default the profiler plugin will generate a report with the top ten function calls sorted by cumulative time in descending order. This is useful if you want to understand what algorithms are taking time,
+
+If you were looking to see what functions were looping a lot, and taking a lot of time, you would do:
+
+```python
+iopipe = IOpipe(plugins=[ProfilerPlugin(enabled=True, sort='time')])
+```
+
+Which wil sort according to time spent within each function.
+
+You can also sort by multiple columns, for example:
+
+```python
+iopipe = IOpipe(plugins=[ProfilerPlugin(enabled=True, sort=['time', 'cumulative'])])
+```
+
+Which would be a combination of the above two examples.
+
+If you want more than ten results in your report:
+
+```python
+iopipe = IOpipe(plugins=[ProfilerPlugin(enabled=True, restrictions=100)])
+```
+
+Which would limit the results to 100 instead of 10. You can also remove all restrictions by setting `restrictions` to `None`.
+
+There are many more ways to sort and restrict the profiling results. Refer to the [pstats Documentation](https://docs.python.org/3/library/profile.html#module-pstats) for detils.
+
+For reference, `sort` is passed to pstats' `sort_stats()` method and `restrictions` is passed to pstats' `print_stats()` method.
 
 ### Trace Plugin
 
