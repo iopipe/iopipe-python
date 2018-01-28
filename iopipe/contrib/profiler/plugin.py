@@ -7,9 +7,12 @@ except ImportError:
     import profile
 import pstats
 try:
-    from StringIO import StringIO
+    from cStringIO import StringIO
 except ImportError:
-    from io import StringIO
+    try:
+        from StringIO import StringIO
+    except ImportError:
+        from io import StringIO
 
 from iopipe.plugins import Plugin
 
