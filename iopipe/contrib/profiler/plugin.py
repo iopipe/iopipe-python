@@ -1,5 +1,4 @@
 from distutils.util import strtobool
-import io
 import logging
 import os
 try:
@@ -7,6 +6,10 @@ try:
 except ImportError:
     import profile
 import pstats
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 from iopipe.plugins import Plugin
 
@@ -77,7 +80,7 @@ class ProfilerPlugin(Plugin):
 
     def post_report(self, report):
         if self.profile is not None:
-            self.stream = io.StringIO()
+            self.stream = StringIO()
             self.stats = pstats.Stats(self.profile, stream=self.stream)
             self.stats.sort_stats(*self.sort)
             self.stats.print_stats(*self.restrictions)
