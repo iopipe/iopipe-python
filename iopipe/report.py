@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import platform
 import sys
 import time
@@ -91,6 +92,11 @@ class Report(object):
         }.items():
             if hasattr(self.context, v):
                 data[k] = getattr(self.context, v)
+        if hasattr(self.context, 'invoked_function_arn') and \
+                'AWS_SAM_LOCAL' in os.environ:
+            data['invokedFunctionArn'] = \
+                'arn:aws:lambda:local:0:function:%s' % \
+                (data.get('functionName', 'unknown'),)
         if hasattr(self.context, 'get_remaining_time_in_millis') and \
                 callable(self.context.get_remaining_time_in_millis):
             data['getRemainingTimeInMillis'] = self.context.get_remaining_time_in_millis()
