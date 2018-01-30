@@ -7,18 +7,23 @@ def test_report_linux_system_success(mock_context, assert_valid_schema):
     report = Report(set_config(), mock_context)
     report.prepare()
 
-    assert_valid_schema(report.report, optional_fields=[
-        'aws.traceId',
-        'environment.nodejs',
-        'errors.count',
-        'errors.message',
-        'errors.name',
-        'errors.stack',
-        'errors.stackHash',
-        'memory',
-        'projectId',
-        'performanceEntries',
-    ])
+    assert_valid_schema(
+        report.report,
+        optional_fields=[
+            'aws.traceId',
+            'environment.runtime.vendor',
+            'environment.runtime.vmVendor',
+            'environment.runtime.vmVersion',
+            'environment.nodejs',
+            'errors.count',
+            'errors.message',
+            'errors.name',
+            'errors.stack',
+            'errors.stackHash',
+            'memory',
+            'projectId',
+            'performanceEntries',
+        ])
 
 
 def test_report_linux_system_error(mock_context, assert_valid_schema):
@@ -30,12 +35,17 @@ def test_report_linux_system_error(mock_context, assert_valid_schema):
     except Exception as e:
         report.prepare(e)
 
-    assert_valid_schema(report.report, optional_fields=[
-        'aws.traceId',
-        'environment.nodejs',
-        'errors.count',
-        'errors.stackHash',
-        'memory',
-        'projectId',
-        'performanceEntries',
-    ])
+    assert_valid_schema(
+        report.report,
+        optional_fields=[
+            'aws.traceId',
+            'environment.runtime.vendor',
+            'environment.runtime.vmVendor',
+            'environment.runtime.vmVersion',
+            'environment.nodejs',
+            'errors.count',
+            'errors.stackHash',
+            'memory',
+            'projectId',
+            'performanceEntries',
+        ])
