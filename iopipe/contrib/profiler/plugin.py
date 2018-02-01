@@ -59,7 +59,7 @@ class ProfilerPlugin(Plugin):
 
     @property
     def enabled(self):
-        return self._enabled or strtobool(os.getenv('IOPIPE_ENABLE_PROFILER', 'false'))
+        return self._enabled is True or strtobool(os.getenv('IOPIPE_ENABLE_PROFILER', 'false'))
 
     def pre_setup(self, iopipe):
         pass
