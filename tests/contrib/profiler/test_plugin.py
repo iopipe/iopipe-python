@@ -12,7 +12,10 @@ def test__profiler_plugin(mock_send_report, mock_get_signed_request, mock_upload
     assert len(plugins) == 1
     assert plugins[0].enabled is True
 
-    mock_get_signed_request.return_value = {'signedRequest': 'https://mock_signed_url'}
+    mock_get_signed_request.return_value = {
+        'signedRequest': 'https://mock_signed_url',
+        'url': 'https://mock_url',
+    }
 
     handler({}, mock_context)
 
@@ -25,3 +28,5 @@ def test__profiler_plugin(mock_send_report, mock_get_signed_request, mock_upload
 
     assert 'function calls in' in profile[0]
     assert 'Ordered by: cumulative time' in profile[2]
+
+    assert iopipe.report.report['plugins'][0]['uploads'][0] == 'https://mock_url'
