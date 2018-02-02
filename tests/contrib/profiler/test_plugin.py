@@ -28,5 +28,3 @@ def test__profiler_plugin(mock_send_report, mock_get_signed_request, mock_upload
 
     assert 'function calls in' in profile[0]
     assert 'Ordered by: cumulative time' in profile[2]
-
-    assert iopipe.report.report['plugins'][0]['uploads'][0] == 'https://mock_url'

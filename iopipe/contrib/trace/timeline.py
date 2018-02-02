@@ -62,7 +62,7 @@ class Timeline(object):
         duration = end_time - start_time
 
         self.data = mark_data(
-            self, name=name, start_time=0, duration=duration, entry_type='measure', timestamp=timestamp)
+            self, name=name, start_time=start_time, duration=duration, entry_type='measure', timestamp=timestamp)
 
     def clear_marks(self):
         self.data = [d for d in self.data if d['entryType'] != 'mark']

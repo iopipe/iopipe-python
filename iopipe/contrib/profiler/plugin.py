@@ -79,6 +79,9 @@ class ProfilerPlugin(Plugin):
             self.profile.disable()
 
     def pre_report(self, report):
+        pass
+
+    def post_report(self, report):
         if self.profile is not None:
             self.stream = StringIO()
             self.stats = pstats.Stats(self.profile, stream=self.stream)
@@ -87,10 +90,3 @@ class ProfilerPlugin(Plugin):
 
             signed_request = get_signed_request(report)
             upload_profiler_report(signed_request['signedRequest'], self.stream)
-
-            plugin = [p for p in report.report['plugins'] if p['name'] == self.name]
-            if plugin:
-                plugin[0]['uploads'] = [signed_request['url']]
-
-    def post_report(self, report):
-        pass
