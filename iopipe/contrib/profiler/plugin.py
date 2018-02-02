@@ -33,7 +33,7 @@ class ProfilerPlugin(Plugin):
         :param enabled: Whether or not the profiler should be enabled for all invocations.
                         Alternatively this plugin can be enabled/disabled via
                         the `IOPIPE_PROFILER_ENABLED` environment
-                        variabl
+                        variable.
         :type enabled: bool
         :param sort: The column(s) in which to sort the stats. One or more
                     columns can be set in the order in which they are to
