@@ -147,7 +147,7 @@ def handler(event, context):
     # do something here
 ```
 
-By default the plugin will be disabled and can be enabled at runtime by setting the `IOPIPE_ENABLE_PROFILER` environment variable to `true`/`True`.
+By default the plugin will be disabled and can be enabled at runtime by setting the `IOPIPE_PROFILER_ENABLED` environment variable to `true`/`True`.
 
 If you want to enable the plugin for all invocations:
 

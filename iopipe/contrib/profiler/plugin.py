@@ -31,7 +31,8 @@ class ProfilerPlugin(Plugin):
         Instantiates the profiler plugin
 
         :param enabled: Whether or not the profiler should be enabled for all invocations.
-                        Alternatively this plugin can be enabled/disabled via the `IOPIPE_ENABLE_PROFILER` environment
+                        Alternatively this plugin can be enabled/disabled via
+                        the `IOPIPE_PROFILER_ENABLED` environment
                         variabl
         :type enabled: bool
         :param sort: The column(s) in which to sort the stats. One or more
@@ -59,7 +60,7 @@ class ProfilerPlugin(Plugin):
 
     @property
     def enabled(self):
-        return self._enabled is True or strtobool(os.getenv('IOPIPE_ENABLE_PROFILER', 'false'))
+        return self._enabled is True or strtobool(os.getenv('IOPIPE_PROFILER_ENABLED', 'false'))
 
     def pre_setup(self, iopipe):
         pass
