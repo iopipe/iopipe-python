@@ -3,9 +3,13 @@ import sys
 import time
 
 from iopipe import IOpipe
+from iopipe.contrib.profiler import ProfilerPlugin
 from iopipe.contrib.trace import TracePlugin
 
 iopipe = IOpipe(os.getenv('IOPIPE_TOKEN'))
+
+profiler_plugin = ProfilerPlugin(enabled=True)
+iopipe_with_profiling = IOpipe(os.getenv('IOPIPE_TOKEN'), plugins=[profiler_plugin])
 
 trace_plugin = TracePlugin()
 iopipe_with_tracing = IOpipe(os.getenv('IOPIPE_TOKEN'), plugins=[trace_plugin])
@@ -27,6 +31,11 @@ def coldstart(event, context):
 @iopipe
 def custom_metrics(event, context):
     context.iopipe.log('time', time.time())
+
+
+@iopipe_with_profiling
+def profiling(event, context):
+    time.sleep(1)
 
 
 @iopipe

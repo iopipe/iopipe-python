@@ -43,6 +43,17 @@ functions:
     handler: handler.custom_metrics
     runtime: python3.6
 
+  py2-profiling:
+    events:
+      - schedule: rate(10 minutes)
+    handler: handler.profiling
+    runtime: python2.7
+  py3-profiling:
+    events:
+      - schedule: rate(10 minutes)
+    handler: handler.profiling
+    runtime: python3.6
+
   py2-success:
     events:
       - schedule: rate(10 minutes)
