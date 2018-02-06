@@ -15,6 +15,14 @@ trace_plugin = TracePlugin()
 iopipe_with_tracing = IOpipe(os.getenv('IOPIPE_TOKEN'), plugins=[trace_plugin])
 
 
+def baseline(event, context):
+    pass
+
+
+def baseline_coldstart(event, context):
+    sys.exit(1)
+
+
 @iopipe
 def caught_error(event, context):
     try:

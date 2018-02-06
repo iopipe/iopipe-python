@@ -10,6 +10,28 @@ provider:
     IOPIPE_TOKEN: ${env:IOPIPE_TOKEN}
 
 functions:
+  py2-baseline:
+    events:
+      - schedule: rate(10 minutes)
+    handler: handler.baseline
+    runtime: python2.7
+  py3-baseline:
+    events:
+      - schedule: rate(10 minutes)
+    handler: handler.baseline
+    runtime: python3.6
+
+  py2-baseline-coldstart:
+    events:
+      - schedule: rate(10 minutes)
+    handler: handler.baseline_coldstart
+    runtime: python2.7
+  py3-baseline-coldstart:
+    events:
+      - schedule: rate(10 minutes)
+    handler: handler.baseline_coldstart
+    runtime: python3.6
+
   py2-caught-error:
     events:
       - schedule: rate(10 minutes)
