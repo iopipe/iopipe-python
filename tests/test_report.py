@@ -1,3 +1,5 @@
+import os
+
 from iopipe.config import set_config
 from iopipe.report import Report
 
@@ -49,3 +51,13 @@ def test_report_linux_system_error(mock_context, assert_valid_schema):
             'projectId',
             'performanceEntries',
         ])
+
+
+def test_report_samlocal(monkeypatch, mock_context):
+    """Assert that if invoked by sam local that the function name is overridden"""
+    monkeypatch.setattr(os, 'environ', {'AWS_SAM_LOCAL': True})
+
+    report = Report(set_config(), mock_context)
+    report.prepare()
+
+    assert report.report['aws']['invokedFunctionArn'] == 'arn:aws:lambda:local:0:function:handler'
