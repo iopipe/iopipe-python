@@ -66,7 +66,7 @@ def test_timeouts(mock_send_report, handler_that_timeouts, mock_context):
     try:
         handler(None, mock_context)
     except Exception:
-         pass
+        pass
 
     assert iopipe.report.report['errors']['message'] == 'Timeout Exceeded.'
     assert iopipe.report.report['errors']['name'] == 'TimeoutError'
@@ -83,7 +83,7 @@ def test_timeouts_disable(mock_send_report, handler_that_timeouts, mock_context)
     try:
         handler(None, mock_context)
     except Exception:
-         pass
+        pass
 
     # Exception will occur because timeout is disabled
     assert iopipe.report.report['errors'] != {}

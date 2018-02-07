@@ -80,14 +80,14 @@ class Report(object):
         """
         data = {}
         for k, v in {
-            # camel case names in the report to align with AWS standards
-            'functionName': 'function_name',
-            'functionVersion': 'function_version',
-            'memoryLimitInMB': 'memory_limit_in_mb',
-            'invokedFunctionArn': 'invoked_function_arn',
-            'awsRequestId': 'aws_request_id',
-            'logGroupName': 'log_group_name',
-            'logStreamName': 'log_stream_name',
+                # camel case names in the report to align with AWS standards
+                'functionName': 'function_name',
+                'functionVersion': 'function_version',
+                'memoryLimitInMB': 'memory_limit_in_mb',
+                'invokedFunctionArn': 'invoked_function_arn',
+                'awsRequestId': 'aws_request_id',
+                'logGroupName': 'log_group_name',
+                'logStreamName': 'log_stream_name',
         }.items():
             if hasattr(self.context, v):
                 data[k] = getattr(self.context, v)

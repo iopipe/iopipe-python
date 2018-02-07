@@ -6,6 +6,7 @@ from iopipe.plugins import get_plugin_meta, is_plugin, Plugin
 
 def test_plugins_incomplete_interface():
     """Assert that a TypeError is raised if a plugin doesn't implmement the interface"""
+
     class IncompletePlugin1(Plugin):
         pass
 

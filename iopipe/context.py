@@ -23,9 +23,7 @@ class IOpipeContext(object):
                           'This metric will not be recorded.')
             return
 
-        event = {
-            'name': str(key)
-        }
+        event = {'name': str(key)}
 
         # Add numerical values to report
         # We typecast decimals as strings: not JSON serializable and casting to floats can result in rounding errors.

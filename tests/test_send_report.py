@@ -17,5 +17,5 @@ def test_send_report_network_timeout(mock_session):
     """Assert that the timeout is changed when network_timeout is set"""
     send_report({'foo': 'bar'}, set_config(network_timeout=60))
 
-    mock_session.post.assert_called_once_with('https://metrics-api.iopipe.com/v0/event', json={'foo': 'bar'},
-                                              timeout=60)
+    mock_session.post.assert_called_once_with(
+        'https://metrics-api.iopipe.com/v0/event', json={'foo': 'bar'}, timeout=60)
