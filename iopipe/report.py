@@ -96,7 +96,7 @@ class Report(object):
                 'AWS_SAM_LOCAL' in os.environ:
             data['invokedFunctionArn'] = \
                 'arn:aws:lambda:local:0:function:%s' % \
-                (data.get('functionName', 'unknown'),)
+                data.get('functionName', 'unknown')
         if hasattr(self.context, 'get_remaining_time_in_millis') and \
                 callable(self.context.get_remaining_time_in_millis):
             data['getRemainingTimeInMillis'] = self.context.get_remaining_time_in_millis()
