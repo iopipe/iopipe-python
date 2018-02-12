@@ -1,7 +1,7 @@
 # IOpipe Analytics & Distributed Tracing Agent for Python
 
 [![PyPI version](https://badge.fury.io/py/iopipe.svg)](https://badge.fury.io/py/iopipe)
-[![Slack](https://img.shields.io/badge/chat-slack-ff69b4.svg)](https://iopipe-community.slack.com/)
+[![Slack](https://img.shields.io/badge/chat-slack-ff69b4.svg)](https://iopipe.now.sh)
 
 This package provides analytics and distributed tracing for event-driven applications running on AWS Lambda.
 
@@ -135,7 +135,7 @@ IOpipe's functionality can be extended through plugins. Plugins hook into the ag
 
 ### Profiler Plugin
 
-**Note:** This feature is still in beta. Want to try it out? Find us on [Slack](https://iopipe-community.slack.com/).
+**Note:** This feature is still in beta. Want to try it out? Find us on [Slack](https://iopipe.now.sh).
 
 The IOpipe agent comes bundled with a profiler plugin that allows you to profile your functions with [cProfile](https://docs.python.org/3/library/profile.html#module-cProfile).
 
