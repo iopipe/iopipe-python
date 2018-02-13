@@ -21,12 +21,12 @@ functions:
     handler: handler.baseline
     runtime: python3.6
 
-  py2-baseline-coldstart:
+  py2-base-coldstart:
     events:
       - schedule: rate(10 minutes)
     handler: handler.baseline_coldstart
     runtime: python2.7
-  py3-baseline-coldstart:
+  py3-base-coldstart:
     events:
       - schedule: rate(10 minutes)
     handler: handler.baseline_coldstart
