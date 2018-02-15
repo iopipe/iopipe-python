@@ -35,6 +35,8 @@ def get_signed_request(report):
         response.raise_for_status()
     except Exception as e:
         logger.debug('Error requesting signed request URL: %s' % e)
+        if hasattr(e, 'response'):
+            logger.debug(e.response.content)
     else:
         response = response.json()
         logger.debug('Signed request URL received for %s' % response['url'])
@@ -55,5 +57,7 @@ def upload_profiler_report(url, data):
         response.raise_for_status()
     except Exception as e:
         logger.debug('Error while uploading profiler report: %s' % e)
+        if hasattr(e, 'response'):
+            logger.debug(e.response.content)
     else:
         logger.debug('Profiler report uploaded successfully')
