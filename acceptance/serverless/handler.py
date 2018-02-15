@@ -1,4 +1,3 @@
-import os
 import sys
 import time
 
@@ -6,13 +5,13 @@ from iopipe import IOpipe
 from iopipe.contrib.profiler import ProfilerPlugin
 from iopipe.contrib.trace import TracePlugin
 
-iopipe = IOpipe(os.getenv('IOPIPE_TOKEN'))
+iopipe = IOpipe(debug=True)
 
 profiler_plugin = ProfilerPlugin(enabled=True)
-iopipe_with_profiling = IOpipe(os.getenv('IOPIPE_TOKEN'), plugins=[profiler_plugin])
+iopipe_with_profiling = IOpipe(debug=True, plugins=[profiler_plugin])
 
 trace_plugin = TracePlugin()
-iopipe_with_tracing = IOpipe(os.getenv('IOPIPE_TOKEN'), plugins=[trace_plugin])
+iopipe_with_tracing = IOpipe(debug=True, plugins=[trace_plugin])
 
 
 def baseline(event, context):

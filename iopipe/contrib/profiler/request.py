@@ -36,8 +36,9 @@ def get_signed_request(report):
     except Exception as e:
         logger.debug('Error requesting signed request URL: %s' % e)
     else:
-        logger.debug('Signed request URL received successfully')
-        return response.json()
+        response = response.json()
+        logger.debug('Signed request URL received for %s' % response['url'])
+        return response
 
 
 def upload_profiler_report(url, data):
