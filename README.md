@@ -14,6 +14,7 @@ This package provides analytics and distributed tracing for event-driven applica
   - [Profiler Plugin](#profiler-plugin)
   - [Trace Plugin](#trace-plugin)
   - [Creating Plugins](#creating-plugins)
+- [Supported Python Versions](#supported-python-versions)
 - [Framework Integration](#framework-integration)
   - [Chalice](#chalice)
   - [Zappa](#zappa)
@@ -299,6 +300,10 @@ A plugin has the following methods defined:
 - `post_invoke`: Is called after each invocation, is passed the `event` and `context` of the invocation.
 - `pre_report`: Is called prior to each report being sent, is passed the `report` instance.
 - `post_report`: Is called after each report is sent, is passed the `report` instance.
+
+## Supported Python Versions
+
+This package supports Python 2.7 and 3.6, the runtimes supported by AWS Lambda.
 
 ## Framework Integration
 
