@@ -1,6 +1,6 @@
 from iopipe.plugins import Plugin
 
-from .util import log_for_event_type
+from .event_types import log_for_event_type
 
 
 class EventInfoPlugin(Plugin):

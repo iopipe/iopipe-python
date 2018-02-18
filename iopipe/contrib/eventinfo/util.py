@@ -1,27 +1,31 @@
-from .event_types import EVENT_TYPES
+from .jsonpath import parser
+
+# Caches previously seen parsers
+PARSERS = {}
 
 
-def get_nested(obj, *path):
-    for p in path:
-        if p == 'length':
-            return len(obj)
-        first_item = p.endswith('[0]')
-        if first_item:
-            p = p.replace('[0]', '')
-        if p not in obj:
-            return
-        obj = obj.get(p)
-        if first_item:
-            if not isinstance(obj, list) or not len(obj) > 0:
-                return
-            obj = obj[0]
-    return obj
+def get_value(obj, path):
+    return_length = False
+    if path.endswith('.length'):
+        return_length = True
+        path = path.replace('.length', '')
+
+    parse = PARSERS.get(path)
+    if parse is None:
+        parse = parser.parse(path)
+        PARSERS[path] = parse
+
+    result = parse.find(obj)
+    if return_length:
+        return len(result)
+    return result[0].value if result else None
 
 
-def log_for_event_type(event, log):
-    for EventType in EVENT_TYPES:
-        event_type = EventType(event)
-        if event_type.has_required_keys():
-            event_info = event_type.collect()
-            (log(k, v) for k, v in event_info.items())
-            break
+def has_key(obj, path):
+    parse = PARSERS.get(path)
+    if parse is None:
+        parse = parser.parse(path)
+        PARSERS[path] = parse
+
+    result = parse.find(obj)
+    return len(result) > 0

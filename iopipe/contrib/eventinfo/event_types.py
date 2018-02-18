@@ -1,4 +1,4 @@
-from .util import get_nested
+from .util import get_value, has_key
 
 
 class EventType(object):
@@ -6,15 +6,15 @@ class EventType(object):
         self.event = event
 
     def has_required_keys(self):
-        return all(get_nested(self.event, *key.split('.')) is not None for key in self.required_keys)
+        return all(has_key(self.event, key) for key in self.required_keys)
 
     def collect(self):
         event_info = {}
         for key in self.keys:
-            value = get_nested(self.event, *key.split('.'))
+            value = get_value(self.event, key)
             if value is not None:
-                event_info['event-info.%s.%s' % (self.type, key)] = value
-        event_info['event-info.eventType'] = self.type
+                event_info['@iopipe/event-info.%s.%s' % (self.type, key)] = value
+        event_info['@iopipe/event-info.eventType'] = self.type
         return event_info
 
 
@@ -46,11 +46,11 @@ class CloudFront(EventType):
         'Records[0].cf.config.distributionId',
         'Records[0].cf.request.clientIp',
         'Records[0].cf.request.headers.host[0].value',
-        'Records[0].cf.request.headers.user-agent[0].value',
+        'Records[0].cf.request.headers.["user-agent"][0].value',
         'Records[0].cf.request.method',
         'Records[0].cf.request.uri',
     ]
-    required_keys = ['Records.cf']
+    required_keys = ['Records[0].cf']
 
 
 class Firehose(EventType):
@@ -61,7 +61,7 @@ class Firehose(EventType):
     ]
     required_keys = [
         'deliveryStreamArn',
-        'records',
+        'records[0]',
         'records[0].kinesisRecordMetadata',
     ]
 
@@ -80,8 +80,8 @@ class Kinesis(EventType):
 
     def has_required_keys(self):
         return super(Kinesis, self).has_required_keys() and \
-            get_nested(self.event, 'Records[0]', 'eventVersion') == '1.0' and \
-            get_nested(self.event, 'Records[0]', 'eventSource') == 'aws:kinesis'
+            get_value(self.event, 'Records[0]', 'eventVersion') == '1.0' and \
+            get_value(self.event, 'Records[0]', 'eventSource') == 'aws:kinesis'
 
 
 class S3(EventType):
@@ -91,8 +91,8 @@ class S3(EventType):
         'Records[0].eventName',
         'Records[0].eventTime',
         'Records[0].requestParameters.sourceIPAddress',
-        'Records[0].responseElements.x-amz-id-2',
-        'Records[0].responseElements.x-amz-request-id',
+        'Records[0].responseElements["x-amz-id-2"]',
+        'Records[0].responseElements["x-amz-request-id"]',
         'Records[0].s3.bucket.arn',
         'Records[0].s3.bucket.name',
         'Records[0].s3.object.key',
@@ -107,8 +107,8 @@ class S3(EventType):
 
     def has_required_keys(self):
         return super(S3, self).has_required_keys() and \
-            get_nested(self.event, 'Records[0]', 'eventVersion') == '2.0' and \
-            get_nested(self.event, 'Records[0]', 'eventSource') == 'aws:s3'
+            get_value(self.event, 'Records[0]', 'eventVersion') == '2.0' and \
+            get_value(self.event, 'Records[0]', 'eventSource') == 'aws:s3'
 
 
 class Scheduled(EventType):
@@ -123,7 +123,7 @@ class Scheduled(EventType):
     required_keys = ['source']
 
     def has_required_keys(self):
-        return super(Scheduled, self).has_required_keys() and get_nested(self.event, 'source') == 'aws.events'
+        return super(Scheduled, self).has_required_keys() and get_value(self.event, 'source') == 'aws.events'
 
 
 class SNS(EventType):
@@ -147,8 +147,17 @@ class SNS(EventType):
 
     def has_required_keys(self):
         return super(SNS, self).has_required_keys() and \
-            get_nested(self.event, 'Records[0]', 'eventVersion') == '1.0' and \
-            get_nested(self.event, 'Records[0]', 'eventSource') == 'aws:sns'
+            get_value(self.event, 'Records[0]', 'eventVersion') == '1.0' and \
+            get_value(self.event, 'Records[0]', 'eventSource') == 'aws:sns'
 
 
 EVENT_TYPES = [ApiGateway, CloudFront, Firehose, Kinesis, S3, Scheduled, SNS]
+
+
+def log_for_event_type(event, log):
+    for EventType in EVENT_TYPES:
+        event_type = EventType(event)
+        if event_type.has_required_keys():
+            event_info = event_type.collect()
+            (log(k, v) for k, v in event_info.items())
+            break
