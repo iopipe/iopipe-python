@@ -2466,8 +2466,8 @@ class LRGeneratedTable(LRTable):
     # -----------------------------------------------------------------------------
 
     def compute_read_sets(self, C, ntrans, nullable):
-        FP = lambda x: self.dr_relation(C, x, nullable)
-        R = lambda x: self.reads_relation(C, x, nullable)
+        FP = lambda x: self.dr_relation(C, x, nullable)  # noqa
+        R = lambda x: self.reads_relation(C, x, nullable)  # noqa
         F = digraph(ntrans, R, FP)
         return F
 
@@ -2488,8 +2488,8 @@ class LRGeneratedTable(LRTable):
     # -----------------------------------------------------------------------------
 
     def compute_follow_sets(self, ntrans, readsets, inclsets):
-        FP = lambda x: readsets[x]
-        R = lambda x: inclsets.get(x, [])
+        FP = lambda x: readsets[x]  # noqa
+        R = lambda x: inclsets.get(x, [])  # noqa
         F = digraph(ntrans, R, FP)
         return F
 
@@ -3209,7 +3209,7 @@ class ParserReflect(object):
                 continue
             if n.startswith('p_') and n != 'p_error':
                 self.log.warning('%r not defined as a function', n)
-            if ((isinstance(v, types.FunctionType) and v.__code__.co_argcount == 1) or (isinstance(v, types.MethodType) and v.__func__.__code__.co_argcount == 2)):
+            if ((isinstance(v, types.FunctionType) and v.__code__.co_argcount == 1) or (isinstance(v, types.MethodType) and v.__func__.__code__.co_argcount == 2)):  # noqa
                 if v.__doc__:
                     try:
                         doc = v.__doc__.split(' ')

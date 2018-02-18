@@ -11,12 +11,23 @@
 from __future__ import absolute_import, division, generators, nested_scopes, print_function, unicode_literals
 
 import logging
+import sys
 
 logger = logging.getLogger(__name__)
 
 # Turn on/off the automatic creation of id attributes
 # ... could be a kwarg pervasively but uses are rare and simple today
 auto_id_field = None
+
+PY3 = sys.version_info[0] == 3
+
+if PY3:
+    integer_types = int,
+    string_types = str,
+else:
+    integer_types = (int, long)  # noqa
+    range = xrange  # noqa
+    string_types = basestring,  # noqa
 
 
 class JSONPath(object):
@@ -565,7 +576,9 @@ class Slice(JSONPath):
 
         # Here's the hack. If it is a dictionary or some kind of constant,
         # put it in a single-element list
-        if (isinstance(datum.value, dict) or isinstance(datum.value, int) or isinstance(datum.value, str)):
+        if (isinstance(datum.value, dict) or
+                isinstance(datum.value, integer_types) or
+                isinstance(datum.value, string_types)):
             return self.find(DatumInContext([datum.value], path=datum.path, context=datum.context))
 
         # Some iterators do not support slicing but we can still
