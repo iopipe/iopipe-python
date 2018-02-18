@@ -1,4 +1,4 @@
-from . import jmespath
+import jmespath
 
 # Caches previously seen parsers
 parsers = {}
