@@ -161,35 +161,15 @@ If you want to enable the plugin for all invocations:
 iopipe = IOpipe(plugins=[ProfilerPlugin(enabled=True)])
 ```
 
-By default the profiler plugin will generate a report with the top ten function calls sorted by cumulative time in descending order. This is useful if you want to understand what algorithms are taking time,
+Now in your IOpipe invocation view you will see a "Profiling" section where you can download your profiling report.
 
-If you were looking to see what functions were looping a lot, and taking a lot of time, you would do:
+Once you download the report you can open it using pstat's interactive browser with this command:
 
-```python
-iopipe = IOpipe(plugins=[ProfilerPlugin(enabled=True, sort='time')])
+```bash
+python -m pstats <file here>
 ```
 
-Which wil sort according to time spent within each function.
-
-You can also sort by multiple columns, for example:
-
-```python
-iopipe = IOpipe(plugins=[ProfilerPlugin(enabled=True, sort=['time', 'cumulative'])])
-```
-
-Which would be a combination of the above two examples.
-
-If you want more than ten results in your report:
-
-```python
-iopipe = IOpipe(plugins=[ProfilerPlugin(enabled=True, restrictions=100)])
-```
-
-Which would limit the results to 100 instead of 10. You can also remove all restrictions by setting `restrictions` to `None`.
-
-There are many more ways to sort and restrict the profiling results. Refer to the [pstats Documentation](https://docs.python.org/3/library/profile.html#module-pstats) for detils.
-
-For reference, `sort` is passed to pstats' `sort_stats()` method and `restrictions` is passed to pstats' `print_stats()` method.
+Within the pstats browser you can sort and restrict the report in a number of ways, enter the `help` command for details. Refer to the [pstats Documentation](https://docs.python.org/3/library/profile.html#module-pstats).
 
 ### Trace Plugin
 

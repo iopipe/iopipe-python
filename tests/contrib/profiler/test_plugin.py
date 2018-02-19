@@ -20,11 +20,4 @@ def test__profiler_plugin(mock_send_report, mock_get_signed_request, mock_upload
     handler({}, mock_context)
 
     mock_get_signed_request.assert_called_once_with(iopipe.report)
-    mock_upload_profiler_report.assert_called_once_with('https://mock_signed_url', plugins[0].stream)
-
-    stream = plugins[0].stream
-    stream.seek(0)
-    profile = stream.readlines()
-
-    assert 'function calls in' in profile[0]
-    assert 'Ordered by: cumulative time' in profile[2]
+    mock_upload_profiler_report.assert_called_once_with('https://mock_signed_url', mock.ANY)
