@@ -164,8 +164,6 @@ When this plugin is installed, custom metrics will be created automatically for 
 * SNS
 * Scheduled Events
 
-To enable this plugin:
-
 ### Profiler Plugin
 
 **Note:** This feature is still in beta. Want to try it out? Find us on [Slack](https://iopipe.now.sh).
