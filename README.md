@@ -11,6 +11,7 @@ This package provides analytics and distributed tracing for event-driven applica
   - [Reporting Exceptions](#reporting-exceptions)
   - [Custom Metrics](#custom-metrics)
 - [Plugins](#plugins)
+  - [Event Info Plugin](#event-info-plugin)
   - [Profiler Plugin](#profiler-plugin)
   - [Trace Plugin](#trace-plugin)
   - [Creating Plugins](#creating-plugins)
@@ -133,6 +134,37 @@ This makes it easy to add custom data and telemetry within your function.
 ## Plugins
 
 IOpipe's functionality can be extended through plugins. Plugins hook into the agent lifecycle to allow you to perform additional analytics.
+
+### Event Info Plugin
+
+The IOpipe agent comes bundled with an event info plugin that automatically extracts useful information from the `event`
+object and creates custom metrics for them.
+
+Here's an example of how to use the event info plugin:
+
+```python
+from iopipe import IOpipe
+from iopipe.contrib.eventinfo import EventInfoPlugin
+
+iopipe = IOpipe(plugins=[EventInfoPlugin()])
+
+@iopipe
+def handler(event, context):
+    # do something here
+```
+
+When this plugin is installed, custom metrics will be created automatically for the following event source data:
+
+* API Gateway
+* CloudFront
+* Kinesis
+* Kinesis Firehose
+* S3
+* SES
+* SNS
+* Scheduled Events
+
+To enable this plugin:
 
 ### Profiler Plugin
 
