@@ -80,8 +80,8 @@ class Kinesis(EventType):
 
     def has_required_keys(self):
         return super(Kinesis, self).has_required_keys() and \
-            get_value(self.event, 'Records[0]', 'eventVersion') == '1.0' and \
-            get_value(self.event, 'Records[0]', 'eventSource') == 'aws:kinesis'
+            get_value(self.event, 'Records[0].eventVersion') == '1.0' and \
+            get_value(self.event, 'Records[0].eventSource') == 'aws:kinesis'
 
 
 class S3(EventType):
@@ -107,8 +107,8 @@ class S3(EventType):
 
     def has_required_keys(self):
         return super(S3, self).has_required_keys() and \
-            get_value(self.event, 'Records[0]', 'eventVersion') == '2.0' and \
-            get_value(self.event, 'Records[0]', 'eventSource') == 'aws:s3'
+            get_value(self.event, 'Records[0].eventVersion') == '2.0' and \
+            get_value(self.event, 'Records[0].eventSource') == 'aws:s3'
 
 
 class Scheduled(EventType):
@@ -147,8 +147,8 @@ class SNS(EventType):
 
     def has_required_keys(self):
         return super(SNS, self).has_required_keys() and \
-            get_value(self.event, 'Records[0]', 'eventVersion') == '1.0' and \
-            get_value(self.event, 'Records[0]', 'eventSource') == 'aws:sns'
+            get_value(self.event, 'Records[0].eventVersion') == '1.0' and \
+            get_value(self.event, 'Records[0].eventSource') == 'aws:sns'
 
 
 EVENT_TYPES = [ApiGateway, CloudFront, Firehose, Kinesis, S3, Scheduled, SNS]
@@ -159,5 +159,5 @@ def log_for_event_type(event, log):
         event_type = EventType(event)
         if event_type.has_required_keys():
             event_info = event_type.collect()
-            (log(k, v) for k, v in event_info.items())
+            [log(k, v) for k, v in event_info.items()]
             break

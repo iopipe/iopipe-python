@@ -39,3 +39,6 @@ def test_timeline(timeline):
     measure_bar = timeline.get_entries_by_name('bar')[0]
 
     assert 100.0 <= measure_bar.duration <= 150.0
+
+    bar_duration = end_bar.startTime - start_bar.startTime
+    assert bar_duration == measure_bar.duration
