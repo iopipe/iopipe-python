@@ -1,17 +1,38 @@
+import json
+import os
 import sys
 import time
+import urllib2
 
 from iopipe import IOpipe
+from iopipe.contrib.eventinfo import EventInfoPlugin
 from iopipe.contrib.profiler import ProfilerPlugin
 from iopipe.contrib.trace import TracePlugin
 
 iopipe = IOpipe(debug=True)
+eventinfo_plugin = EventInfoPlugin()
+iopipe_with_eventinfo = IOpipe(debug=True, plugins=[eventinfo_plugin])
 
 profiler_plugin = ProfilerPlugin(enabled=True)
 iopipe_with_profiling = IOpipe(debug=True, plugins=[profiler_plugin])
 
 trace_plugin = TracePlugin()
 iopipe_with_tracing = IOpipe(debug=True, plugins=[trace_plugin])
+
+
+@iopipe_with_eventinfo
+def api_gateway(event, context):
+    return {
+        'statusCode': 200,
+        'body': json.dumps({'success': True}),
+    }
+
+
+@iopipe_with_eventinfo
+def api_trigger(event, context):
+    gateway_url = os.getenv('PY%d_API_GATEWAY_URL' % sys.version_info[0])
+    if gateway_url is not None:
+        urllib2.urlopen(gateway_url)
 
 
 def baseline(event, context):
