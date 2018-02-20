@@ -2,7 +2,11 @@ import json
 import os
 import sys
 import time
-import urllib2
+
+try:
+    from urllib.request import urlopen
+except ImportError:
+    from urllib2 import urlopen
 
 from iopipe import IOpipe
 from iopipe.contrib.eventinfo import EventInfoPlugin
@@ -32,7 +36,7 @@ def api_gateway(event, context):
 def api_trigger(event, context):
     gateway_url = os.getenv('PY%d_API_GATEWAY_URL' % sys.version_info[0])
     if gateway_url is not None:
-        urllib2.urlopen(gateway_url)
+        urlopen(gateway_url)
 
 
 def baseline(event, context):
