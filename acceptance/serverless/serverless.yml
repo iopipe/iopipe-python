@@ -10,6 +10,32 @@ provider:
     IOPIPE_TOKEN: ${env:IOPIPE_TOKEN}
 
 functions:
+  py2-api-gateway:
+    events:
+      - http:
+          path: /
+          method: get
+    handler: handler.api_gateway
+    runtime: python2.7
+  py3-api-gateway:
+    events:
+      - http:
+          path: /
+          method: get
+    handler: handler.api_gateway
+    runtime: python3.6
+
+  py2-api-trigger:
+    events:
+      - schedule: rate(10 minutes)
+    handler: handler.api_trigger
+    runtime: python2.7
+  py3-api-trigger:
+    events:
+      - schedule: rate(10 minutes)
+    handler: handler.api_trigger
+    runtime: python3.6
+
   py2-baseline:
     events:
       - schedule: rate(10 minutes)
