@@ -8,6 +8,8 @@ provider:
   role: ${env:IAM_ROLE}
   environment:
     IOPIPE_TOKEN: ${env:IOPIPE_TOKEN}
+    PY2_API_GATEWAY_URL: ${env:PY2_API_GATEWAY_URL}
+    PY3_API_GATEWAY_URL: ${env:PY3_API_GATEWAY_URL}
 
 functions:
   py2-api-gateway:
