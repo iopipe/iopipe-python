@@ -8,8 +8,6 @@ provider:
   role: ${env:IAM_ROLE}
   environment:
     IOPIPE_TOKEN: ${env:IOPIPE_TOKEN}
-    PY2_API_GATEWAY_URL: ${env:PY2_API_GATEWAY_URL}
-    PY3_API_GATEWAY_URL: ${env:PY3_API_GATEWAY_URL}
 
 functions:
   py2-api-gateway:
@@ -28,11 +26,15 @@ functions:
     runtime: python3.6
 
   py2-api-trigger:
+    environment:
+      PY_API_GATEWAY_URL: ${env:PY2_API_GATEWAY_URL}
     events:
       - schedule: rate(10 minutes)
     handler: handler.api_trigger
     runtime: python2.7
   py3-api-trigger:
+    environment:
+      PY2_API_GATEWAY_URL: ${env:PY3_API_GATEWAY_URL}
     events:
       - schedule: rate(10 minutes)
     handler: handler.api_trigger
