@@ -90,3 +90,5 @@ ENV/
 
 # node.js
 node_modules
+
+.pytest_cache
