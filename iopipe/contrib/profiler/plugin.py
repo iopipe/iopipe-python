@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 class ProfilerPlugin(Plugin):
     name = 'profiler'
-    version = '0.2.0'
+    version = '0.2.1'
     homepage = 'https://github.com/iopipe/iopipe-python#profiler-plugin'
 
     def __init__(self, enabled=False):
@@ -42,6 +42,7 @@ class ProfilerPlugin(Plugin):
         pass
 
     def pre_invoke(self, event, context):
+        self.context = context
         self.profile = None
 
         if self.enabled:
@@ -53,11 +54,13 @@ class ProfilerPlugin(Plugin):
             self.profile.disable()
 
     def pre_report(self, report):
-        pass
-
-    def post_report(self, report):
         if self.profile is not None:
             with tempfile.NamedTemporaryFile() as stats_file:
                 self.profile.dump_stats(stats_file.name)
                 signed_request = get_signed_request(report)
                 upload_profiler_report(signed_request['signedRequest'], stats_file.file)
+                if 'jwtAccess' in signed_request:
+                    self.context.iopipe.log('@iopipe/profiler.jwtAccess', signed_request['jwtAccess'])
+
+    def post_report(self, report):
+        pass
