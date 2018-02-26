@@ -139,10 +139,10 @@ class Report(object):
 
         self.report['environment']['os'].update({
             'cpus': system.read_stat(),
-            'freemem': meminfo['MemFree'],
+            'freemem': meminfo['MemTotal'] - meminfo['MemUsed'],
             'hostname': system.read_hostname(),
             'totalmem': meminfo['MemTotal'],
-            'usedmem': meminfo['MemTotal'] - meminfo['MemFree'],
+            'usedmem': meminfo['MemUsed'],
         })
 
         self.report['environment']['os']['linux']['pid'] = {

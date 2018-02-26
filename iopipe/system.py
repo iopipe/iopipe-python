@@ -1,3 +1,4 @@
+import resource
 import socket
 
 
@@ -39,6 +40,8 @@ def read_meminfo():
             # MemAvailable:        3287752 kB
             # HugePages_Total:             0
             data[line[0]] = int(line[1].lstrip().rstrip(" kB\n"))
+    data['MemUsed'] = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss + \
+        resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss
     return data
 
 
