@@ -11,8 +11,8 @@ def set_config(**config):
     config.setdefault('debug', bool(strtobool(os.getenv('IOPIPE_DEBUG', 'false'))))
     config.setdefault('enabled', bool(strtobool(os.getenv('IOPIPE_ENABLED', 'true'))))
     config.setdefault('host', get_hostname())
-    config.setdefault('install_method', 'manual')
-    config.setdefault('network_timeout', 5)
+    config.setdefault('install_method', os.getenv('IOPIPE_INSTALL_METHOD', 'manual'))
+    config.setdefault('network_timeout', os.getenv('IOPIPE_NETWORK_TIMEOUT', 5))
     config.setdefault('path', get_collector_path())
     config.setdefault('plugins', [])
     config.setdefault('timeout_window', os.getenv('IOPIPE_TIMEOUT_WINDOW', 0.5))
@@ -40,6 +40,6 @@ def set_config(**config):
     try:
         config['timeout_window'] = float(config['timeout_window'])
     except ValueError:
-        config['timeout_window'] = 1.5
+        config['timeout_window'] = 0.5
 
     return config
