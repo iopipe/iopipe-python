@@ -81,6 +81,10 @@ Debug mode will log all data sent to IOpipe servers. This is also a good way to 
 
 Conditionally enable/disable the agent. For example, you will likely want to disabled the agent during development. The environment variable `$IOPIPE_ENABLED` will also be checked.
 
+#### `network_timeout` (int: optional = 5)
+
+The number of seconds IOpipe will wait while sending a report before timing out. If not supplied, the environment variable `$IOPIPE_NETWORK_TIMEOUT` will be used if present.
+
 #### `timeout_window` (float|int: optional = 0.5)
 
 By default, IOpipe will capture timeouts by exiting your function 0.5 seconds early from the AWS configured timeout, to allow time for reporting. You can disable this feature by setting `timeout_window` to `0` in your configuration. If not supplied, the environment variable `$IOPIPE_TIMEOUT_WINDOW` will be used if present.
