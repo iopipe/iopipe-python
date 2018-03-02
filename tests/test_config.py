@@ -76,9 +76,10 @@ def test_set_config__iopipe_install_method(monkeypatch):
 
 
 def test_set_config__iopipe_network_timeout(monkeypatch):
-    monkeypatch.setattr(os, 'getenv', partial(mock_getenv, 'IOPIPE_NETWORK_TIMEOUT', '60'))
+    monkeypatch.setattr(os, 'getenv', partial(mock_getenv,
+        'IOPIPE_NETWORK_TIMEOUT', '60000'))
     config = set_config()
-    assert config['network_timeout'] == 60
+    assert config['network_timeout'] == 60.0
 
     monkeypatch.setattr(os, 'getenv', partial(mock_getenv, 'IOPIPE_NETWORK_TIMEOUT', 'not a number'))
     config = set_config()
@@ -86,7 +87,7 @@ def test_set_config__iopipe_network_timeout(monkeypatch):
 
 
 def test_set_config__iopipe_timeout_window(monkeypatch):
-    monkeypatch.setattr(os, 'getenv', partial(mock_getenv, 'IOPIPE_TIMEOUT_WINDOW', '5'))
+    monkeypatch.setattr(os, 'getenv', partial(mock_getenv, 'IOPIPE_TIMEOUT_WINDOW', '5000'))
     config = set_config()
     assert config['timeout_window'] == 5.0
 
