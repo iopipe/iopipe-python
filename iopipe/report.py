@@ -37,6 +37,7 @@ class Report(object):
         self.config = config
         self.context = context
         self.custom_metrics = []
+        self.labels = []
         self.plugins = get_plugin_meta(config['plugins'])
 
         self.report = {
@@ -65,6 +66,7 @@ class Report(object):
             },
             'errors': {},
             'installMethod': self.config.get('install_method'),
+            'labels': self.labels,
             'plugins': self.plugins,
             'processId': constants.PROCESS_ID,
             'timestamp': int(time.time() * 1000),
