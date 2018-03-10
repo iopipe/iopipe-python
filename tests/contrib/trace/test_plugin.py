@@ -47,4 +47,5 @@ def test__trace_plugin__valid_schema(mock_send_report, handler_with_trace_auto_m
         'errors.stackHash',
         'memory',
         'projectId',
+        'plugins.uploads',
     ])
