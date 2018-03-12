@@ -23,5 +23,5 @@ def test__profiler_plugin(mock_send_report, mock_get_signed_request, mock_upload
     mock_get_signed_request.assert_called_once_with(iopipe.report)
     mock_upload_profiler_report.assert_called_once_with('https://mock_signed_url', mock.ANY)
 
-    metrics = iopipe.report.custom_metrics
-    assert any([m['name'] == '@iopipe/profiler.jwtAccess' for m in metrics])
+    plugin = next((p for p in iopipe.report.plugins if p['name'] == 'profiler'))
+    assert plugin['uploads'][0] == 'foobar'

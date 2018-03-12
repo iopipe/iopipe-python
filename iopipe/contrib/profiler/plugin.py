@@ -60,7 +60,10 @@ class ProfilerPlugin(Plugin):
                 signed_request = get_signed_request(report)
                 upload_profiler_report(signed_request['signedRequest'], stats_file.file)
                 if 'jwtAccess' in signed_request:
-                    self.context.iopipe.log('@iopipe/profiler.jwtAccess', signed_request['jwtAccess'])
+                    plugin = next((p for p in report.plugins if p['name'] == self.name))
+                    if 'uploads' not in plugin:
+                        plugin['uploads'] = []
+                    plugin['uploads'].append(signed_request['jwtAccess'])
 
     def post_report(self, report):
         pass
