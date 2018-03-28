@@ -27,7 +27,8 @@ def get_signed_request(report):
             json={
                 'arn': report.report['aws']['invokedFunctionArn'],
                 'requestId': report.report['aws']['awsRequestId'],
-                'timestamp': report.report['timestamp']
+                'timestamp': report.report['timestamp'],
+                'extension': '.cprofile'
             },
             headers={
                 'Authorization': report.report['client_id']
