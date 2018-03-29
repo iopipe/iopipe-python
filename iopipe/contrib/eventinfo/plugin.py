@@ -5,7 +5,7 @@ from .event_types import log_for_event_type
 
 class EventInfoPlugin(Plugin):
     name = 'event-info'
-    version = '0.1.0'
+    version = '1.0.0'
     homepage = 'https://github.com/iopipe/iopipe-python#event-info-plugin'
     enabled = True
 

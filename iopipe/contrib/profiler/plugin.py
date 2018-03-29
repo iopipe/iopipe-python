@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 class ProfilerPlugin(Plugin):
     name = 'profiler'
-    version = '0.2.1'
+    version = '1.0.0'
     homepage = 'https://github.com/iopipe/iopipe-python#profiler-plugin'
 
     def __init__(self, enabled=False):
