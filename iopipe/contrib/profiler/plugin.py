@@ -58,12 +58,13 @@ class ProfilerPlugin(Plugin):
             with tempfile.NamedTemporaryFile() as stats_file:
                 self.profile.dump_stats(stats_file.name)
                 signed_request = get_signed_request(report)
-                upload_profiler_report(signed_request['signedRequest'], stats_file.file)
-                if 'jwtAccess' in signed_request:
-                    plugin = next((p for p in report.plugins if p['name'] == self.name))
-                    if 'uploads' not in plugin:
-                        plugin['uploads'] = []
-                    plugin['uploads'].append(signed_request['jwtAccess'])
+                if 'signedRequest' in signed_request:
+                    upload_profiler_report(signed_request['signedRequest'], stats_file.file)
+                    if 'jwtAccess' in signed_request:
+                        plugin = next((p for p in report.plugins if p['name'] == self.name))
+                        if 'uploads' not in plugin:
+                            plugin['uploads'] = []
+                        plugin['uploads'].append(signed_request['jwtAccess'])
 
     def post_report(self, report):
         pass
