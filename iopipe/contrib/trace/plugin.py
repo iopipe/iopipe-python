@@ -16,7 +16,7 @@ class TracePlugin(Plugin):
         self.timeline = Timeline()
 
     def pre_setup(self, iopipe):
-        self.timeline.mark('start:iopipe')
+        pass
 
     def post_setup(self, iopipe):
         pass
@@ -28,7 +28,6 @@ class TracePlugin(Plugin):
         context.iopipe.unregister('mark')
 
     def pre_report(self, report):
-        self.timeline.mark('end:iopipe')
         if self.auto_measure:
             add_timeline_measures(self.timeline)
         report.report['performanceEntries'] = [e._asdict() for e in self.timeline.get_entries()]
