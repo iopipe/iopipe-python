@@ -9,9 +9,8 @@ def test__trace_plugin(mock_send_report, handler_with_trace, mock_context):
 
     handler({}, mock_context)
 
-    assert len(iopipe.report.report['performanceEntries']) == 4
+    assert len(iopipe.report.report['performanceEntries']) == 2
     assert not any([e['name'] == 'measure:foo' for e in iopipe.report.report['performanceEntries']])
-    assert not any([e['name'] == 'measure:iopipe' for e in iopipe.report.report['performanceEntries']])
 
 
 @mock.patch('iopipe.report.send_report', autospec=True)
@@ -22,9 +21,8 @@ def test__trace_plugin_auto_measure(mock_send_report, handler_with_trace_auto_me
 
     handler({}, mock_context)
 
-    assert len(iopipe.report.report['performanceEntries']) == 6
+    assert len(iopipe.report.report['performanceEntries']) == 3
     assert any([e['name'] == 'measure:foo' for e in iopipe.report.report['performanceEntries']])
-    assert any([e['name'] == 'measure:iopipe' for e in iopipe.report.report['performanceEntries']])
 
 
 @mock.patch('iopipe.report.send_report', autospec=True)
