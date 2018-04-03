@@ -120,6 +120,7 @@ def handler_with_labels(iopipe):
     @iopipe.decorator
     def _handler_with_labels(event, context):
         context.iopipe.label('a-label')
+        context.iopipe.label('a-label') # duplicates are dropped
         context.iopipe.label('another-label')
         # These will be dropped
         context.iopipe.label(22)

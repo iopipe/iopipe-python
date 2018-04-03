@@ -42,8 +42,7 @@ class IOpipeContext(object):
 
         self.instance.report.custom_metrics.append(event)
 
-    def log(self, key, value):
-        self.metric(key, value)
+    log = metric
 
     def label(self, name):
         if not isinstance(name, str):
@@ -57,7 +56,7 @@ class IOpipeContext(object):
                           'This label will not be recorded.' % (name, constants.METRIC_NAME_LIMIT))
             return
 
-        self.instance.report.labels.append(name)
+        self.instance.report.labels.add(name)
 
     def error(self, error):
         if self.instance.report is None:
