@@ -121,7 +121,7 @@ def handler_with_labels(iopipe):
     def _handler_with_labels(event, context):
         context.iopipe.label('a-label')
         context.iopipe.label('a-label') # duplicates are dropped
-        context.iopipe.label('another-label')
+        context.iopipe.label(u'another-label') # works with unicode
         # These will be dropped
         context.iopipe.label(22)
         context.iopipe.label('a'*129) # too long

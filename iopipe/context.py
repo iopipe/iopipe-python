@@ -1,6 +1,7 @@
 import decimal
 import numbers
 import warnings
+from six import string_types
 from . import constants
 
 
@@ -45,7 +46,7 @@ class IOpipeContext(object):
     log = metric
 
     def label(self, name):
-        if not isinstance(name, str):
+        if not isinstance(name, string_types):
             warnings.warn('Attempted to add a label that is not of type string. '
                           'This label will not be recorded.')
             return
