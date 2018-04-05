@@ -9,20 +9,20 @@ def test__trace_plugin(mock_send_report, handler_with_trace, mock_context):
 
     handler({}, mock_context)
 
-    assert len(iopipe.report.report['performanceEntries']) == 2
-    assert not any([e['name'] == 'measure:foo' for e in iopipe.report.report['performanceEntries']])
+    assert len(iopipe.report.report['performanceEntries']) == 3
+    assert any([e['name'] == 'measure:foo' for e in iopipe.report.report['performanceEntries']])
 
 
 @mock.patch('iopipe.report.send_report', autospec=True)
-def test__trace_plugin_auto_measure(mock_send_report, handler_with_trace_auto_measure, mock_context):
-    iopipe, handler = handler_with_trace_auto_measure
+def test__trace_plugin_no_auto_measure(mock_send_report, handler_with_trace_no_auto_measure, mock_context):
+    iopipe, handler = handler_with_trace_no_auto_measure
 
     assert len(iopipe.config['plugins']) == 1
 
     handler({}, mock_context)
 
-    assert len(iopipe.report.report['performanceEntries']) == 3
-    assert any([e['name'] == 'measure:foo' for e in iopipe.report.report['performanceEntries']])
+    assert len(iopipe.report.report['performanceEntries']) == 2
+    assert not any([e['name'] == 'measure:foo' for e in iopipe.report.report['performanceEntries']])
 
 
 @mock.patch('iopipe.report.send_report', autospec=True)

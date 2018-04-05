@@ -7,11 +7,11 @@ from .util import add_timeline_measures
 
 class TracePlugin(Plugin):
     name = 'trace'
-    version = '1.0.0'
+    version = '1.1.0'
     homepage = 'https://github.com/iopipe/iopipe-python#trace-plugin'
     enabled = True
 
-    def __init__(self, auto_measure=False):
+    def __init__(self, auto_measure=True):
         self.auto_measure = auto_measure
         self.timeline = Timeline()
 
