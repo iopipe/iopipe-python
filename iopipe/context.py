@@ -1,6 +1,8 @@
 import decimal
 import numbers
 import warnings
+from six import string_types
+from . import constants
 
 
 class ContextWrapper(object):
@@ -17,13 +19,20 @@ class IOpipeContext(object):
     def __init__(self, instance):
         self.instance = instance
 
-    def log(self, key, value):
+    def metric(self, key, value):
         if self.instance.report is None:
-            warnings.warn('Attempting to log metrics before function decorated with IOpipe. '
+            warnings.warn('Attempting to add metrics before function decorated with IOpipe. '
                           'This metric will not be recorded.')
             return
 
-        event = {'name': str(key)}
+        name = str(key)
+        if len(name) > constants.METRIC_NAME_LIMIT:
+            warnings.warn('Custom metric of name %s is longer than allowed limit of '
+                          '%s characters. '
+                          'This metric will not be recorded.' % (name, constants.METRIC_NAME_LIMIT))
+            return
+
+        event = {'name': name}
 
         # Add numerical values to report
         # We typecast decimals as strings: not JSON serializable and casting to floats can result in rounding errors.
@@ -33,6 +42,22 @@ class IOpipeContext(object):
             event['s'] = str(value)
 
         self.instance.report.custom_metrics.append(event)
+
+    log = metric
+
+    def label(self, name):
+        if not isinstance(name, string_types):
+            warnings.warn('Attempted to add a label that is not of type string. '
+                          'This label will not be recorded.')
+            return
+
+        if len(name) > constants.METRIC_NAME_LIMIT:
+            warnings.warn('Label of name %s is longer than allowed limit of '
+                          '%s characters. '
+                          'This label will not be recorded.' % (name, constants.METRIC_NAME_LIMIT))
+            return
+
+        self.instance.report.labels.add(name)
 
     def error(self, error):
         if self.instance.report is None:

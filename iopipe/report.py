@@ -37,6 +37,7 @@ class Report(object):
         self.config = config
         self.context = context
         self.custom_metrics = []
+        self.labels = set()
         self.plugins = get_plugin_meta(config['plugins'])
 
         self.report = {
@@ -129,6 +130,9 @@ class Report(object):
             self.retain_error(error, frame)
 
         self.report['environment']['host']['boot_id'] = system.read_bootid()
+
+        # convert labels to list for sending
+        self.report['labels'] = list(self.labels)
 
         meminfo = system.read_meminfo()
 

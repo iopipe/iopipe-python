@@ -65,6 +65,8 @@ def coldstart(event, context):
 @iopipe
 def custom_metrics(event, context):
     context.iopipe.log('time', time.time())
+    context.iopipe.metric('a-metric', 'value')
+    context.iopipe.label('has-metrics')
 
 
 @iopipe_with_profiling

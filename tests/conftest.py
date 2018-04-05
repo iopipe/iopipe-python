@@ -1,6 +1,7 @@
 import json
 import numbers
 import time
+from decimal import Decimal
 
 import requests
 import pytest
@@ -102,10 +103,30 @@ def handler(iopipe):
 def handler_with_events(iopipe):
     @iopipe.decorator
     def _handler_with_events(event, context):
-        iopipe.log('somekey', 2)
-        iopipe.log('anotherkey', 'qualitative value')
+        iopipe.log('key1', 2)
+        iopipe.log('key2', 'qualitative value')
+        context.iopipe.log('key3', 3)
+        context.iopipe.log('key4', 'second qualitative value')
+        context.iopipe.metric('key5', 4)
+        context.iopipe.metric('key6', 'third qualitative value')
+        context.iopipe.metric('key7', Decimal(12.3))
+        context.iopipe.metric('a'*129, 'this will be dropped')
 
     return iopipe, _handler_with_events
+
+
+@pytest.fixture
+def handler_with_labels(iopipe):
+    @iopipe.decorator
+    def _handler_with_labels(event, context):
+        context.iopipe.label('a-label')
+        context.iopipe.label('a-label') # duplicates are dropped
+        context.iopipe.label(u'another-label') # works with unicode
+        # These will be dropped
+        context.iopipe.label(22)
+        context.iopipe.label('a'*129) # too long
+
+    return iopipe, _handler_with_labels
 
 
 @pytest.fixture

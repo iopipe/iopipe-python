@@ -40,7 +40,18 @@ def test_custom_metrics(mock_send_report, handler_with_events, mock_context):
     iopipe, handler = handler_with_events
     handler(None, mock_context)
 
-    assert len(iopipe.report.custom_metrics) == 2
+    assert len(iopipe.report.custom_metrics) == 7
+    # Decimals are converted to strings
+    assert iopipe.report.custom_metrics[6]['s'] == '12.300000000000000710542735760100185871124267578125'
+
+
+@mock.patch('iopipe.report.send_report', autospec=True)
+def test_labels(mock_send_report, handler_with_labels, mock_context):
+    """Assert that the agent collects labels"""
+    iopipe, handler = handler_with_labels
+    handler(None, mock_context)
+
+    assert len(iopipe.report.labels) == 2
 
 
 @mock.patch('iopipe.report.send_report', autospec=True)

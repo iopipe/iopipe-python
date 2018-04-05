@@ -130,10 +130,25 @@ iopipe = IOpipe()
 def handler(event, context):
   # the name of the metric must be a string
   # numerical (int, long, float) and string types supported for values
-  context.iopipe.log("my_metric", 42)
+  context.iopipe.metric("my_metric", 42)
 ```
 
-This makes it easy to add custom data and telemetry within your function.
+Metric key names are limited to 128 characters, and string values are limited to 1024 characters.
+
+### Label
+
+Label invocations sent to IOpipe by calling the `label` method with a string (limit of 128 characters):
+
+```python
+from iopipe import IOpipe
+
+iopipe = IOpipe()
+
+@iopipe
+def handler(event, context):
+  # the name of the tag must be a string
+  context.iopipe.label("this-invocation-is-special")
+```
 
 ## Plugins
 
