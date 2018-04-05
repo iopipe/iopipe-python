@@ -75,7 +75,7 @@ def test_is_plugin():
 def test_get_plugin_meta():
     assert get_plugin_meta([TracePlugin()]) == [{
         'name': 'trace',
-        'version': '1.0.0',
+        'version': '1.1.0',
         'homepage': 'https://github.com/iopipe/iopipe-python#trace-plugin',
         'enabled': True,
     }]
