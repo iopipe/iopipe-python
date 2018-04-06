@@ -101,6 +101,7 @@ class Report(object):
         if hasattr(self.context, 'get_remaining_time_in_millis') and \
                 callable(self.context.get_remaining_time_in_millis):
             data['getRemainingTimeInMillis'] = self.context.get_remaining_time_in_millis()
+        data['traceId'] = os.getenv('_X_AMZN_TRACE_ID', '')
         return data
 
     def retain_error(self, error, frame=None):
