@@ -6,7 +6,7 @@ try:
 except ImportError:
     from botocore.vendored import requests
 
-from iopipe.collector import SUPPORTED_REGIONS
+from .collector import SUPPORTED_REGIONS
 
 logger = logging.getLogger(__name__)
 

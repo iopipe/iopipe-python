@@ -2,6 +2,7 @@ import json
 import numbers
 import time
 from decimal import Decimal
+from six import string_types
 
 import requests
 import pytest
@@ -72,7 +73,7 @@ def _assert_valid_schema(obj, schema=None, path=None, optional_fields=None):
         elif schema[key] == 'n':
             assert isinstance(obj[key], numbers.Number), '%s not a number' % key_path
         elif schema[key] == 's':
-            assert isinstance(obj[key], str), '%s not a string' % key_path
+            assert isinstance(obj[key], string_types), '%s not a string' % key_path
 
 
 @pytest.fixture
