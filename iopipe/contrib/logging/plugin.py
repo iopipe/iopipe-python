@@ -1,7 +1,11 @@
-import io
 import logging
 
 from logging.handlers import StreamHandler
+
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 from iopipe.signer import get_signed_request
 
@@ -11,28 +15,36 @@ from .request import upload_log_data
 class LoggingPlugin(object):
     name = 'logging'
     version = '0.1.0'
-    homepage = 'https://github.com/iopipe/iopipe-python#trace-plugin'
+    homepage = 'https://github.com/iopipe/iopipe-python#logging-plugin'
     enabled = True
 
-    def __init__(self, log_level=logging.INFO, formatter=None, name=None):
-        self.formatter = formatter
-        if self.formatter is None:
-            self.formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s')
+    def __init__(self, level=logging.INFO, formatter=None, name=None):
+        """
+        Instantiates the logging plugin
 
-        self.log_level = log_level
+        :param level: Specify a log level for the handler.
+        :param formatter: Specify a custom log message formatter.
+        :param name: Specify custom log name.
+        """
+        if formatter is None:
+            formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+        self.handler = StreamHandler(StringIO())
+        self.handler.setFormatter(formatter)
+        self.handler.setLevel(level)
+
         self.logger = logging.getLogger(name)
+        self.logger.addHandler(self.handler)
 
     def pre_setup(self, iopipe):
-        self.iopipe = iopipe
-
-    def post_setup(self, iopipe):
         pass
 
+    def post_setup(self, iopipe):
+        if iopipe.config['debug'] is True:
+            self.handler.setLevel(logging.DEBUG)
+
     def pre_invoke(self, event, context):
-        self.handler = StreamHandler(io.StringIO())
-        self.handler.setFormatter(self.formatter)
-        self.handler.setLevel(self.log_level)
-        self.logger.addHandler(self.handler)
+        self.handler.stream = StringIO()
 
     def post_invoke(self, event, context):
         self.handler.flush()
