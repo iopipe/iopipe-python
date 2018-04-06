@@ -33,3 +33,17 @@ def test__logging_plugin(mock_send_report, mock_get_signed_request, mock_upload_
     assert 'testlog - WARNING - Got something.' in stream.getvalue()
     assert 'testlog - ERROR - And you have it, too.' in stream.getvalue()
     assert"testlog - CRITICAL - And it's fatal." in stream.getvalue()
+
+
+@mock.patch('iopipe.contrib.logging.plugin.upload_log_data', autospec=True)
+@mock.patch('iopipe.contrib.logging.plugin.get_signed_request', autospec=True)
+@mock.patch('iopipe.report.send_report', autospec=True)
+def test__logging_plugin__debug(mock_send_report, mock_get_signed_request, mock_upload_log_data,
+                                handler_with_logging_debug, mock_context):
+    iopipe, handler = handler_with_logging_debug
+
+    handler({}, mock_context)
+
+    stream = iopipe.plugins[0].handler.stream
+
+    assert 'testlog - DEBUG - I should be logged.' in stream.getvalue()

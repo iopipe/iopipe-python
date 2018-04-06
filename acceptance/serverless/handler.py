@@ -10,12 +10,16 @@ except ImportError:
 
 from iopipe import IOpipe
 from iopipe.contrib.eventinfo import EventInfoPlugin
+from iopipe.contrib.logging import LoggingPlugin
 from iopipe.contrib.profiler import ProfilerPlugin
 from iopipe.contrib.trace import TracePlugin
 
 iopipe = IOpipe(debug=True)
 eventinfo_plugin = EventInfoPlugin()
 iopipe_with_eventinfo = IOpipe(debug=True, plugins=[eventinfo_plugin])
+
+logging_plugin = LoggingPlugin()
+iopipe_with_logging = IOpipe(debug=True, plugins=[logging_plugin])
 
 profiler_plugin = ProfilerPlugin(enabled=True)
 iopipe_with_profiling = IOpipe(debug=True, plugins=[profiler_plugin])
@@ -67,6 +71,16 @@ def custom_metrics(event, context):
     context.iopipe.log('time', time.time())
     context.iopipe.metric('a-metric', 'value')
     context.iopipe.label('has-metrics')
+
+
+@iopipe_with_logging
+def logging(event, context):
+    context.iopipe.log('time', time.time())
+    context.iopipe.log.debug("I'm a debug message.")
+    context.iopipe.log.info("I'm an info message.")
+    context.iopipe.log.warn("I'm a warning message.")
+    context.iopipe.log.error("I'm an error message.")
+    context.iopipe.log.critical("I'm a critical message.")
 
 
 @iopipe_with_profiling

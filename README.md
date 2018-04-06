@@ -12,6 +12,7 @@ This package provides analytics and distributed tracing for event-driven applica
   - [Custom Metrics](#custom-metrics)
 - [Plugins](#plugins)
   - [Event Info Plugin](#event-info-plugin)
+  - [Logging Plugin](#logging-plugin)
   - [Profiler Plugin](#profiler-plugin)
   - [Trace Plugin](#trace-plugin)
   - [Creating Plugins](#creating-plugins)
@@ -183,9 +184,64 @@ When this plugin is installed, custom metrics will be created automatically for 
 * SNS
 * Scheduled Events
 
-### Profiler Plugin
+### Logging Plugin
 
-**Note:** This feature is still in beta. Want to try it out? Find us on [Slack](https://iopipe.now.sh).
+The IOpipe agent comes bundled with a logging plugin that allows you to attach IOpipe to the `logging` module.
+
+Here's an example of how to use the logging plugin:
+
+```python
+from iopipe import IOpipe
+from iopipe.contrib.logging import LoggingPlugin
+
+iopipe = IOpipe(plugins=[LoggingPlugin()])
+
+@iopipe
+def handler(event, context):
+    context.iopipe.log.info('Handler has started execution')
+```
+
+Since this plugin just adds a handler to the `logging` module, you can use `logging` directly as well:
+
+```python
+import logging
+
+from iopipe import IOpipe
+from iopipe.contrib.logging import LoggingPlugin
+
+iopipe = IOpipe(plugins=[LoggingPlugin()])
+logger = logging.getLogger()
+
+@iopipe
+def handler(event, context):
+    logger.error('Uh oh')
+```
+
+You can also specify a log name, such as if you only wanted to log messages for `mymodule`:
+
+```python
+from iopipe import IOpipe
+from iopipe.contrib.logging import LoggingPlugin
+
+iopipe = IOpipe(plugins=[LoggingPlugin('mymodule')])
+```
+
+This would be equivalent to `logging.getLogger('mymodule')`.
+
+By default, the logging plugin log level is `logging.INFO`, but it can be set like this:
+
+```python
+import logging
+
+from iopipe import IOpipe
+from iopipe.contrib.logging import LoggingPlugin
+
+iopipe = IOpipe(plugins=[LoggingPlugin(level=logging.DEBUG)])
+```
+
+Putting IOpipe into `debug` mode also sets the log level to `logging.DEBUG`.
+
+### Profiler Plugin
 
 The IOpipe agent comes bundled with a profiler plugin that allows you to profile your functions with [cProfile](https://docs.python.org/3/library/profile.html#module-cProfile).
 

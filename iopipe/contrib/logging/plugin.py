@@ -11,6 +11,7 @@ from iopipe.plugins import Plugin
 from iopipe.signer import get_signed_request
 
 from .request import upload_log_data
+from .wrapper import LogWrapper
 
 
 class LoggingPlugin(Plugin):
@@ -19,7 +20,7 @@ class LoggingPlugin(Plugin):
     homepage = 'https://github.com/iopipe/iopipe-python#logging-plugin'
     enabled = True
 
-    def __init__(self, level=logging.INFO, formatter=None, name=None):
+    def __init__(self, name=None, level=logging.INFO, formatter=None):
         """
         Instantiates the logging plugin
 
@@ -44,8 +45,11 @@ class LoggingPlugin(Plugin):
     def post_setup(self, iopipe):
         if iopipe.config['debug'] is True:
             self.handler.setLevel(logging.DEBUG)
+            self.logger.setLevel(logging.DEBUG)
 
     def pre_invoke(self, event, context):
+
+        context.iopipe.register('log', LogWrapper(self.logger, context), force=True)
         self.handler.stream = StringIO()
 
     def post_invoke(self, event, context):
