@@ -13,8 +13,8 @@ def iopipe_with_trace():
 
 
 @pytest.fixture
-def iopipe_with_trace_auto_measure():
-    plugin = TracePlugin(auto_measure=True)
+def iopipe_with_trace_no_auto_measure():
+    plugin = TracePlugin(auto_measure=False)
     return IOpipe(token='test-suite', url='https://metrics-api.iopipe.com', debug=True, plugins=[plugin])
 
 
@@ -35,8 +35,8 @@ def handler_with_trace(iopipe_with_trace):
 
 
 @pytest.fixture
-def handler_with_trace_auto_measure(iopipe_with_trace_auto_measure):
-    @iopipe_with_trace_auto_measure
+def handler_with_trace_no_auto_measure(iopipe_with_trace_no_auto_measure):
+    @iopipe_with_trace_no_auto_measure
     def _handler(event, context):
         assert hasattr(context, 'iopipe')
         assert hasattr(context.iopipe, 'mark')
@@ -47,7 +47,7 @@ def handler_with_trace_auto_measure(iopipe_with_trace_auto_measure):
         context.iopipe.mark.start('foo')
         context.iopipe.mark.end('foo')
 
-    return iopipe_with_trace_auto_measure, _handler
+    return iopipe_with_trace_no_auto_measure, _handler
 
 
 @pytest.fixture
