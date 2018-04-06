@@ -111,7 +111,7 @@ class Report(object):
         """
         stack = traceback.format_exc()
         if frame is not None:
-            stack = traceback.format_stack(frame)
+            stack = '\n'.join(traceback.format_stack(frame))
         details = {
             'name': type(error).__name__,
             'message': '{}'.format(error),
