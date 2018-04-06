@@ -66,6 +66,7 @@ def test_erroring(mock_send_report, handler_that_errors, mock_context):
 
     assert iopipe.report.report['errors']['name'] == 'ValueError'
     assert iopipe.report.report['errors']['message'] == 'Behold, a value error'
+    assert isinstance(iopipe.report.report['errors']['stack'], str)
 
 
 @mock.patch('iopipe.report.send_report', autospec=True)
