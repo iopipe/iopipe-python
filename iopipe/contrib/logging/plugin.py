@@ -1,18 +1,19 @@
 import logging
 
-from logging.handlers import StreamHandler
+from logging import StreamHandler
 
 try:
     from StringIO import StringIO
 except ImportError:
     from io import StringIO
 
+from iopipe.plugins import Plugin
 from iopipe.signer import get_signed_request
 
 from .request import upload_log_data
 
 
-class LoggingPlugin(object):
+class LoggingPlugin(Plugin):
     name = 'logging'
     version = '0.1.0'
     homepage = 'https://github.com/iopipe/iopipe-python#logging-plugin'
@@ -35,6 +36,7 @@ class LoggingPlugin(object):
 
         self.logger = logging.getLogger(name)
         self.logger.addHandler(self.handler)
+        self.logger.setLevel(level)
 
     def pre_setup(self, iopipe):
         pass
