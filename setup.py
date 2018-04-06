@@ -5,7 +5,7 @@ setup(
     version='1.3.0',
     description='IOpipe agent for serverless Application Performance Monitoring',
     author='IOpipe',
-    author_email='support@iopipe.com',
+    author_email='dev@iopipe.com',
     url='https://github.com/iopipe/iopipe-python',
     packages=find_packages(exclude=('tests', 'tests.*',)),
     extras_require={
