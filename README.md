@@ -255,7 +255,7 @@ def handler(event, context):
 
 Any block of code wrapped with `start` and `end` or using the context manager will be traced and the data collected will be available on your IOpipe dashboard.
 
-By default, the trace plugin will auto measure any trace you make. But you can disable this by setting `auto_measure` to `False`:
+By default, the trace plugin will auto-measure any trace you make. But you can disable this by setting `auto_measure` to `False`:
 
 ```python
 from iopipe import IOpipe
