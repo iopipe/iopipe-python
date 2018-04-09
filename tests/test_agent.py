@@ -66,6 +66,7 @@ def test_erroring(mock_send_report, handler_that_errors, mock_context):
 
     assert iopipe.report.report['errors']['name'] == 'ValueError'
     assert iopipe.report.report['errors']['message'] == 'Behold, a value error'
+    assert isinstance(iopipe.report.report['errors']['stack'], str)
 
 
 @mock.patch('iopipe.report.send_report', autospec=True)
@@ -81,6 +82,7 @@ def test_timeouts(mock_send_report, handler_that_timeouts, mock_context):
 
     assert iopipe.report.report['errors']['message'] == 'Timeout Exceeded.'
     assert iopipe.report.report['errors']['name'] == 'TimeoutError'
+    assert isinstance(iopipe.report.report['errors']['stack'], str)
 
 
 @mock.patch('iopipe.report.send_report', autospec=True)
