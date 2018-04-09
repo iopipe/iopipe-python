@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import pytest
 
 from iopipe import IOpipe
@@ -19,6 +21,8 @@ def handler_with_logging(iopipe_with_logging):
         context.iopipe.log.warn('Got something.')
         context.iopipe.log.error('And you have it, too.')
         context.iopipe.log.critical("And it's fatal.")
+
+        print('This is not a misprint.')
 
     return iopipe_with_logging, _handler
 

@@ -34,6 +34,8 @@ def test__logging_plugin(mock_send_report, mock_get_signed_request, mock_upload_
     assert 'testlog - ERROR - And you have it, too.' in stream.getvalue()
     assert"testlog - CRITICAL - And it's fatal." in stream.getvalue()
 
+    assert'testlog - INFO - This is not a misprint.' in stream.getvalue()
+
 
 @mock.patch('iopipe.contrib.logging.plugin.upload_log_data', autospec=True)
 @mock.patch('iopipe.contrib.logging.plugin.get_signed_request', autospec=True)
