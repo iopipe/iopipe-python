@@ -186,7 +186,7 @@ When this plugin is installed, custom metrics will be created automatically for 
 
 ### Logging Plugin
 
-The IOpipe agent comes bundled with a logging plugin that allows you to attach IOpipe to the `logging` module.
+The IOpipe agent comes bundled with a logging plugin that allows you to attach IOpipe to the `logging` module so that you can see your log messages in the IOpipe dashboard.
 
 Here's an example of how to use the logging plugin:
 
@@ -240,6 +240,25 @@ iopipe = IOpipe(plugins=[LoggingPlugin(level=logging.DEBUG)])
 ```
 
 Putting IOpipe into `debug` mode also sets the log level to `logging.DEBUG`.
+
+The logging plugin also redirects stdout by default, so you can do the following:
+
+```python
+from iopipe import IOpipe
+from iopipe.contrib.logging import LoggingPlugin
+
+iopipe = IOpipe(plugins=[LoggingPlugin()])
+
+@iopipe
+def handler(event, context):
+    print('I will be logged')
+```
+
+If you prefer your print statements not to be logged, you can disable this by setting `redirect_stdout` to `False`:
+
+```python
+iopipe = IOpipe(plugins=[LoggingPlugin(redirect_stdout=False)])
+```
 
 ### Profiler Plugin
 
