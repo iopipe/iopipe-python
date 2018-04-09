@@ -58,7 +58,7 @@ Simply use our decorator to report metrics:
 ```python
 from iopipe import IOpipe
 
-iopipe = IOpipe("your project token here")
+iopipe = IOpipe('your project token here')
 
 @iopipe
 def handler(event, context):
@@ -130,7 +130,7 @@ iopipe = IOpipe()
 def handler(event, context):
   # the name of the metric must be a string
   # numerical (int, long, float) and string types supported for values
-  context.iopipe.metric("my_metric", 42)
+  context.iopipe.metric('my_metric', 42)
 ```
 
 Metric key names are limited to 128 characters, and string values are limited to 1024 characters.
@@ -147,7 +147,7 @@ iopipe = IOpipe()
 @iopipe
 def handler(event, context):
   # the name of the tag must be a string
-  context.iopipe.label("this-invocation-is-special")
+  context.iopipe.label('this-invocation-is-special')
 ```
 
 ## Plugins
@@ -237,7 +237,6 @@ def handler(event, context):
     context.iopipe.mark.start('expensive operation')
     # do something here
     context.iopipe.mark.end('expensive operation')
-    context.iopipe.mark.measure('expensive operation')
 ```
 
 Or you can use it as a context manager:
@@ -252,19 +251,25 @@ iopipe = IOpipe(plugins=[TracePlugin()])
 def handler(event, context):
     with context.iopipe.mark('expensive operation'):
         # do something here
-
-    context.iopipe.mark.measure('expensive operation')
 ```
 
 Any block of code wrapped with `start` and `end` or using the context manager will be traced and the data collected will be available on your IOpipe dashboard.
 
-You can also omit the `measure` call by enablling `auto_measure` in the plugin:
+By default, the trace plugin will auto-measure any trace you make. But you can disable this by setting `auto_measure` to `False`:
 
 ```python
 from iopipe import IOpipe
 from iopipe.contrib.trace import TracePlugin
 
-iopipe = IOpipe(plugins=[TracePlugin(auto_measure=True)])
+iopipe = IOpipe(plugins=[TracePlugin(auto_measure=False)])
+
+@iopipe
+def handler(event, context):
+    with context.iopipe.mark('expensive operation'):
+        # do something here
+
+    # Manually measure the trace
+    context.iopipe.mark.measure('expensive operation')
 ```
 
 ### Creating Plugins
