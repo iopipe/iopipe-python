@@ -33,6 +33,7 @@ def test__trace_plugin__valid_schema(mock_send_report, handler_with_trace, mock_
     handler({}, mock_context)
 
     assert_valid_schema(iopipe.report.report, optional_fields=[
+        'disk',
         'environment.runtime.vendor',
         'environment.runtime.vmVendor',
         'environment.runtime.vmVersion',
