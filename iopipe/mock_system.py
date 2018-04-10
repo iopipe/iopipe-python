@@ -1,3 +1,5 @@
+from __future__ import division
+
 import random
 import uuid
 
@@ -9,6 +11,18 @@ def read_bootid():
     Mocks read_bootid as this is a Linux-specific operation.
     """
     return uuid.uuid4().hex
+
+
+def read_disk():
+    """
+    Mocks read_disk as this is a Linux-specific operation.
+    """
+    used = random.randint(0, 500)
+    return {
+        'totalMiB': 500,
+        'usedMiB': used,
+        'usedPercentage': round((used / 500) * 100, 2)
+    }
 
 
 def read_meminfo():
