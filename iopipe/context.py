@@ -1,8 +1,8 @@
 import decimal
 import numbers
 import warnings
-from six import string_types
 from . import constants
+from .compat import string_types
 
 
 class ContextWrapper(object):

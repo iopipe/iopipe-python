@@ -12,6 +12,7 @@ def test_report_linux_system_success(mock_context, assert_valid_schema):
     assert_valid_schema(
         report.report,
         optional_fields=[
+            'disk',
             'environment.runtime.vendor',
             'environment.runtime.vmVendor',
             'environment.runtime.vmVersion',
@@ -40,6 +41,7 @@ def test_report_linux_system_error(mock_context, assert_valid_schema):
     assert_valid_schema(
         report.report,
         optional_fields=[
+            'disk',
             'environment.runtime.vendor',
             'environment.runtime.vmVendor',
             'environment.runtime.vmVersion',
