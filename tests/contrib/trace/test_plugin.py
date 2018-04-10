@@ -26,25 +26,26 @@ def test__trace_plugin_no_auto_measure(mock_send_report, handler_with_trace_no_a
 
 
 @mock.patch('iopipe.report.send_report', autospec=True)
-def test__trace_plugin__valid_schema(mock_send_report, handler_with_trace, mock_context,
-                                     assert_valid_schema):
+def test__trace_plugin__valid_schema(mock_send_report, handler_with_trace, mock_context, assert_valid_schema):
     iopipe, handler = handler_with_trace
 
     handler({}, mock_context)
 
-    assert_valid_schema(iopipe.report.report, optional_fields=[
-        'disk',
-        'environment.runtime.vendor',
-        'environment.runtime.vmVendor',
-        'environment.runtime.vmVersion',
-        'environment.nodejs',
-        'errors.count',
-        'errors.message',
-        'errors.name',
-        'errors.stack',
-        'errors.stackHash',
-        'labels',
-        'memory',
-        'projectId',
-        'plugins.uploads',
-    ])
+    assert_valid_schema(
+        iopipe.report.report,
+        optional_fields=[
+            'disk',
+            'environment.runtime.vendor',
+            'environment.runtime.vmVendor',
+            'environment.runtime.vmVersion',
+            'environment.nodejs',
+            'errors.count',
+            'errors.message',
+            'errors.name',
+            'errors.stack',
+            'errors.stackHash',
+            'labels',
+            'memory',
+            'projectId',
+            'plugins.uploads',
+        ])

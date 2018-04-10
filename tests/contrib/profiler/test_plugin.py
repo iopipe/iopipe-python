@@ -20,7 +20,7 @@ def test__profiler_plugin(mock_send_report, mock_get_signed_request, mock_upload
 
     handler({}, mock_context)
 
-    mock_get_signed_request.assert_called_once_with(iopipe.report)
+    mock_get_signed_request.assert_called_once_with(iopipe.report, '.cprofile')
     mock_upload_profiler_report.assert_called_once_with('https://mock_signed_url', mock.ANY)
 
     plugin = next((p for p in iopipe.report.plugins if p['name'] == 'profiler'))

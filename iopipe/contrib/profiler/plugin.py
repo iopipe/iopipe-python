@@ -8,8 +8,9 @@ except ImportError:
 import tempfile
 
 from iopipe.plugins import Plugin
+from iopipe.signer import get_signed_request
 
-from .request import get_signed_request, upload_profiler_report
+from .request import upload_profiler_report
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +58,7 @@ class ProfilerPlugin(Plugin):
         if self.profile is not None:
             with tempfile.NamedTemporaryFile() as stats_file:
                 self.profile.dump_stats(stats_file.name)
-                signed_request = get_signed_request(report)
+                signed_request = get_signed_request(report, '.cprofile')
                 if signed_request and 'signedRequest' in signed_request:
                     upload_profiler_report(signed_request['signedRequest'], stats_file.file)
                     if 'jwtAccess' in signed_request:

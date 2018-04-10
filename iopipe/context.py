@@ -71,8 +71,8 @@ class IOpipeContext(object):
         self.instance.run_hooks('post:report')
         raise error
 
-    def register(self, name, value):
-        if not hasattr(self, name):
+    def register(self, name, value, force=False):
+        if not hasattr(self, name) or force:
             setattr(self, name, value)
 
     def unregister(self, name):

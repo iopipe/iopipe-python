@@ -2,6 +2,7 @@ import json
 import numbers
 import time
 from decimal import Decimal
+from six import string_types
 
 import requests
 import pytest
@@ -72,7 +73,7 @@ def _assert_valid_schema(obj, schema=None, path=None, optional_fields=None):
         elif schema[key] == 'n':
             assert isinstance(obj[key], numbers.Number), '%s not a number' % key_path
         elif schema[key] == 's':
-            assert isinstance(obj[key], str), '%s not a string' % key_path
+            assert isinstance(obj[key], string_types), '%s not a string' % key_path
 
 
 @pytest.fixture
@@ -110,7 +111,7 @@ def handler_with_events(iopipe):
         context.iopipe.metric('key5', 4)
         context.iopipe.metric('key6', 'third qualitative value')
         context.iopipe.metric('key7', Decimal(12.3))
-        context.iopipe.metric('a'*129, 'this will be dropped')
+        context.iopipe.metric('a' * 129, 'this will be dropped')
 
     return iopipe, _handler_with_events
 
@@ -120,11 +121,11 @@ def handler_with_labels(iopipe):
     @iopipe.decorator
     def _handler_with_labels(event, context):
         context.iopipe.label('a-label')
-        context.iopipe.label('a-label') # duplicates are dropped
-        context.iopipe.label(u'another-label') # works with unicode
+        context.iopipe.label('a-label')  # duplicates are dropped
+        context.iopipe.label(u'another-label')  # works with unicode
         # These will be dropped
         context.iopipe.label(22)
-        context.iopipe.label('a'*129) # too long
+        context.iopipe.label('a' * 129)  # too long
 
     return iopipe, _handler_with_labels
 

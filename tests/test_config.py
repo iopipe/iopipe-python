@@ -76,8 +76,7 @@ def test_set_config__iopipe_install_method(monkeypatch):
 
 
 def test_set_config__iopipe_network_timeout(monkeypatch):
-    monkeypatch.setattr(os, 'getenv', partial(mock_getenv,
-        'IOPIPE_NETWORK_TIMEOUT', '60000'))
+    monkeypatch.setattr(os, 'getenv', partial(mock_getenv, 'IOPIPE_NETWORK_TIMEOUT', '60000'))
     config = set_config()
     assert config['network_timeout'] == 60.0
 

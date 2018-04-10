@@ -2,7 +2,7 @@ import functools
 import os
 
 from iopipe.collector import SUPPORTED_REGIONS
-from iopipe.contrib.profiler.signer import get_signer_hostname
+from iopipe.signer import get_signer_hostname
 
 
 def test_get_signer_hostname(monkeypatch):
