@@ -15,6 +15,16 @@ def test_read_bootid(benchmark):
     assert len(system.read_bootid()) > 0
 
 
+def test_read_disk(benchmark):
+    if not sys.platform.startswith('linux'):
+        pytest.skip('this test requires linux, skipping')
+
+    disk = benchmark(system.read_disk)
+
+    assert disk['totalMiB'] >= disk['usedMiB']
+    assert round((disk['usedMiB'] / disk['totalMiB']) * 100, 2) == disk['usedPercentage']
+
+
 def test_read_hostname(benchmark):
     benchmark(system.read_hostname)
 

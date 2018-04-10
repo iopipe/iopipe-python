@@ -1,5 +1,10 @@
+from __future__ import division
+
+import os
 import resource
 import socket
+
+MB_FACTOR = float(1 << 20)
 
 
 def read_bootid():
@@ -11,6 +16,23 @@ def read_bootid():
     """
     with open('/proc/sys/kernel/random/boot_id') as bootid_file:
         return bootid_file.readline()
+
+
+def read_disk():
+    """
+    Returns disk usage for /tmp
+
+    :returns: Disk usage (total, used, percentage used)
+    :rtype dict
+    """
+    s = os.statvfs('/tmp')
+    return {
+        # This should report as 500MB, if not may need to be hardcoded
+        # https://aws.amazon.com/lambda/faqs/
+        'totalMiB': (s.f_blocks * s.f_bsize) / MB_FACTOR,
+        'usedMiB': ((s.f_blocks - s.f_bfree) * s.f_frsize) / MB_FACTOR,
+        'usedPercentage': round((((s.f_blocks - s.f_bfree) * s.f_frsize) / (s.f_blocks * s.f_bsize)) * 100, 2)
+    }
 
 
 def read_hostname():

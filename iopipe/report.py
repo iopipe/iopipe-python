@@ -158,6 +158,8 @@ class Report(object):
             },
         }
 
+        self.report['disk'] = system.read_disk()
+
         self.report['duration'] = int((monotonic() - self.start_time) * 1e9)
 
     def send(self):
