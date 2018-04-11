@@ -22,7 +22,7 @@ class LoggingPlugin(Plugin):
     homepage = 'https://github.com/iopipe/iopipe-python#logging-plugin'
     enabled = True
 
-    def __init__(self, name=None, level=logging.INFO, formatter=None, redirect_stdout=True):
+    def __init__(self, name=None, level=logging.INFO, redirect_stdout=True):
         """
         Instantiates the logging plugin
 
@@ -30,13 +30,10 @@ class LoggingPlugin(Plugin):
         :type name: str
         :param level: Specify a log level for the handler.
         :type level: int
-        :param formatter: Specify a custom log message formatter.
-        :type formatter: :class:`Formatter`
         :param redirect_stdout: Whether or not to redirect stdout.
         :type redirect_print: bool
         """
-        if formatter is None or not isinstance(formatter, Formatter):
-            formatter = Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter = Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
         self.handler = StreamHandler(StringIO())
         self.handler.setFormatter(formatter)
