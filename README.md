@@ -185,7 +185,7 @@ When this plugin is installed, custom metrics will be created automatically for 
 * SNS
 * Scheduled Events
 
-Now in your IOpipe invocation view you will seee useful event information.
+Now in your IOpipe invocation view you will see useful event information.
 
 ### Logging Plugin
 
