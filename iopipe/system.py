@@ -1,7 +1,6 @@
 from __future__ import division
 
 import os
-import resource
 import socket
 
 MB_FACTOR = float(1 << 20)
@@ -62,8 +61,6 @@ def read_meminfo():
             # MemAvailable:        3287752 kB
             # HugePages_Total:             0
             data[line[0]] = int(line[1].lstrip().rstrip(" kB\n")) * 1024
-    data['MemUsed'] = (resource.getrusage(resource.RUSAGE_SELF).ru_maxrss +
-                       resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss) * 1024
     return data
 
 

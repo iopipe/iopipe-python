@@ -34,7 +34,6 @@ def read_meminfo():
         'MemFree': random.randint(0, 999999999),
         'MemAvailable': random.randint(0, 999999999),
         'HugePages_Total': random.randint(0, 999999999),
-        'MemUsed': random.randint(0, 999999999),
     }
 
 
