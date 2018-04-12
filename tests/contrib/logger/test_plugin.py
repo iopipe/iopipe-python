@@ -28,13 +28,13 @@ def test__logger_plugin(mock_send_report, mock_get_signed_request, mock_upload_l
 
     stream = iopipe.plugins[0].handler.stream
 
-    assert 'testlog - DEBUG - I got nothing.' not in stream.getvalue()
-    assert 'testlog - INFO - I might have something.' in stream.getvalue()
-    assert 'testlog - WARNING - Got something.' in stream.getvalue()
-    assert 'testlog - ERROR - And you have it, too.' in stream.getvalue()
-    assert "testlog - CRITICAL - And it's fatal." in stream.getvalue()
+    assert '"message": "I got nothing.", "name": "testlog", "severity": "DEBUG"' not in stream.getvalue()
+    assert '"message": "I might have something.", "name": "testlog", "severity": "INFO"' in stream.getvalue()
+    assert '"message": "Got something.", "name": "testlog", "severity": "WARNING"' in stream.getvalue()
+    assert '"message": "And you have it, too.", "name": "testlog", "severity": "ERROR"' in stream.getvalue()
+    assert '"message": "And it\'s fatal.", "name": "testlog", "severity": "CRITICAL"' in stream.getvalue()
 
-    assert 'testlog - INFO - This is not a misprint.' in stream.getvalue()
+    assert '"message": "This is not a misprint.", "name": "testlog", "severity": "INFO"' in stream.getvalue()
 
 
 @mock.patch('iopipe.contrib.logger.plugin.upload_log_data', autospec=True)
@@ -48,4 +48,4 @@ def test__logger_plugin__debug(mock_send_report, mock_get_signed_request, mock_u
 
     stream = iopipe.plugins[0].handler.stream
 
-    assert 'testlog - DEBUG - I should be logged.' in stream.getvalue()
+    assert '"message": "I should be logged.", "name": "testlog", "severity": "DEBUG"' in stream.getvalue()
