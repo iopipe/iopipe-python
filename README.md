@@ -10,6 +10,7 @@ This package provides analytics and distributed tracing for event-driven applica
   - [Configuration](#configuration)
   - [Reporting Exceptions](#reporting-exceptions)
   - [Custom Metrics](#custom-metrics)
+  - [Labels](#labels)
 - [Plugins](#plugins)
   - [Event Info Plugin](#event-info-plugin)
   - [Logging Plugin](#logging-plugin)
@@ -136,7 +137,7 @@ def handler(event, context):
 
 Metric key names are limited to 128 characters, and string values are limited to 1024 characters.
 
-### Label
+### Labels
 
 Label invocations sent to IOpipe by calling the `label` method with a string (limit of 128 characters):
 
@@ -183,6 +184,8 @@ When this plugin is installed, custom metrics will be created automatically for 
 * SES
 * SNS
 * Scheduled Events
+
+Now in your IOpipe invocation view you will see useful event information.
 
 ### Logging Plugin
 
@@ -253,6 +256,8 @@ iopipe = IOpipe(plugins=[LoggingPlugin()])
 def handler(event, context):
     print('I will be logged')
 ```
+
+Now in your IOpipe invocation view you will see log messages for that invocation.
 
 If you prefer your print statements not to be logged, you can disable this by setting `redirect_stdout` to `False`:
 
