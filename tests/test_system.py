@@ -39,6 +39,9 @@ def test_read_meminfo(benchmark):
 
     assert 'MemFree' in meminfo
     assert 'MemTotal' in meminfo
+    assert 'MemUsed' in meminfo
+    assert meminfo['MemUsed'] <= meminfo['MemTotal']
+
 
 
 def test_read_pid_stat(benchmark):

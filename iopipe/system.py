@@ -61,9 +61,9 @@ def read_meminfo():
             # MemFree:                 1840972 kB
             # MemAvailable:        3287752 kB
             # HugePages_Total:             0
-            data[line[0]] = int(line[1].lstrip().rstrip(" kB\n"))
-    data['MemUsed'] = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss + \
-        resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss
+            data[line[0]] = int(line[1].lstrip().rstrip(" kB\n")) * 1024
+    data['MemUsed'] = (resource.getrusage(resource.RUSAGE_SELF).ru_maxrss +
+                       resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss) * 1024
     return data
 
 
