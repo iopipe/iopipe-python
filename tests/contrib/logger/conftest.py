@@ -22,6 +22,11 @@ def handler_with_logger(iopipe_with_logger):
         context.iopipe.log.error('And you have it, too.')
         context.iopipe.log.critical("And it's fatal.")
 
+        try:
+            raise ValueError('What do you value?')
+        except Exception as e:
+            context.iopipe.log.exception(e)
+
         print('This is not a misprint.')
 
     return iopipe_with_logger, _handler

@@ -13,7 +13,7 @@ class JSONFormatter(logging.Formatter):
             if record.message[-1:] != '\n':
                 record.message = record.message + '\n'
             record.message = record.message + record.exc_text
-        if record.stack_info:
+        if hasattr(record, 'stack_info') and record.stack_info:
             if record.message[-1:] != '\n':
                 record.message = record.message + '\n'
             record.message = record.message + self.formatStack(record.stack_info)
