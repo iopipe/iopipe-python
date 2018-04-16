@@ -3,18 +3,18 @@ from __future__ import print_function
 import pytest
 
 from iopipe import IOpipe
-from iopipe.contrib.logging import LoggingPlugin
+from iopipe.contrib.logger import LoggerPlugin
 
 
 @pytest.fixture
-def iopipe_with_logging():
-    plugin = LoggingPlugin('testlog')
+def iopipe_with_logger():
+    plugin = LoggerPlugin('testlog')
     return IOpipe(token='test-suite', url='https://metrics-api.iopipe.com', plugins=[plugin])
 
 
 @pytest.fixture
-def handler_with_logging(iopipe_with_logging):
-    @iopipe_with_logging
+def handler_with_logger(iopipe_with_logger):
+    @iopipe_with_logger
     def _handler(event, context):
         context.iopipe.log.debug('I got nothing.')
         context.iopipe.log.info('I might have something.')
@@ -24,19 +24,19 @@ def handler_with_logging(iopipe_with_logging):
 
         print('This is not a misprint.')
 
-    return iopipe_with_logging, _handler
+    return iopipe_with_logger, _handler
 
 
 @pytest.fixture
-def iopipe_with_logging_debug():
-    plugin = LoggingPlugin(name='testlog')
+def iopipe_with_logger_debug():
+    plugin = LoggerPlugin(name='testlog')
     return IOpipe(token='test-suite', url='https://metrics-api.iopipe.com', debug=True, plugins=[plugin])
 
 
 @pytest.fixture
-def handler_with_logging_debug(iopipe_with_logging_debug):
-    @iopipe_with_logging_debug
+def handler_with_logger_debug(iopipe_with_logger_debug):
+    @iopipe_with_logger_debug
     def _handler(event, context):
         context.iopipe.log.debug('I should be logged.')
 
-    return iopipe_with_logging_debug, _handler
+    return iopipe_with_logger_debug, _handler

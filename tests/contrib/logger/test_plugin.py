@@ -1,12 +1,12 @@
 import mock
 
 
-@mock.patch('iopipe.contrib.logging.plugin.upload_log_data', autospec=True)
-@mock.patch('iopipe.contrib.logging.plugin.get_signed_request', autospec=True)
+@mock.patch('iopipe.contrib.logger.plugin.upload_log_data', autospec=True)
+@mock.patch('iopipe.contrib.logger.plugin.get_signed_request', autospec=True)
 @mock.patch('iopipe.report.send_report', autospec=True)
-def test__logging_plugin(mock_send_report, mock_get_signed_request, mock_upload_log_data, handler_with_logging,
-                         mock_context):
-    iopipe, handler = handler_with_logging
+def test__logger_plugin(mock_send_report, mock_get_signed_request, mock_upload_log_data, handler_with_logger,
+                        mock_context):
+    iopipe, handler = handler_with_logger
     plugins = iopipe.plugins
 
     assert len(plugins) == 1
@@ -23,7 +23,7 @@ def test__logging_plugin(mock_send_report, mock_get_signed_request, mock_upload_
     mock_get_signed_request.assert_called_once_with(iopipe.report, '.log')
     mock_upload_log_data.assert_called_once_with('https://mock_signed_url', mock.ANY)
 
-    plugin = next((p for p in iopipe.report.plugins if p['name'] == 'logging'))
+    plugin = next((p for p in iopipe.report.plugins if p['name'] == 'logger'))
     assert plugin['uploads'][0] == 'foobar'
 
     stream = iopipe.plugins[0].handler.stream
@@ -37,12 +37,12 @@ def test__logging_plugin(mock_send_report, mock_get_signed_request, mock_upload_
     assert 'testlog - INFO - This is not a misprint.' in stream.getvalue()
 
 
-@mock.patch('iopipe.contrib.logging.plugin.upload_log_data', autospec=True)
-@mock.patch('iopipe.contrib.logging.plugin.get_signed_request', autospec=True)
+@mock.patch('iopipe.contrib.logger.plugin.upload_log_data', autospec=True)
+@mock.patch('iopipe.contrib.logger.plugin.get_signed_request', autospec=True)
 @mock.patch('iopipe.report.send_report', autospec=True)
-def test__logging_plugin__debug(mock_send_report, mock_get_signed_request, mock_upload_log_data,
-                                handler_with_logging_debug, mock_context):
-    iopipe, handler = handler_with_logging_debug
+def test__logger_plugin__debug(mock_send_report, mock_get_signed_request, mock_upload_log_data,
+                               handler_with_logger_debug, mock_context):
+    iopipe, handler = handler_with_logger_debug
 
     handler({}, mock_context)
 
