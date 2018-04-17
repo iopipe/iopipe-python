@@ -1,8 +1,11 @@
 import json
 import logging
+import time
 
 
 class JSONFormatter(logging.Formatter):
+    converter = time.gmtime
+
     def format(self, record):
         record.asctime = self.formatTime(record, self.datefmt)
         record.message = record.getMessage()
