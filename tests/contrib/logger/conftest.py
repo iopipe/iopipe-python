@@ -45,3 +45,18 @@ def handler_with_logger_debug(iopipe_with_logger_debug):
         context.iopipe.log.debug('I should be logged.')
 
     return iopipe_with_logger_debug, _handler
+
+
+@pytest.fixture
+def iopipe_with_logger_use_tmp():
+    plugin = LoggerPlugin(name='testlog', use_tmp=True)
+    return IOpipe(token='test-suite', url='https://metrics-api.iopipe.com', plugins=[plugin])
+
+
+@pytest.fixture
+def handler_with_logger_use_tmp(iopipe_with_logger_use_tmp):
+    @iopipe_with_logger_use_tmp
+    def _handler(event, context):
+        context.iopipe.log.info('I should be logged to /tmp.')
+
+    return iopipe_with_logger_use_tmp, _handler

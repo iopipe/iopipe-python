@@ -58,3 +58,18 @@ def test__logger_plugin__debug(mock_send_report, mock_get_signed_request, mock_u
     stream = iopipe.plugins[0].handler.stream
 
     assert '"message": "I should be logged.", "name": "testlog", "severity": "DEBUG"' in stream.getvalue()
+
+
+@mock.patch('iopipe.contrib.logger.plugin.upload_log_data', autospec=True)
+@mock.patch('iopipe.contrib.logger.plugin.get_signed_request', autospec=True)
+@mock.patch('iopipe.report.send_report', autospec=True)
+def test__logger_plugin__use_tmp(mock_send_report, mock_get_signed_request, mock_upload_log_data,
+                                 handler_with_logger_use_tmp, mock_context):
+    iopipe, handler = handler_with_logger_use_tmp
+
+    handler({}, mock_context)
+
+    stream = iopipe.plugins[0].handler.stream
+
+    assert hasattr(stream, 'file')
+    assert stream.file.closed
