@@ -13,7 +13,7 @@ This package provides analytics and distributed tracing for event-driven applica
   - [Labels](#labels)
 - [Plugins](#plugins)
   - [Event Info Plugin](#event-info-plugin)
-  - [Logging Plugin](#logging-plugin)
+  - [Logger Plugin](#logger-plugin)
   - [Profiler Plugin](#profiler-plugin)
   - [Trace Plugin](#trace-plugin)
   - [Creating Plugins](#creating-plugins)
@@ -187,32 +187,32 @@ When this plugin is installed, custom metrics will be created automatically for 
 
 Now in your IOpipe invocation view you will see useful event information.
 
-### Logging Plugin
+### Logger Plugin
 
-The IOpipe agent comes bundled with a logging plugin that allows you to attach IOpipe to the `logging` module so that you can see your log messages in the IOpipe dashboard.
+The IOpipe agent comes bundled with a logger plugin that allows you to attach IOpipe to the `logging` module so that you can see your log messages in the IOpipe dashboard.
 
-Here's an example of how to use the logging plugin:
+Here's an example of how to use the logger plugin:
 
 ```python
 from iopipe import IOpipe
-from iopipe.contrib.logging import LoggingPlugin
+from iopipe.contrib.logger import LoggingPlugin
 
-iopipe = IOpipe(plugins=[LoggingPlugin()])
+iopipe = IOpipe(plugins=[LoggerPlugin()])
 
 @iopipe
 def handler(event, context):
     context.iopipe.log.info('Handler has started execution')
 ```
 
-Since this plugin just adds a handler to the `logging` module, you can use `logging` directly as well:
+Since this plugin adds a handler to the `logging` module, you can use `logging` directly as well:
 
 ```python
 import logging
 
 from iopipe import IOpipe
-from iopipe.contrib.logging import LoggingPlugin
+from iopipe.contrib.logger import LoggerPlugin
 
-iopipe = IOpipe(plugins=[LoggingPlugin()])
+iopipe = IOpipe(plugins=[LoggerPlugin()])
 logger = logging.getLogger()
 
 @iopipe
@@ -224,9 +224,9 @@ You can also specify a log name, such as if you only wanted to log messages for 
 
 ```python
 from iopipe import IOpipe
-from iopipe.contrib.logging import LoggingPlugin
+from iopipe.contrib.logger import LoggerPlugin
 
-iopipe = IOpipe(plugins=[LoggingPlugin('mymodule')])
+iopipe = IOpipe(plugins=[LoggerPlugin('mymodule')])
 ```
 
 This would be equivalent to `logging.getLogger('mymodule')`.
@@ -237,20 +237,20 @@ By default, the logging plugin log level is `logging.INFO`, but it can be set li
 import logging
 
 from iopipe import IOpipe
-from iopipe.contrib.logging import LoggingPlugin
+from iopipe.contrib.logger import LoggerPlugin
 
-iopipe = IOpipe(plugins=[LoggingPlugin(level=logging.DEBUG)])
+iopipe = IOpipe(plugins=[LoggerPlugin(level=logging.DEBUG)])
 ```
 
 Putting IOpipe into `debug` mode also sets the log level to `logging.DEBUG`.
 
-The logging plugin also redirects stdout by default, so you can do the following:
+The logger plugin also redirects stdout by default, so you can do the following:
 
 ```python
 from iopipe import IOpipe
-from iopipe.contrib.logging import LoggingPlugin
+from iopipe.contrib.logger import LoggerPlugin
 
-iopipe = IOpipe(plugins=[LoggingPlugin()])
+iopipe = IOpipe(plugins=[LoggerPlugin()])
 
 @iopipe
 def handler(event, context):
@@ -262,7 +262,7 @@ Now in your IOpipe invocation view you will see log messages for that invocation
 If you prefer your print statements not to be logged, you can disable this by setting `redirect_stdout` to `False`:
 
 ```python
-iopipe = IOpipe(plugins=[LoggingPlugin(redirect_stdout=False)])
+iopipe = IOpipe(plugins=[LoggerPlugin(redirect_stdout=False)])
 ```
 
 ### Profiler Plugin
