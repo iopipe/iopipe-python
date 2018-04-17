@@ -16,15 +16,15 @@ from .stream import StreamToLogger
 from .wrapper import LogWrapper
 
 
-class LoggingPlugin(Plugin):
-    name = 'logging'
+class LoggerPlugin(Plugin):
+    name = 'logger'
     version = '0.1.0'
-    homepage = 'https://github.com/iopipe/iopipe-python#logging-plugin'
+    homepage = 'https://github.com/iopipe/iopipe-python#logger-plugin'
     enabled = True
 
     def __init__(self, name=None, level=logging.INFO, redirect_stdout=True):
         """
-        Instantiates the logging plugin
+        Instantiates the logger plugin
 
         :param name: Specify custom log name.
         :type name: str
