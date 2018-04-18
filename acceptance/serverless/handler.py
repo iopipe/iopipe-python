@@ -90,9 +90,18 @@ def logging(event, context):
         context.log.exception(e)
 
 
+def fib(n):
+    if n == 0:
+        return 0
+    if n == 1:
+        return 1
+    return fib(n - 1) + fib(n - 2)
+
+
 @iopipe_with_profiling
 def profiling(event, context):
-    time.sleep(1)
+    fib_number = fib(10)
+    context.iopipe.metric('fib number', fib_number)
 
 
 @iopipe
