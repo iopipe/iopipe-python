@@ -39,10 +39,10 @@ def api_gateway(event, context):
 @iopipe_with_eventinfo
 def api_trigger(event, context):
     gateway_url = os.getenv('PY_API_GATEWAY_URL')
-    context.iopipe.log('gateway_url', gateway_url or '')
+    context.iopipe.metric('gateway_url', gateway_url or '')
     if gateway_url is not None:
         with urlopen(gateway_url) as r:
-            context.iopipe.log('response_status', getattr(r, 'status', getattr(r, 'code')))
+            context.iopipe.metric('response_status', getattr(r, 'status', getattr(r, 'code')))
 
 
 def baseline(event, context):
@@ -68,14 +68,14 @@ def coldstart(event, context):
 
 @iopipe
 def custom_metrics(event, context):
-    context.iopipe.log('time', time.time())
+    context.iopipe.metric('time', time.time())
     context.iopipe.metric('a-metric', 'value')
     context.iopipe.label('has-metrics')
 
 
 @iopipe_with_logging
 def logging(event, context):
-    # This should still work
+    # This should still work (backwards compatibility)
     context.iopipe.log('time', time.time())
 
     context.iopipe.log.debug("I'm a debug message.")
@@ -120,7 +120,6 @@ def tracing(event, context):
     context.iopipe.mark.start('foobar')
     time.sleep(1)
     context.iopipe.mark.end('foobar')
-    context.iopipe.mark.measure('foobar')
 
 
 @iopipe
