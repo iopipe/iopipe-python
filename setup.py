@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='iopipe',
-    version='1.4.1',
+    version='1.5.0',
     description='IOpipe agent for serverless Application Performance Monitoring',
     author='IOpipe',
     author_email='dev@iopipe.com',
