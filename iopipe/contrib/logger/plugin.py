@@ -1,16 +1,11 @@
 import logging
 import sys
 
-from logging import Formatter, StreamHandler
-
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
-
+from iopipe.compat import StringIO
 from iopipe.plugins import Plugin
 from iopipe.signer import get_signed_request
 
+from .formatter import JSONFormatter
 from .request import upload_log_data
 from .stream import StreamToLogger
 from .wrapper import LogWrapper
@@ -33,9 +28,9 @@ class LoggerPlugin(Plugin):
         :param redirect_stdout: Whether or not to redirect stdout.
         :type redirect_print: bool
         """
-        formatter = Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter = JSONFormatter()
 
-        self.handler = StreamHandler(StringIO())
+        self.handler = logging.StreamHandler(StringIO())
         self.handler.setFormatter(formatter)
         self.handler.setLevel(level)
 

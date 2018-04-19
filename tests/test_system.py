@@ -41,7 +41,6 @@ def test_read_meminfo(benchmark):
     assert 'MemTotal' in meminfo
 
 
-
 def test_read_pid_stat(benchmark):
     if not sys.platform.startswith('linux'):
         pytest.skip('this test requires linux, skipping')
