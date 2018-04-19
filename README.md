@@ -373,17 +373,10 @@ from iopipe.plugins import Plugin
 
 
 class MyPlugin(Plugin):
-    @property
-    def name(self):
-        return 'my-plugin'
-
-    @property
-    def version(self):
-        return '0.1.0'
-
-    @property
-    def homepage(self):
-        return 'https://github.com/iopipe/my-plugin/'
+    name = 'my-plugin'
+    version = '0.1.0'
+    homepage = 'https://github.com/iopipe/my-plugin/'
+    enabled = True
 
     def pre_setup(self, iopipe):
         pass
@@ -413,6 +406,7 @@ A plugin has the following properties defined:
 - `name`: The name of the plugin, must be a string.
 - `version`: The version of the plugin, must be a string.
 - `homepage`: The URL of the plugin's homepage, must be a string.
+- `enabled`: Whether or not the plugin is enabled, must be a boolean.
 
 #### Plugin Methods
 
