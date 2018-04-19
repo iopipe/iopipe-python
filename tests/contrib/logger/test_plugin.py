@@ -1,3 +1,5 @@
+from datetime import datetime
+import json
 import mock
 
 
@@ -35,6 +37,13 @@ def test__logger_plugin(mock_send_report, mock_get_signed_request, mock_upload_l
     assert '"message": "And it\'s fatal.", "name": "testlog", "severity": "CRITICAL"' in stream.getvalue()
 
     assert '"message": "This is not a misprint.", "name": "testlog", "severity": "INFO"' in stream.getvalue()
+
+    stream.seek(0)
+
+    for line in stream.readlines():
+        json_msg = json.loads(line)
+        assert 'timestamp' in json_msg
+        assert isinstance(datetime.strptime(json_msg['timestamp'], '%Y-%m-%d %H:%M:%S.%f'), datetime)
 
 
 @mock.patch('iopipe.contrib.logger.plugin.upload_log_data', autospec=True)

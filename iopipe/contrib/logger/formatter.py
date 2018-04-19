@@ -5,6 +5,8 @@ import time
 
 class JSONFormatter(logging.Formatter):
     converter = time.gmtime
+    default_time_format = '%Y-%m-%d %H:%M:%S'
+    default_msec_format = '%s.%03d'
 
     def format(self, record):
         record.asctime = self.formatTime(record, self.datefmt)
@@ -24,5 +26,5 @@ class JSONFormatter(logging.Formatter):
             'message': record.message,
             'name': record.name,
             'severity': record.levelname,
-            'time': record.asctime,
+            'timestamp': record.asctime,
         }, sort_keys=True)
