@@ -8,8 +8,15 @@ class JSONFormatter(logging.Formatter):
     default_time_format = '%Y-%m-%d %H:%M:%S'
     default_msec_format = '%s.%03d'
 
+    def formatTime(self, record, datefmt=None):
+        """Override to make Python 2/3 compatible"""
+        ct = self.converter(record.created)
+        t = time.strftime(self.default_time_format, ct)
+        s = self.default_msec_format % (t, record.msecs)
+        return s
+
     def format(self, record):
-        record.asctime = self.formatTime(record, self.datefmt)
+        record.asctime = self.formatTime(record)
         record.message = record.getMessage()
         if record.exc_info:
             if not record.exc_text:
