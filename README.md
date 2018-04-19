@@ -189,6 +189,8 @@ Now in your IOpipe invocation view you will see useful event information.
 
 ### Logger Plugin
 
+**Note:** This plugin is in beta. Want to give it a try? Find us on [![Slack](https://img.shields.io/badge/chat-slack-ff69b4.svg)](https://iopipe.now.sh).
+
 The IOpipe agent comes bundled with a logger plugin that allows you to attach IOpipe to the `logging` module so that you can see your log messages in the IOpipe dashboard.
 
 Here's an example of how to use the logger plugin:
