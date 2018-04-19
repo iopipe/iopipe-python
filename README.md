@@ -197,7 +197,7 @@ Here's an example of how to use the logger plugin:
 
 ```python
 from iopipe import IOpipe
-from iopipe.contrib.logger import LoggingPlugin
+from iopipe.contrib.logger import LoggerPlugin
 
 iopipe = IOpipe(plugins=[LoggerPlugin()])
 
@@ -233,7 +233,7 @@ iopipe = IOpipe(plugins=[LoggerPlugin('mymodule')])
 
 This would be equivalent to `logging.getLogger('mymodule')`.
 
-By default, the logging plugin log level is `logging.INFO`, but it can be set like this:
+By default, the logger plugin log level is `logging.INFO`, but it can be set like this:
 
 ```python
 import logging
