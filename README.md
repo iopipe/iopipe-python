@@ -267,6 +267,14 @@ If you prefer your print statements not to be logged, you can disable this by se
 iopipe = IOpipe(plugins=[LoggerPlugin(redirect_stdout=False)])
 ```
 
+By default the logger plugin will log messages to an in-memory buffer. If you prefer to log messages to your Lambda function's `/tmp` directory:
+
+```python
+iopipe = IOpipe(plugins=[LoggerPlugin(use_tmp=True)])
+```
+
+With `use_tmp` enabled, the plugin will automatically delete log files written to `/tmp` after each invocation.
+
 ### Profiler Plugin
 
 The IOpipe agent comes bundled with a profiler plugin that allows you to profile your functions with [cProfile](https://docs.python.org/3/library/profile.html#module-cProfile).
