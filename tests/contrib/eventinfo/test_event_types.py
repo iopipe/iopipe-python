@@ -18,8 +18,8 @@ def test__event_Types__apigw(event_apigw):
     event_info = event.collect()
     assert event_info != {}
 
-    expected_keys = ['@iopipe/event-info.apiGateway.%s' % key for key in event.keys] + ['@iopipe/event-info.eventType']
-    assert list(event_info.keys()) == expected_keys
+    expected_keys = ['@iopipe/event-info.eventType'] + ['@iopipe/event-info.apiGateway.%s' % key for key in event.keys]
+    assert list(event_info.keys()).sort() == expected_keys.sort()
 
 
 def test__event_Types__cloudfront(event_cloudfront):
@@ -29,8 +29,8 @@ def test__event_Types__cloudfront(event_cloudfront):
     event_info = event.collect()
     assert event_info != {}
 
-    expected_keys = ['@iopipe/event-info.cloudFront.%s' % key for key in event.keys] + ['@iopipe/event-info.eventType']
-    assert list(event_info.keys()) == expected_keys
+    expected_keys = ['@iopipe/event-info.eventType'] + ['@iopipe/event-info.cloudFront.%s' % key for key in event.keys]
+    assert list(event_info.keys()).sort() == expected_keys.sort()
 
 
 def test__event_types__kinesis(event_kinesis):
@@ -40,8 +40,8 @@ def test__event_types__kinesis(event_kinesis):
     event_info = event.collect()
     assert event_info != {}
 
-    expected_keys = ['@iopipe/event-info.kinesis.%s' % key for key in event.keys] + ['@iopipe/event-info.eventType']
-    assert list(event_info.keys()) == expected_keys
+    expected_keys = ['@iopipe/event-info.eventType'] + ['@iopipe/event-info.kinesis.%s' % key for key in event.keys]
+    assert list(event_info.keys()).sort() == expected_keys.sort()
 
 
 def test__event_types__scheduled(event_scheduled):
@@ -51,5 +51,5 @@ def test__event_types__scheduled(event_scheduled):
     event_info = event.collect()
     assert event_info != {}
 
-    expected_keys = ['@iopipe/event-info.scheduled.%s' % key for key in event.keys] + ['@iopipe/event-info.eventType']
-    assert list(event_info.keys()) == expected_keys
+    expected_keys = ['@iopipe/event-info.eventType'] + ['@iopipe/event-info.scheduled.%s' % key for key in event.keys]
+    assert list(event_info.keys()).sort() == expected_keys.sort()
