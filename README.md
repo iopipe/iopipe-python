@@ -395,6 +395,14 @@ def handler(event, context):
     context.iopipe.mark.measure('expensive operation')
 ```
 
+The trace plugin can also trace your HTTP/HTTPS requests automatically. To enable this feature, set `auto_http` to `True` or set the `IOPIPE_TRACE_AUTO_HTTP` environment variable. For example:
+
+```python
+iopipe = IOpipe(plugins=[TracePlugin(auto_http=True)])
+```
+
+With `auto_http` enabled, you will see traces for any HTTP/HTTPS requests you make within your function on your IOpipe dashboard. Currently this feature only supports the `requests` library, including `boto3` and `botocore` support.
+
 ### Creating Plugins
 
 To create an IOpipe plugin you must implement the `iopipe.plugins.Plugin` interface.

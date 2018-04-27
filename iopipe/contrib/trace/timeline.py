@@ -86,5 +86,8 @@ class Timeline(object):
     def clear(self):
         self.data = []
 
+    def delete(self, name):
+        self.data = [d for d in self.data if name not in d.name]
+
     def now(self):
         return time_in_millis(offset=get_offset(self))

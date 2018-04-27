@@ -31,3 +31,6 @@ class Marker(object):
             "start:%s" % (start or name),
             "end:%s" % (end or start or name),
         )
+
+    def delete(self, name):
+        self.timeline.delete(name)
