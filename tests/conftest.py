@@ -2,12 +2,12 @@ import json
 import numbers
 import time
 from decimal import Decimal
-from six import string_types
 
 import requests
 import pytest
 
 from iopipe import IOpipe
+from iopipe.compat import string_types
 
 SCHEMA_JSON = None
 SCHEMA_JSON_URL = 'https://raw.githubusercontent.com/iopipe/iopipe/master/src/schema.json'
