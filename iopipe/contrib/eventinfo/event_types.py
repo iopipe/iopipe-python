@@ -10,7 +10,7 @@ class EventType(object):
 
     def collect(self):
         if self.keys == 'all':
-            return collect_all_keys(self.event)
+            return collect_all_keys(self.event, '@iopipe/event-info.%s' % self.type)
         event_info = {}
         for key in self.keys:
             value = get_value(self.event, key)

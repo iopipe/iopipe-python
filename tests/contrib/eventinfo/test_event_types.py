@@ -7,6 +7,8 @@ def test__event_Types__alexa_skill(event_alexa_skill):
 
     event_info = event.collect()
     assert event_info != {}
+    assert all([k.startswith('@iopipe/event-info.alexaSkill.') for k in event_info])
+    assert len(list(event_info.keys())) == 34
 
 
 def test__event_Types__apigw(event_apigw):
@@ -16,6 +18,9 @@ def test__event_Types__apigw(event_apigw):
     event_info = event.collect()
     assert event_info != {}
 
+    expected_keys = ['@iopipe/event-info.apiGateway.%s' % key for key in event.keys] + ['@iopipe/event-info.eventType']
+    assert list(event_info.keys()) == expected_keys
+
 
 def test__event_Types__cloudfront(event_cloudfront):
     event = et.CloudFront(event_cloudfront)
@@ -23,6 +28,9 @@ def test__event_Types__cloudfront(event_cloudfront):
 
     event_info = event.collect()
     assert event_info != {}
+
+    expected_keys = ['@iopipe/event-info.cloudFront.%s' % key for key in event.keys] + ['@iopipe/event-info.eventType']
+    assert list(event_info.keys()) == expected_keys
 
 
 def test__event_types__kinesis(event_kinesis):
@@ -32,6 +40,9 @@ def test__event_types__kinesis(event_kinesis):
     event_info = event.collect()
     assert event_info != {}
 
+    expected_keys = ['@iopipe/event-info.kinesis.%s' % key for key in event.keys] + ['@iopipe/event-info.eventType']
+    assert list(event_info.keys()) == expected_keys
+
 
 def test__event_types__scheduled(event_scheduled):
     event = et.Scheduled(event_scheduled)
@@ -39,3 +50,6 @@ def test__event_types__scheduled(event_scheduled):
 
     event_info = event.collect()
     assert event_info != {}
+
+    expected_keys = ['@iopipe/event-info.scheduled.%s' % key for key in event.keys] + ['@iopipe/event-info.eventType']
+    assert list(event_info.keys()) == expected_keys
