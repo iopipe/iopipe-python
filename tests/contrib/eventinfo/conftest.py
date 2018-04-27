@@ -29,6 +29,11 @@ def _load_event(name):
 
 
 @pytest.fixture
+def event_alexa_skill():
+    return _load_event('alexa_skill')
+
+
+@pytest.fixture
 def event_apigw():
     return _load_event('apigw')
 

@@ -1,6 +1,14 @@
 from iopipe.contrib.eventinfo import event_types as et
 
 
+def test__event_Types__alexa_skill(event_alexa_skill):
+    event = et.AlexaSkill(event_alexa_skill)
+    assert event.has_required_keys() is True
+
+    event_info = event.collect()
+    assert event_info != {}
+
+
 def test__event_Types__apigw(event_apigw):
     event = et.ApiGateway(event_apigw)
     assert event.has_required_keys() is True

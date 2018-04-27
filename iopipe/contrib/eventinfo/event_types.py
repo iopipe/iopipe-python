@@ -1,4 +1,4 @@
-from .util import get_value, has_key
+from .util import collect_all_keys, get_value, has_key
 
 
 class EventType(object):
@@ -9,6 +9,8 @@ class EventType(object):
         return all(has_key(self.event, key) for key in self.required_keys)
 
     def collect(self):
+        if self.keys == 'all':
+            return collect_all_keys(self.event)
         event_info = {}
         for key in self.keys:
             value = get_value(self.event, key)
@@ -16,6 +18,17 @@ class EventType(object):
                 event_info['@iopipe/event-info.%s.%s' % (self.type, key)] = value
         event_info['@iopipe/event-info.eventType'] = self.type
         return event_info
+
+
+class AlexaSkill(EventType):
+    type = 'alexaSkill'
+    keys = 'all'
+    required_keys = [
+        'context.System',
+        'request.requestId',
+        'session.attributes',
+        'session.user',
+    ]
 
 
 class ApiGateway(EventType):
@@ -151,7 +164,7 @@ class SNS(EventType):
             get_value(self.event, 'Records[0].eventSource') == 'aws:sns'
 
 
-EVENT_TYPES = [ApiGateway, CloudFront, Firehose, Kinesis, S3, Scheduled, SNS]
+EVENT_TYPES = [AlexaSkill, ApiGateway, CloudFront, Firehose, Kinesis, S3, Scheduled, SNS]
 
 
 def log_for_event_type(event, log):
