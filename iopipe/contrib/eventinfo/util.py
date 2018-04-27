@@ -28,3 +28,22 @@ def has_key(obj, path):
     parser = _get_parser(path)
     result = parser.search(obj)
     return result is not None
+
+
+def collect_all_keys(obj, initial_path):
+    out = {}
+
+    def flatten(o, path=None):
+        if path is None:
+            path = [initial_path]
+        if isinstance(o, dict):
+            for key in o:
+                flatten(o[key], path + [key])
+        elif isinstance(o, list):
+            for i, value in enumerate(o):
+                flatten(value, path + [str(i)])
+        else:
+            out['.'.join(path)] = o
+
+    flatten(obj)
+    return out
