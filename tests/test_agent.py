@@ -11,9 +11,11 @@ def test_coldstarts(mock_send_report, handler, mock_context, monkeypatch):
 
     handler(None, mock_context)
     assert iopipe.report.report['coldstart'] is True
+    assert 'coldstart' in iopipe.report.labels
 
     handler(None, mock_context)
     assert iopipe.report.report['coldstart'] is False
+    assert 'coldstart' not in iopipe.report.labels
 
 
 @mock.patch('iopipe.report.send_report', autospec=True)
@@ -43,6 +45,7 @@ def test_custom_metrics(mock_send_report, handler_with_events, mock_context):
     assert len(iopipe.report.custom_metrics) == 7
     # Decimals are converted to strings
     assert iopipe.report.custom_metrics[6]['s'] == '12.300000000000000710542735760100185871124267578125'
+    assert 'metrics' in iopipe.report.labels
 
 
 @mock.patch('iopipe.report.send_report', autospec=True)
@@ -67,6 +70,7 @@ def test_erroring(mock_send_report, handler_that_errors, mock_context):
     assert iopipe.report.report['errors']['name'] == 'ValueError'
     assert iopipe.report.report['errors']['message'] == 'Behold, a value error'
     assert isinstance(iopipe.report.report['errors']['stack'], str)
+    assert 'error' in iopipe.report.labels
 
 
 @mock.patch('iopipe.report.send_report', autospec=True)
@@ -83,6 +87,7 @@ def test_timeouts(mock_send_report, handler_that_timeouts, mock_context):
     assert iopipe.report.report['errors']['message'] == 'Timeout Exceeded.'
     assert iopipe.report.report['errors']['name'] == 'TimeoutError'
     assert isinstance(iopipe.report.report['errors']['stack'], str)
+    assert 'timeout' in iopipe.report.labels
 
 
 @mock.patch('iopipe.report.send_report', autospec=True)

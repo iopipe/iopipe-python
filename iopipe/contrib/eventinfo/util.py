@@ -1,4 +1,5 @@
 import jmespath
+import re
 
 # Caches previously seen parsers
 parsers = {}
@@ -49,3 +50,8 @@ def collect_all_keys(obj, initial_path, exclude_keys=None):
 
     flatten(obj)
     return out
+
+
+def slugify(name):
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1-\2', name)
+    return re.sub('([a-z0-9])([A-Z])', r'\1-\2', s1).lower()

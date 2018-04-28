@@ -1,6 +1,6 @@
 from iopipe.plugins import Plugin
 
-from .event_types import log_for_event_type
+from .event_types import metrics_for_event_type
 
 
 class EventInfoPlugin(Plugin):
@@ -19,7 +19,7 @@ class EventInfoPlugin(Plugin):
         pass
 
     def post_invoke(self, event, context):
-        log_for_event_type(event, context.iopipe.log)
+        metrics_for_event_type(event, context)
 
     def pre_report(self, report):
         pass

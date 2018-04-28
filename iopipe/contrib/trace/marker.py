@@ -1,6 +1,7 @@
 class Marker(object):
-    def __init__(self, timeline):
+    def __init__(self, timeline, context):
         self.timeline = timeline
+        self.context = context
         self.contexts = []
 
     def __call__(self, name):
@@ -19,6 +20,7 @@ class Marker(object):
 
     def start(self, name):
         self.timeline.mark('start:%s' % name)
+        self.context.iopipe.label('trace')
 
     def end(self, name):
         self.timeline.mark('end:%s' % name)

@@ -48,9 +48,10 @@ def _assert_valid_schema(obj, schema=None, path=None, optional_fields=None):
     if not optional_fields:
         optional_fields = []
 
-    for key in obj:
-        key_path = '.'.join(path + [key])
-        assert key in schema, "%s not in schema" % key_path
+    if isinstance(obj, dict):
+        for key in obj:
+            key_path = '.'.join(path + [key])
+            assert key in schema, "%s not in schema" % key_path
 
     for key in schema:
         key_path = '.'.join(path + [key])
@@ -65,7 +66,8 @@ def _assert_valid_schema(obj, schema=None, path=None, optional_fields=None):
             _assert_valid_schema(obj[key], schema[key], path + [key], optional_fields)
         elif isinstance(obj[key], list):
             for item in obj[key]:
-                _assert_valid_schema(item, schema[key][0], path + [key], optional_fields)
+                if isinstance(item, dict):
+                    _assert_valid_schema(item, schema[key][0], path + [key], optional_fields)
         elif schema[key] == 'b':
             assert isinstance(obj[key], bool), '%s not a boolean' % key_path
         elif schema[key] == 'i':

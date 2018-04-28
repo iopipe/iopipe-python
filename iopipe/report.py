@@ -71,7 +71,9 @@ class Report(object):
             'timestamp': int(time.time() * 1000),
         }
 
-        constants.COLDSTART = False
+        if constants.COLDSTART is True:
+            constants.COLDSTART = False
+            self.labels.add('coldstart')
 
     def extract_context_data(self):
         """
@@ -110,9 +112,12 @@ class Report(object):
 
         :param error: The error exception to add to the report.
         """
-        stack = traceback.format_exc()
-        if frame is not None:
+        if frame is None:
+            stack = traceback.format_exc()
+            self.labels.add('error')
+        else:
             stack = '\n'.join(traceback.format_stack(frame))
+            self.labels.add('timeout')
         details = {
             'name': type(error).__name__,
             'message': '{}'.format(error),

@@ -22,7 +22,7 @@ class TracePlugin(Plugin):
         pass
 
     def pre_invoke(self, event, context):
-        context.iopipe.register('mark', Marker(self.timeline))
+        context.iopipe.register('mark', Marker(self.timeline, context))
 
     def post_invoke(self, event, context):
         context.iopipe.unregister('mark')

@@ -7,4 +7,9 @@ class LogWrapper(object):
         self.context.iopipe.metric(key, value)
 
     def __getattr__(self, name):
+        self.context.iopipe.label('logs')
+        if name in ['warn', 'warning']:
+            self.context.iopipe.label('logs-warning')
+        if name in ['critical', 'error', 'exception']:
+            self.context.iopipe.label('logs-error')
         return getattr(self.logger, name)

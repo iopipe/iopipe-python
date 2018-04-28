@@ -42,6 +42,7 @@ class IOpipeContext(object):
             event['s'] = str(value)
 
         self.instance.report.custom_metrics.append(event)
+        self.label('metrics')
 
     log = metric
 

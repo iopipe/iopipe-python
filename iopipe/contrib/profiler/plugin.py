@@ -56,6 +56,7 @@ class ProfilerPlugin(Plugin):
 
     def pre_report(self, report):
         if self.profile is not None:
+            self.context.iopipe.label('profile')
             with tempfile.NamedTemporaryFile() as stats_file:
                 self.profile.dump_stats(stats_file.name)
                 signed_request = get_signed_request(report, '.cprofile')
