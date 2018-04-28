@@ -15,7 +15,8 @@ def test__eventinfo_plugin__apigw(mock_send_report, handler_with_eventinfo, even
 
     assert any([m['name'] == '@iopipe/event-info.eventType' for m in metrics])
     assert len(metrics) == 10
-    assert 'event-info' in iopipe.report.labels
+    assert '@iopipe/event-info' in iopipe.report.labels
+    assert '@iopipe/api-gateway' in iopipe.report.labels
 
     event_type = [m for m in metrics if m['name'] == '@iopipe/event-info.eventType']
     assert len(event_type) == 1

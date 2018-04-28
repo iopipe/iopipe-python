@@ -73,7 +73,7 @@ class Report(object):
 
         if constants.COLDSTART is True:
             constants.COLDSTART = False
-            self.labels.add('coldstart')
+            self.labels.add('@iopipe/coldstart')
 
     def extract_context_data(self):
         """
@@ -114,10 +114,10 @@ class Report(object):
         """
         if frame is None:
             stack = traceback.format_exc()
-            self.labels.add('error')
+            self.labels.add('@iopipe/error')
         else:
             stack = '\n'.join(traceback.format_stack(frame))
-            self.labels.add('timeout')
+            self.labels.add('@iopipe/timeout')
         details = {
             'name': type(error).__name__,
             'message': '{}'.format(error),
@@ -134,6 +134,9 @@ class Report(object):
         """
         if error:
             self.retain_error(error, frame)
+
+        if self.custom_metrics:
+            self.labels.add('@iopipe/metrics')
 
         self.report['environment']['host']['boot_id'] = system.read_bootid()
 

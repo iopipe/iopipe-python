@@ -20,7 +20,7 @@ class Marker(object):
 
     def start(self, name):
         self.timeline.mark('start:%s' % name)
-        self.context.iopipe.label('trace')
+        self.context.iopipe.label('@iopipe/trace')
 
     def end(self, name):
         self.timeline.mark('end:%s' % name)

@@ -1,4 +1,5 @@
 import json
+import mock
 import numbers
 import time
 from decimal import Decimal
@@ -24,6 +25,7 @@ class MockContext(object):
         self.function_version = version
         self.invoked_function_arn = 'arn:aws:lambda:us-east-1:1:function:%s:%s' % (name, version)
         self.remaining_time_in_millis = float('inf')
+        self.iopipe = mock.Mock()
 
     def get_remaining_time_in_millis(self):
         return self.remaining_time_in_millis

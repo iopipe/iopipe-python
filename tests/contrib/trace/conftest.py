@@ -51,8 +51,8 @@ def handler_with_trace_no_auto_measure(iopipe_with_trace_no_auto_measure):
 
 
 @pytest.fixture
-def marker(timeline):
-    return Marker(timeline)
+def marker(timeline, mock_context):
+    return Marker(timeline, mock_context)
 
 
 @pytest.fixture
