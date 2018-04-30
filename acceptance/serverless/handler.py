@@ -102,7 +102,7 @@ def logging_tmp(event, context):
     for _ in range(15000):
         level = random.choice(['debug', 'info', 'warn', 'error', 'critical'])
         random_text = random.choice(text['text'])
-        getattr(context.iopipe.logger, level)(random_text)
+        getattr(context.iopipe.log, level)(random_text)
 
 
 def fib(n):
