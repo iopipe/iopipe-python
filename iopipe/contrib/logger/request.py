@@ -22,7 +22,8 @@ def upload_log_data(url, data):
         response.raise_for_status()
     except Exception as e:
         logger.debug('Error while uploading log data: %s', e)
-        if hasattr(e, 'response'):
+        logger.exception(e)
+        if hasattr(e, 'response') and hasattr(e.response, 'content'):
             logger.debug(e.response.content)
     else:
         logger.debug('Log data uploaded successfully')

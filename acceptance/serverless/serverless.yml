@@ -9,6 +9,14 @@ provider:
   environment:
     IOPIPE_TOKEN: ${env:IOPIPE_TOKEN}
 
+package:
+  exclude:
+    - ./**
+  include:
+    - handler.py
+    - iopipe/**
+    - text.json
+
 functions:
   py2-api-gateway:
     events:
