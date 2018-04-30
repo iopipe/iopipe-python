@@ -106,6 +106,17 @@ functions:
     handler: handler.logging
     runtime: python3.6
 
+  py2-logging-tmp:
+    events:
+      - schedule: rate(1 hour)
+    handler: handler.logging_tmp
+    runtime: python2.7
+  py3-logging-tmp:
+    events:
+      - schedule: rate(1 hour)
+    handler: handler.logging_tmp
+    runtime: python3.6
+
   py2-profiling:
     events:
       - schedule: rate(10 minutes)
