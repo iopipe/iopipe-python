@@ -108,22 +108,26 @@ functions:
       - schedule: rate(10 minutes)
     handler: handler.logging
     runtime: python2.7
+    timeout: 300
   py3-logging:
     events:
       - schedule: rate(10 minutes)
     handler: handler.logging
     runtime: python3.6
+    timeout: 300
 
   py2-logging-tmp:
     events:
       - schedule: rate(1 hour)
     handler: handler.logging_tmp
     runtime: python2.7
+    timeout: 300
   py3-logging-tmp:
     events:
       - schedule: rate(1 hour)
     handler: handler.logging_tmp
     runtime: python3.6
+    timeout: 300
 
   py2-profiling:
     events:
