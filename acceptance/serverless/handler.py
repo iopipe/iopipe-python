@@ -91,7 +91,7 @@ def logging(event, context):
     try:
         raise ValueError('I have no values.')
     except Exception as e:
-        context.log.exception(e)
+        context.iopipe.log.exception(e)
 
 
 @iopipe_with_logging_tmp
