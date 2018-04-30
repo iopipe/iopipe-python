@@ -1,5 +1,6 @@
 import json
 import os
+import random
 import sys
 import time
 
@@ -20,6 +21,9 @@ iopipe_with_eventinfo = IOpipe(debug=True, plugins=[eventinfo_plugin])
 
 logger_plugin = LoggerPlugin()
 iopipe_with_logging = IOpipe(debug=True, plugins=[logger_plugin])
+
+logger_plugin_tmp = LoggerPlugin(use_tmp=True)
+iopipe_with_logging_tmp = IOpipe(debug=True, plugins=[logger_plugin_tmp])
 
 profiler_plugin = ProfilerPlugin(enabled=True)
 iopipe_with_profiling = IOpipe(debug=True, plugins=[profiler_plugin])
@@ -88,6 +92,17 @@ def logging(event, context):
         raise ValueError('I have no values.')
     except Exception as e:
         context.log.exception(e)
+
+
+@iopipe_with_logging_tmp
+def logging_tmp(event, context):
+    with open('text.json') as f:
+        text = json.load(f)
+
+    for _ in range(15000):
+        level = random.choice(['debug', 'info', 'warn', 'error', 'critical'])
+        random_text = random.choice(text['text'])
+        getattr(context.iopipe.logger, level)(random_text)
 
 
 def fib(n):

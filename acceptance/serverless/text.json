@@ -1,0 +1,32 @@
+{
+  "text": [
+    "Haskell is a standardized, general-purpose purely functional programming language, with non-strict semantics and strong static typing.",
+    "Haskell features a type system with type inference and lazy evaluation.",
+    "Type classes first appeared in the Haskell programming language.",
+    "Its main implementation is the Glasgow Haskell Compiler.",
+    "Erlang is a general-purpose, concurrent, functional programming language.",
+    "It is also a garbage-collected runtime system.",
+    "The sequential subset of Erlang supports eager evaluation, single assignment, and dynamic typing.",
+    "Erlang is known for its designs that are well suited for systems.",
+    "Atoms are used within a program to denote distinguished values.",
+    "They are written as strings of consecutive alphanumeric characters, the first character being lowercase.",
+    "Atoms can contain any character if they are enclosed within single quotes and an escape convention exists which allows any character to be used within an atom.",
+    "Tuples are containers for a fixed number of Erlang data types.",
+    "The syntax {D1,D2,...,Dn} denotes a tuple whose arguments are D1, D2, ... Dn.",
+    "The arguments can be primitive data types or compound data types.",
+    "Any element of a tuple can be accessed in constant time.",
+    "Ports are used to communicate with the external world.",
+    "Ports are created with the built-in function open_port.",
+    "Messages can be sent to and received from ports, but these messages must obey the so-called \"port protocol.\"",
+    "Do you have any idea why this is not working?",
+    "Do you come here often?",
+    "Where are my pants?",
+    "I don't even care.",
+    "He looked inquisitively at his keyboard and wrote another sentence.",
+    "Make me a sandwich.",
+    "In 1989 the building was heavily damaged by fire, but it has since been restored.",
+    "Initially composing light-hearted and irreverent works, he also wrote serious, sombre and religious pieces beginning in the 1930s.",
+    "She spent her earliest years reading classic literature, and writing poetry.",
+    "The Galactic Empire is nearing completion of the Death Star, a space station with the power to destroy entire planets."
+  ]
+}
