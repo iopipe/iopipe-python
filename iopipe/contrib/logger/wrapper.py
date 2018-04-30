@@ -4,7 +4,7 @@ class LogWrapper(object):
         self.context = context
 
     def __call__(self, key, value):
-        return self.context.metric(key, value)
+        self.context.iopipe.metric(key, value)
 
     def __getattr__(self, name):
         return getattr(self.logger, name)
