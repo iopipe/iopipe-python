@@ -2,6 +2,10 @@ from .util import collect_all_keys, get_value, has_key
 
 
 class EventType(object):
+    keys = []
+    exclude_keys = []
+    required_keys = []
+
     def __init__(self, event):
         self.event = event
 
@@ -10,7 +14,7 @@ class EventType(object):
 
     def collect(self):
         if self.keys == 'all':
-            return collect_all_keys(self.event, '@iopipe/event-info.%s' % self.type)
+            return collect_all_keys(self.event, '@iopipe/event-info.%s' % self.type, self.exclude_keys)
         event_info = {}
         for key in self.keys:
             value = get_value(self.event, key)
@@ -23,6 +27,11 @@ class EventType(object):
 class AlexaSkill(EventType):
     type = 'alexaSkill'
     keys = 'all'
+    exclude_keys = [
+        'context.System.apiAccessToken',
+        'context.System.user.accessToken',
+        'context.System.user.permissions.consentToken',
+    ]
     required_keys = [
         'context.System',
         'request.requestId',
