@@ -8,7 +8,7 @@ def test__event_Types__alexa_skill(event_alexa_skill):
     event_info = event.collect()
     assert event_info != {}
     assert all([k.startswith('@iopipe/event-info.alexaSkill.') for k in event_info])
-    assert len(list(event_info.keys())) == 34
+    assert len(list(event_info.keys())) == 31
 
 
 def test__event_Types__apigw(event_apigw):

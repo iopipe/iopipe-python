@@ -30,7 +30,7 @@ def has_key(obj, path):
     return result is not None
 
 
-def collect_all_keys(obj, initial_path):
+def collect_all_keys(obj, initial_path, exclude_keys=None):
     out = {}
 
     def flatten(o, path=None):
@@ -43,6 +43,8 @@ def collect_all_keys(obj, initial_path):
             for i, value in enumerate(o):
                 flatten(value, path + [str(i)])
         else:
+            if exclude_keys and '.'.join(path[1:]) in exclude_keys:
+                return
             out['.'.join(path)] = o
 
     flatten(obj)
