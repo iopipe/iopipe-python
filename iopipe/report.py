@@ -24,21 +24,24 @@ class Report(object):
     The report of system status
     """
 
-    def __init__(self, config, context):
+    def __init__(self, client, context):
         """
         Instantiates a new IOpipe report.
 
-        :param config: The IOpipe agent config.
+        :param client: The IOpipe client.
         :param context: The AWS Lambda context.
         """
         self.start_time = monotonic()
         self.sent = False
         self.stat_start = system.read_pid_stat('self')
-        self.config = config
+
+        self.client = client
+        self.config = client.config
         self.context = context
+
         self.custom_metrics = []
         self.labels = set()
-        self.plugins = get_plugin_meta(config['plugins'])
+        self.plugins = get_plugin_meta(self.config['plugins'])
 
         self.report = {
             'client_id': self.config['token'],
@@ -181,4 +184,4 @@ class Report(object):
         logger.debug('Sending report to IOpipe:')
         logger.debug(json.dumps(self.report, indent=2, sort_keys=True))
 
-        send_report(self.report, self.config)
+        self.client.submit_future(send_report, self.report, self.config)

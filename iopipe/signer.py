@@ -1,5 +1,6 @@
 import logging
 import os
+import time
 
 try:
     import requests
@@ -23,11 +24,12 @@ def get_signer_hostname():
     return 'signer.{region}.iopipe.com'.format(region=region)
 
 
-def get_signed_request(report, extension):
+def get_signed_request(token, context, extension):
     """
     Returns a signed request URL from IOpipe
 
-    :param report: The IOpipe report to request a signed URL
+    :param token: The IOpipe token.
+    :param context: The AWS context to request a signed URL
     :param extension: The extension of the file to sign.
     :returns: A signed request URL
     :rtype: str
@@ -39,13 +41,13 @@ def get_signed_request(report, extension):
         response = requests.post(
             url,
             json={
-                'arn': report.report['aws']['invokedFunctionArn'],
-                'requestId': report.report['aws']['awsRequestId'],
-                'timestamp': report.report['timestamp'],
+                'arn': context.invokedFunctionArn,
+                'requestId': context.awsRequestId,
+                'timestamp': int(time.time() * 1000),
                 'extension': extension
             },
             headers={
-                'Authorization': report.report['client_id']
+                'Authorization': token,
             })
         response.raise_for_status()
     except Exception as e:

@@ -1,3 +1,4 @@
+import contextlib
 import logging
 
 try:
@@ -15,14 +16,15 @@ def upload_profiler_report(url, data):
     :param url: The signed URL
     :param data: The profiler report
     """
-    data.seek(0)
-    try:
-        logger.debug('Uploading profiler report to IOpipe')
-        response = requests.put(url, data=data)
-        response.raise_for_status()
-    except Exception as e:
-        logger.debug('Error while uploading profiler report: %s', e)
-        if hasattr(e, 'response'):
-            logger.debug(e.response.content)
-    else:
-        logger.debug('Profiler report uploaded successfully')
+    with contextlib.closing(data):
+        data.file.seek(0)
+        try:
+            logger.debug('Uploading profiler report to IOpipe')
+            response = requests.put(url, data=data.file)
+            response.raise_for_status()
+        except Exception as e:
+            logger.debug('Error while uploading profiler report: %s', e)
+            if hasattr(e, 'response'):
+                logger.debug(e.response.content)
+        else:
+            logger.debug('Profiler report uploaded successfully')

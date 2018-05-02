@@ -1,5 +1,5 @@
+from concurrent.futures import wait
 import logging
-import os
 import sys
 import tempfile
 
@@ -46,7 +46,7 @@ class LoggerPlugin(Plugin):
         self.use_tmp = use_tmp
 
     def pre_setup(self, iopipe):
-        pass
+        self.iopipe = iopipe
 
     def post_setup(self, iopipe):
         if iopipe.config['debug'] is True:
@@ -54,7 +54,8 @@ class LoggerPlugin(Plugin):
             self.logger.setLevel(logging.DEBUG)
 
     def pre_invoke(self, event, context):
-        context.iopipe.register('log', LogWrapper(self.logger, context), force=True)
+        self.context = context
+        self.context.iopipe.register('log', LogWrapper(self.logger, context), force=True)
 
         if self.use_tmp is True:
             self.handler.stream = tempfile.NamedTemporaryFile(mode='w')
@@ -65,28 +66,26 @@ class LoggerPlugin(Plugin):
             sys.stdout = StreamToLogger(self.logger)
 
     def post_invoke(self, event, context):
+        self.signed_request = None
         self.handler.flush()
-        if self.use_tmp:
-            os.fsync(self.handler.stream.fileno())
+        if self.handler.stream.tell():
+            self.signed_request = self.iopipe.submit_future(get_signed_request, self.iopipe.config['token'],
+                                                            self.context, '.log')
         if self.redirect_stdout is True:
             sys.stdout = sys.__stdout__
 
     def pre_report(self, report):
-        pass
-
-    def post_report(self, report):
-        if self.handler.stream.tell() > 0:
-            signed_request = get_signed_request(report, '.log')
-            if signed_request and 'signedRequest' in signed_request:
-                upload_log_data(signed_request['signedRequest'], self.handler.stream)
-                if 'jwtAccess' in signed_request:
+        if self.handler.stream.tell():
+            if self.signed_request is not None:
+                wait([self.signed_request])
+                self.signed_request = self.signed_request.result()
+            if self.signed_request is not None and 'signedRequest' in self.signed_request:
+                self.iopipe.submit_future(upload_log_data, self.signed_request['signedRequest'], self.handler.stream)
+                if 'jwtAccess' in self.signed_request:
                     plugin = next((p for p in report.plugins if p['name'] == self.name))
                     if 'uploads' not in plugin:
                         plugin['uploads'] = []
-                    plugin['uploads'].append(signed_request['jwtAccess'])
-        if self.use_tmp is True:
-            self.handler.stream.close()
+                    plugin['uploads'].append(self.signed_request['jwtAccess'])
 
-    def __del__(self):
-        if self.use_tmp and self.handler and self.handler.stream:
-            self.handler.stream.close()
+    def post_report(self, report):
+        pass
