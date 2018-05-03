@@ -1,9 +1,18 @@
+import os
+
 from setuptools import find_packages, setup
+
+try:
+    from pypandoc import convert
+    README = convert('README.md', 'rst')
+except ImportError:
+    README = open(os.path.join(os.path.dirname(__file__), 'README.md'), 'r', encoding='utf-8').read()
 
 setup(
     name='iopipe',
     version='1.5.0',
     description='IOpipe agent for serverless Application Performance Monitoring',
+    long_description=README,
     author='IOpipe',
     author_email='dev@iopipe.com',
     url='https://github.com/iopipe/iopipe-python',
