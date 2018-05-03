@@ -5,8 +5,8 @@ from setuptools import find_packages, setup
 try:
     from pypandoc import convert
     README = convert('README.md', 'rst')
-except ImportError:
-    README = open(os.path.join(os.path.dirname(__file__), 'README.md'), 'r', encoding='utf-8').read()
+except (ImportError, OSError):
+    README = open(os.path.join(os.path.dirname(__file__), 'README.md'), 'r').read()
 
 setup(
     name='iopipe',
