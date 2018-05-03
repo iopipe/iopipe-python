@@ -8,7 +8,8 @@ machine:
 
 dependencies:
   pre:
-    - pip install -U flake8 setuptools tox twine
+    - sudo apt-get install pandoc
+    - pip install -U flake8 pypandoc setuptools tox twine
     - npm install serverless
     - which serverless
 
