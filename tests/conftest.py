@@ -1,4 +1,5 @@
 import json
+import mock
 import numbers
 import time
 from decimal import Decimal
@@ -24,6 +25,7 @@ class MockContext(object):
         self.function_version = version
         self.invoked_function_arn = 'arn:aws:lambda:us-east-1:1:function:%s:%s' % (name, version)
         self.remaining_time_in_millis = float('inf')
+        self.iopipe = mock.Mock()
 
     def get_remaining_time_in_millis(self):
         return self.remaining_time_in_millis
@@ -48,9 +50,10 @@ def _assert_valid_schema(obj, schema=None, path=None, optional_fields=None):
     if not optional_fields:
         optional_fields = []
 
-    for key in obj:
-        key_path = '.'.join(path + [key])
-        assert key in schema, "%s not in schema" % key_path
+    if isinstance(obj, dict):
+        for key in obj:
+            key_path = '.'.join(path + [key])
+            assert key in schema, "%s not in schema" % key_path
 
     for key in schema:
         key_path = '.'.join(path + [key])
@@ -65,7 +68,8 @@ def _assert_valid_schema(obj, schema=None, path=None, optional_fields=None):
             _assert_valid_schema(obj[key], schema[key], path + [key], optional_fields)
         elif isinstance(obj[key], list):
             for item in obj[key]:
-                _assert_valid_schema(item, schema[key][0], path + [key], optional_fields)
+                if isinstance(item, dict):
+                    _assert_valid_schema(item, schema[key][0], path + [key], optional_fields)
         elif schema[key] == 'b':
             assert isinstance(obj[key], bool), '%s not a boolean' % key_path
         elif schema[key] == 'i':

@@ -25,3 +25,4 @@ def test__profiler_plugin(mock_send_report, mock_get_signed_request, mock_upload
 
     plugin = next((p for p in iopipe.report.plugins if p['name'] == 'profiler'))
     assert plugin['uploads'][0] == 'foobar'
+    assert '@iopipe/profile' in iopipe.report.labels

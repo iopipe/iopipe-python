@@ -71,7 +71,9 @@ class Report(object):
             'timestamp': int(time.time() * 1000),
         }
 
-        constants.COLDSTART = False
+        if constants.COLDSTART is True:
+            constants.COLDSTART = False
+            self.labels.add('@iopipe/coldstart')
 
     def extract_context_data(self):
         """
@@ -110,9 +112,12 @@ class Report(object):
 
         :param error: The error exception to add to the report.
         """
-        stack = traceback.format_exc()
-        if frame is not None:
+        if frame is None:
+            stack = traceback.format_exc()
+            self.labels.add('@iopipe/error')
+        else:
             stack = '\n'.join(traceback.format_stack(frame))
+            self.labels.add('@iopipe/timeout')
         details = {
             'name': type(error).__name__,
             'message': '{}'.format(error),
@@ -129,6 +134,9 @@ class Report(object):
         """
         if error:
             self.retain_error(error, frame)
+
+        if self.custom_metrics:
+            self.labels.add('@iopipe/metrics')
 
         self.report['environment']['host']['boot_id'] = system.read_bootid()
 

@@ -73,16 +73,17 @@ class LoggerPlugin(Plugin):
         pass
 
     def post_report(self, report):
-                signed_request = get_signed_request(report, '.log')
-                if signed_request and 'signedRequest' in signed_request:
-                    upload_log_data(signed_request['signedRequest'], self.handler.stream)
-                    if 'jwtAccess' in signed_request:
-                        plugin = next((p for p in report.plugins if p['name'] == self.name))
-                        if 'uploads' not in plugin:
-                            plugin['uploads'] = []
-                        plugin['uploads'].append(signed_request['jwtAccess'])
-                if self.use_tmp is True:
-                    self.handler.stream.close()
+        if self.handler.stream.tell() > 0:
+            signed_request = get_signed_request(report, '.log')
+            if signed_request and 'signedRequest' in signed_request:
+                upload_log_data(signed_request['signedRequest'], self.handler.stream)
+                if 'jwtAccess' in signed_request:
+                    plugin = next((p for p in report.plugins if p['name'] == self.name))
+                    if 'uploads' not in plugin:
+                        plugin['uploads'] = []
+                    plugin['uploads'].append(signed_request['jwtAccess'])
+        if self.use_tmp is True:
+            self.handler.stream.close()
 
     def __del__(self):
         if self.use_tmp and self.handler and self.handler.stream:

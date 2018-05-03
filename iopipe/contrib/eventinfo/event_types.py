@@ -1,4 +1,4 @@
-from .util import collect_all_keys, get_value, has_key
+from .util import collect_all_keys, get_value, has_key, slugify
 
 
 class EventType(object):
@@ -8,6 +8,10 @@ class EventType(object):
 
     def __init__(self, event):
         self.event = event
+
+    @property
+    def slug(self):
+        return slugify(self.type)
 
     def has_required_keys(self):
         return all(has_key(self.event, key) for key in self.required_keys)
@@ -176,10 +180,12 @@ class SNS(EventType):
 EVENT_TYPES = [AlexaSkill, ApiGateway, CloudFront, Firehose, Kinesis, S3, Scheduled, SNS]
 
 
-def log_for_event_type(event, log):
+def metrics_for_event_type(event, context):
     for EventType in EVENT_TYPES:
         event_type = EventType(event)
         if event_type.has_required_keys():
+            context.iopipe.label('@iopipe/event-info')
+            context.iopipe.label('@iopipe/%s' % event_type.slug)
             event_info = event_type.collect()
-            [log(k, v) for k, v in event_info.items()]
+            [context.iopipe.metric(k, v) for k, v in event_info.items()]
             break
