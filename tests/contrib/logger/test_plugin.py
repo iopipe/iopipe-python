@@ -1,6 +1,11 @@
 from datetime import datetime
 import json
 import mock
+import sys
+
+import pytest
+
+from iopipe.system import read_disk
 
 
 @mock.patch('iopipe.contrib.logger.plugin.upload_log_data', autospec=True)
@@ -74,3 +79,20 @@ def test__logger_plugin__use_tmp(mock_send_report, mock_get_signed_request, mock
 
     assert hasattr(stream, 'file')
     assert stream.file.closed
+
+
+@mock.patch('iopipe.contrib.logger.plugin.upload_log_data', autospec=True)
+@mock.patch('iopipe.contrib.logger.plugin.get_signed_request', autospec=True)
+@mock.patch('iopipe.report.send_report', autospec=True)
+def test__logger_plugin__use_tmp__disk_used(mock_send_report, mock_get_signed_request, mock_upload_log_data,
+                                 handler_with_logger_use_tmp, mock_context):
+    """Asserts that disk usage increases when logging to disk"""
+    if not sys.platform.startswith('linux'):
+        pytest.skip('this test requires linux, skipping')
+
+    disk_usage = read_disk()
+
+    iopipe, handler = handler_with_logger_use_tmp
+    handler({}, mock_context)
+
+    assert iopipe.report.report['disk']['usedMiB'] > disk_usage['usedMiB']
