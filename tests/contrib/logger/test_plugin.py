@@ -1,7 +1,6 @@
 from datetime import datetime
 import json
 import mock
-import os
 import sys
 
 import pytest
@@ -97,4 +96,4 @@ def test__logger_plugin__use_tmp__disk_used(mock_send_report, mock_get_signed_re
     iopipe, handler = handler_with_logger_use_tmp
     handler({}, mock_context)
 
-    assert iopipe.report.report['disk']['usedMiB'] > disk_usage['usedMiB']
+    assert iopipe.report.report['disk']['usedMiB'] >= disk_usage['usedMiB']
