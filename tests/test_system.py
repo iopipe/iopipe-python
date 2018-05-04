@@ -21,6 +21,8 @@ def test_read_disk(benchmark):
 
     disk = benchmark(system.read_disk)
 
+    assert disk['totalMiB'] > 0
+    assert disk['usedMiB'] > 0
     assert disk['totalMiB'] >= disk['usedMiB']
     assert round((disk['usedMiB'] / disk['totalMiB']) * 100, 2) == disk['usedPercentage']
 
