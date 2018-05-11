@@ -1,4 +1,5 @@
 import logging
+import os
 import sys
 import tempfile
 
@@ -65,7 +66,8 @@ class LoggerPlugin(Plugin):
 
     def post_invoke(self, event, context):
         self.handler.flush()
-
+        if self.use_tmp:
+            os.fsync(self.handler.stream.fileno())
         if self.redirect_stdout is True:
             sys.stdout = sys.__stdout__
 
