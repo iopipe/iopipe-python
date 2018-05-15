@@ -431,7 +431,7 @@ IOpipe integrates with popular serverless frameworks. See below for examples. If
 
 ### Chalice
 
-Using IOpipe with the [Chalice](https://github.com/aws/chalice) framework is easy. Just wrap your `app` like so:
+Using IOpipe with the [Chalice](https://github.com/aws/chalice) framework is easy. Wrap your `app` like so:
 
 ```python
 from chalice import Chalice
@@ -466,7 +466,7 @@ plugins:
   - serverless-python-requirements
 ```
 
-Then just add `iopipe `to your `requirements.txt`:
+Then add `iopipe `to your `requirements.txt`:
 
 ```bash
 $ echo "iopipe" >> requirements.txt
