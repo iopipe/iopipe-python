@@ -20,6 +20,7 @@ This package provides analytics and distributed tracing for event-driven applica
 - [Supported Python Versions](#supported-python-versions)
 - [Framework Integration](#framework-integration)
   - [Chalice](#chalice)
+  - [Serverless](#serverless)
   - [Zappa](#zappa)
 - [License](#license)
 
@@ -430,7 +431,7 @@ IOpipe integrates with popular serverless frameworks. See below for examples. If
 
 ### Chalice
 
-Using IOpipe with the [Chalice](https://github.com/aws/chalice) framework is easy. Just wrap your `app` like so:
+Using IOpipe with the [Chalice](https://github.com/aws/chalice) framework is easy. Wrap your `app` like so:
 
 ```python
 from chalice import Chalice
@@ -447,6 +448,35 @@ def index():
 # Do this after defining your routes
 app = iopipe(app)
 ```
+
+### Serverless
+
+Using IOpipe with [Serverless](https://github.com/serverless/serverless) is easy.
+
+First, we recommend the [serverless-python-requirements](https://github.com/UnitedIncome/serverless-python-requirements) plugin:
+
+```bash
+$ npm install --save-dev serverless-python-requirements
+```
+
+This plugin will add `requirements.txt` support to Serverless. Once installed, add the following to your `serverless.yml`:
+
+```yaml
+plugins:
+  - serverless-python-requirements
+```
+
+Then add `iopipe `to your `requirements.txt`:
+
+```bash
+$ echo "iopipe" >> requirements.txt
+```
+
+Now Serverless will `pip install -r requirements.txt` when packaging your functions.
+
+Keep in mind you still need to add the `@iopipe` decorator to your functions. See [Usage](#usage) for details.
+
+Be sure to check out the [serverless-python-requirements](https://github.com/UnitedIncome/serverless-python-requirements) `README` as the plugin has a number of useful features for compiling AWS Lambda compatible Python packages.
 
 ### Zappa
 
