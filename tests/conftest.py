@@ -7,8 +7,9 @@ from decimal import Decimal
 import requests
 import pytest
 
-from iopipe import IOpipe
+from iopipe import IOpipe, IOpipeCore
 from iopipe.compat import string_types
+from iopipe.contrib.trace import TracePlugin
 
 SCHEMA_JSON = None
 SCHEMA_JSON_URL = 'https://raw.githubusercontent.com/iopipe/iopipe/master/src/schema.json'
@@ -87,7 +88,12 @@ def assert_valid_schema():
 
 @pytest.fixture
 def iopipe():
-    return IOpipe('test-suite', 'https://metrics-api.iopipe.com', True)
+    return IOpipeCore('test-suite', 'https://metrics-api.iopipe.com', True)
+
+
+@pytest.fixture
+def default_iopipe_override():
+    return IOpipe('test-suite', 'https://metrics-api.iopipe.com', True, plugins=[TracePlugin(auto_measure=False)])
 
 
 @pytest.fixture

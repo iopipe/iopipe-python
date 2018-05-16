@@ -1,6 +1,6 @@
 import pytest
 
-from iopipe import IOpipe
+from iopipe import IOpipeCore
 from iopipe.contrib.trace.marker import Marker
 from iopipe.contrib.trace import TracePlugin
 from iopipe.contrib.trace.timeline import Timeline
@@ -9,13 +9,13 @@ from iopipe.contrib.trace.timeline import Timeline
 @pytest.fixture
 def iopipe_with_trace():
     plugin = TracePlugin()
-    return IOpipe(token='test-suite', url='https://metrics-api.iopipe.com', debug=True, plugins=[plugin])
+    return IOpipeCore(token='test-suite', url='https://metrics-api.iopipe.com', debug=True, plugins=[plugin])
 
 
 @pytest.fixture
 def iopipe_with_trace_no_auto_measure():
     plugin = TracePlugin(auto_measure=False)
-    return IOpipe(token='test-suite', url='https://metrics-api.iopipe.com', debug=True, plugins=[plugin])
+    return IOpipeCore(token='test-suite', url='https://metrics-api.iopipe.com', debug=True, plugins=[plugin])
 
 
 @pytest.fixture

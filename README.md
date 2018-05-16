@@ -11,6 +11,7 @@ This package provides analytics and distributed tracing for event-driven applica
   - [Reporting Exceptions](#reporting-exceptions)
   - [Custom Metrics](#custom-metrics)
   - [Labels](#labels)
+  - [Core Agent](#core-agent)
 - [Plugins](#plugins)
   - [Event Info Plugin](#event-info-plugin)
   - [Logger Plugin](#logger-plugin)
@@ -153,7 +154,24 @@ def handler(event, context):
   context.iopipe.label('this-invocation-is-special')
 ```
 
-## Plugins
+### Core Agent
+
+By default, the IOpipe agent comes pre-loaded with all the bundled plugins in `iopipe.contrib.*`. If you prefer to run the agent without plugins or configure which plugins are used, you can use `IOpipeCore`:
+
+```python
+from iopipe import IOpipeCore
+
+iopipe = IOpipeCore()
+
+@iopipe
+def handler(event, context):
+pass
+```
+
+Although any plugins that add overhead are disabled by default when loaded, so we recommend using the default agent.
+
+
+# Plugins
 
 IOpipe's functionality can be extended through plugins. Plugins hook into the agent lifecycle to allow you to perform additional analytics.
 

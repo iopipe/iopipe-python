@@ -2,14 +2,14 @@ from __future__ import print_function
 
 import pytest
 
-from iopipe import IOpipe
+from iopipe import IOpipeCore
 from iopipe.contrib.logger import LoggerPlugin
 
 
 @pytest.fixture
 def iopipe_with_logger():
     plugin = LoggerPlugin('testlog')
-    return IOpipe(token='test-suite', url='https://metrics-api.iopipe.com', plugins=[plugin])
+    return IOpipeCore(token='test-suite', url='https://metrics-api.iopipe.com', plugins=[plugin])
 
 
 @pytest.fixture
@@ -35,7 +35,7 @@ def handler_with_logger(iopipe_with_logger):
 @pytest.fixture
 def iopipe_with_logger_debug():
     plugin = LoggerPlugin(name='testlog')
-    return IOpipe(token='test-suite', url='https://metrics-api.iopipe.com', debug=True, plugins=[plugin])
+    return IOpipeCore(token='test-suite', url='https://metrics-api.iopipe.com', debug=True, plugins=[plugin])
 
 
 @pytest.fixture
@@ -50,7 +50,7 @@ def handler_with_logger_debug(iopipe_with_logger_debug):
 @pytest.fixture
 def iopipe_with_logger_use_tmp():
     plugin = LoggerPlugin(name='testlog', use_tmp=True)
-    return IOpipe(token='test-suite', url='https://metrics-api.iopipe.com', plugins=[plugin])
+    return IOpipeCore(token='test-suite', url='https://metrics-api.iopipe.com', plugins=[plugin])
 
 
 @pytest.fixture
