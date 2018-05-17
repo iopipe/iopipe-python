@@ -69,6 +69,8 @@ def handler(event, context):
   pass
 ```
 
+ The agent comes preloaded with the [Event Info](#event-info-plugin), [Logger](#logger-plugin), [Profiler](#profiler-plugin) and [Trace](#trace-plugin) plugins. See the relevant plugin sections for usage.
+
 ### Configuration
 
 The following may be set as kwargs to the IOpipe class initializer:
@@ -167,9 +169,6 @@ iopipe = IOpipeCore()
 def handler(event, context):
 pass
 ```
-
-Although any plugins that add overhead are disabled by default when loaded, so we recommend using the default agent.
-
 
 # Plugins
 
