@@ -184,8 +184,8 @@ def metrics_for_event_type(event, context):
     for EventType in EVENT_TYPES:
         event_type = EventType(event)
         if event_type.has_required_keys():
-            context.iopipe.label('@iopipe/event-info')
-            context.iopipe.label('@iopipe/%s' % event_type.slug)
+            context.iopipe.label('@iopipe/plugin-event-info')
+            context.iopipe.label('@iopipe/aws-%s' % event_type.slug)
             event_info = event_type.collect()
             [context.iopipe.metric(k, v) for k, v in event_info.items()]
             break
