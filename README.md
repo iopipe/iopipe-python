@@ -478,6 +478,36 @@ Keep in mind you still need to add the `@iopipe` decorator to your functions. Se
 
 Be sure to check out the [serverless-python-requirements](https://github.com/UnitedIncome/serverless-python-requirements) `README` as the plugin has a number of useful features for compiling AWS Lambda compatible Python packages.
 
+If you're using the [serverless-wsgi](https://github.com/logandk/serverless-wsgi) plugin, you will need to wrap the wsgi handler it bundles with your function.
+
+The easiest way to do this is to create a `wsgi_wrapper.py` module in your project's root with the following:
+
+```python
+from iopipe import IOpipe
+from wsgi import handler
+
+iopipe = IOpipe()
+handler = iopipe(handler)
+```
+
+Then in your `serverless.yml`, instead of this:
+
+```yaml
+functions:
+  api:
+    handler: wsgi.handler
+    ...
+```
+
+Use this:
+
+```yaml
+functions:
+  api:
+    handler: wsgi_wrapper.handler
+    ...
+```
+
 ### Zappa
 
 Using IOpipe with [Zappa](https://github.com/Miserlou/Zappa) is easy. In your project add the following:
