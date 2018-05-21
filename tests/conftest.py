@@ -91,6 +91,11 @@ def iopipe():
 
 
 @pytest.fixture
+def iopipe_with_sync_http():
+    return IOpipe('test-suite', 'https://metrics-api.iopipe.com', True, sync_http=True)
+
+
+@pytest.fixture
 def mock_context():
     return MockContext('handler', '$LATEST')
 
@@ -151,3 +156,12 @@ def handler_that_timeouts(iopipe):
         raise Exception('Should timeout before this is raised')
 
     return iopipe, _handler_that_timeouts
+
+
+@pytest.fixture
+def handler_with_sync_http(iopipe_with_sync_http):
+    @iopipe_with_sync_http
+    def _handler(event, context):
+        pass
+
+    return iopipe_with_sync_http, _handler

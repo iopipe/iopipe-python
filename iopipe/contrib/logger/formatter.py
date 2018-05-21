@@ -29,9 +29,11 @@ class JSONFormatter(logging.Formatter):
             if record.message[-1:] != '\n':
                 record.message = record.message + '\n'
             record.message = record.message + self.formatStack(record.stack_info)
-        return json.dumps({
-            'message': record.message,
-            'name': record.name,
-            'severity': record.levelname,
-            'timestamp': record.asctime,
-        }, sort_keys=True)
+        return json.dumps(
+            {
+                'message': record.message,
+                'name': record.name,
+                'severity': record.levelname,
+                'timestamp': record.asctime,
+            },
+            sort_keys=True)

@@ -1,3 +1,4 @@
+import concurrent.futures as futures
 import functools
 import inspect
 import logging
@@ -13,6 +14,14 @@ logging.basicConfig()
 
 logger = logging.getLogger('iopipe')
 logger.setLevel(logging.INFO)
+
+
+class MockFuture(object):
+    def __init__(self, func, *args, **kwargs):
+        self._result = func(*args, **kwargs)
+
+    def result(self):
+        return self._result
 
 
 class TimeoutError(Exception):
@@ -37,12 +46,17 @@ class IOpipe(object):
 
         self.config = set_config(**options)
         self.config['plugins'] = self.load_plugins(self.config['plugins'])
+        self.futures = []
+        self.pool = futures.ThreadPoolExecutor(thread_name_prefix='iopipe')
         self.report = None
 
         if self.config['debug']:
             logger.setLevel(logging.DEBUG)
 
         self.run_hooks('post:setup')
+
+    def __del__(self):
+        self.pool.shutdown()
 
     def log(self, key, value):
         if self.report is None:
@@ -82,7 +96,7 @@ class IOpipe(object):
                               'Set the IOPIPE_TOKEN environment variable with your IOpipe project token.')
                 return func(event, context)
 
-            self.report = Report(self.config, context)
+            self.report = Report(self, context)
 
             signal.signal(signal.SIGALRM, self.handle_timeout)
 
@@ -128,6 +142,7 @@ class IOpipe(object):
                 self.run_hooks('post:report')
             finally:
                 signal.setitimer(signal.ITIMER_REAL, 0)
+                self.wait_for_futures()
 
             return result
 
@@ -149,6 +164,7 @@ class IOpipe(object):
         self.run_hooks('pre:report')
         self.report.send()
         self.run_hooks('post:report')
+        self.wait_for_futures()
 
     def load_plugins(self, plugins):
         """
@@ -177,3 +193,25 @@ class IOpipe(object):
 
         if name in hooks:
             [hooks[name](p) for p in self.plugins if p.enabled]
+
+    def submit_future(self, func, *args, **kwargs):
+        """
+        Submit a function call to be run as a future in a thread pool. This
+        should be an I/O bound operation.
+        """
+        # This mode will run futures synchronously. This should only be used
+        # for benchmarking purposes.
+        if self.config['sync_http'] is True:
+            return MockFuture(func, *args, **kwargs)
+
+        future = self.pool.submit(func, *args, **kwargs)
+        self.futures.append(future)
+        return future
+
+    def wait_for_futures(self):
+        """
+        Wait for all futures to complete. This should be done at the end of an
+        invocation.
+        """
+        [future for future in futures.as_completed(self.futures)]
+        self.futures = []

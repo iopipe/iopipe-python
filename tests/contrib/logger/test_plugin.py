@@ -27,7 +27,7 @@ def test__logger_plugin(mock_send_report, mock_get_signed_request, mock_upload_l
 
     handler({}, mock_context)
 
-    mock_get_signed_request.assert_called_once_with(iopipe.report, '.log')
+    mock_get_signed_request.assert_called_once_with(iopipe.config['token'], mock.ANY, '.log')
     mock_upload_log_data.assert_called_once_with('https://mock_signed_url', mock.ANY)
 
     plugin = next((p for p in iopipe.report.plugins if p['name'] == 'logger'))
@@ -78,7 +78,7 @@ def test__logger_plugin__use_tmp(mock_send_report, mock_get_signed_request, mock
     stream = iopipe.plugins[0].handler.stream
 
     assert hasattr(stream, 'file')
-    assert stream.file.closed
+    assert stream.closed
 
 
 @mock.patch('iopipe.contrib.logger.plugin.upload_log_data', autospec=True)

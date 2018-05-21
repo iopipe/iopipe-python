@@ -16,6 +16,7 @@ def set_config(**config):
     config.setdefault('network_timeout', os.getenv('IOPIPE_NETWORK_TIMEOUT', 5000))
     config.setdefault('path', get_collector_path())
     config.setdefault('plugins', [])
+    config.setdefault('sync_http', False)
     config.setdefault('timeout_window', os.getenv('IOPIPE_TIMEOUT_WINDOW', 500))
     config.setdefault('token', os.getenv('IOPIPE_TOKEN') or os.getenv('IOPIPE_CLIENTID') or '')
 

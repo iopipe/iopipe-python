@@ -1,4 +1,5 @@
 import logging
+import os
 
 try:
     import requests
@@ -8,17 +9,17 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
-def upload_profiler_report(url, data):
+def upload_profiler_report(url, filename):
     """
     Uploads a profiler report to IOpipe
 
     :param url: The signed URL
-    :param data: The profiler report
+    :param filename: The profiler report file.
     """
-    data.seek(0)
     try:
         logger.debug('Uploading profiler report to IOpipe')
-        response = requests.put(url, data=data)
+        with open(filename, 'rb') as data:
+            response = requests.put(url, data=data)
         response.raise_for_status()
     except Exception as e:
         logger.debug('Error while uploading profiler report: %s', e)
@@ -26,3 +27,6 @@ def upload_profiler_report(url, data):
             logger.debug(e.response.content)
     else:
         logger.debug('Profiler report uploaded successfully')
+    finally:
+        if os.path.isfile(filename):
+            os.remove(filename)

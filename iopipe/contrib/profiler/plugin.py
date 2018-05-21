@@ -1,3 +1,4 @@
+from concurrent.futures import wait
 from distutils.util import strtobool
 import logging
 import os
@@ -37,7 +38,7 @@ class ProfilerPlugin(Plugin):
         return self._enabled is True or strtobool(os.getenv('IOPIPE_PROFILER_ENABLED', 'false'))
 
     def pre_setup(self, iopipe):
-        pass
+        self.iopipe = iopipe
 
     def post_setup(self, iopipe):
         pass
@@ -45,8 +46,12 @@ class ProfilerPlugin(Plugin):
     def pre_invoke(self, event, context):
         self.context = context
         self.profile = None
+        self.signed_request = None
+        self.stats_file = None
 
         if self.enabled:
+            self.signed_request = self.iopipe.submit_future(get_signed_request, self.iopipe.config['token'],
+                                                            self.context, '.cprofile')
             self.profile = profile.Profile()
             self.profile.enable()
 
@@ -57,16 +62,20 @@ class ProfilerPlugin(Plugin):
     def pre_report(self, report):
         if self.profile is not None:
             self.context.iopipe.label('@iopipe/plugin-profiler')
-            with tempfile.NamedTemporaryFile() as stats_file:
-                self.profile.dump_stats(stats_file.name)
-                signed_request = get_signed_request(report, '.cprofile')
-                if signed_request and 'signedRequest' in signed_request:
-                    upload_profiler_report(signed_request['signedRequest'], stats_file.file)
-                    if 'jwtAccess' in signed_request:
-                        plugin = next((p for p in report.plugins if p['name'] == self.name))
-                        if 'uploads' not in plugin:
-                            plugin['uploads'] = []
-                        plugin['uploads'].append(signed_request['jwtAccess'])
+            if self.signed_request is not None:
+                wait([self.signed_request])
+                self.signed_request = self.signed_request.result()
+            if self.signed_request is not None and 'signedRequest' in self.signed_request:
+                with tempfile.NamedTemporaryFile(delete=False) as stats_file:
+                    self.profile.dump_stats(stats_file.name)
+                    self.iopipe.submit_future(upload_profiler_report, self.signed_request['signedRequest'],
+                                              stats_file.name)
+                    self.stats_file = stats_file.name
+                if 'jwtAccess' in self.signed_request:
+                    plugin = next((p for p in report.plugins if p['name'] == self.name))
+                    if 'uploads' not in plugin:
+                        plugin['uploads'] = []
+                    plugin['uploads'].append(self.signed_request['jwtAccess'])
 
     def post_report(self, report):
         pass

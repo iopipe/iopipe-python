@@ -1,4 +1,5 @@
 import os
+import sys
 
 from setuptools import find_packages, setup
 
@@ -7,6 +8,10 @@ try:
     README = convert('README.md', 'rst')
 except (ImportError, OSError):
     README = open(os.path.join(os.path.dirname(__file__), 'README.md'), 'r').read()
+
+install_requires = []
+if sys.version_info[0] == 2:
+    install_requires.append('futures')
 
 setup(
     name='iopipe',
@@ -18,10 +23,11 @@ setup(
     url='https://github.com/iopipe/iopipe-python',
     packages=find_packages(exclude=('tests', 'tests.*',)),
     extras_require={
-        'dev': ['flake8', 'requests'],
+        'dev': ['jmespath>=0.7.1,<1.0.0', 'requests'],
     },
+    install_requires=install_requires,
     setup_requires=['pytest-runner'],
-    tests_require=['jmespath>=0.7.1,<1.0.0', 'mock', 'pytest', 'pytest-benchmark', 'requests'],
+    tests_require=['flake8', 'jmespath>=0.7.1,<1.0.0', 'mock', 'pytest', 'pytest-benchmark', 'requests'],
     zip_safe=True,
     classifiers=[
         'Development Status :: 5 - Production/Stable',

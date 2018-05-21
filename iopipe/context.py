@@ -47,8 +47,7 @@ class IOpipeContext(object):
 
     def label(self, name):
         if not isinstance(name, string_types):
-            warnings.warn('Attempted to add a label that is not of type string. '
-                          'This label will not be recorded.')
+            warnings.warn('Attempted to add a label that is not of type string. ' 'This label will not be recorded.')
             return
 
         if len(name) > constants.METRIC_NAME_LIMIT:

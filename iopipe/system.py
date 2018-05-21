@@ -64,7 +64,7 @@ def read_meminfo():
     return data
 
 
-def read_pid_stat(pid):
+def read_pid_stat(pid='self'):
     """
     Returns system process stat information.
 
@@ -82,7 +82,7 @@ def read_pid_stat(pid):
     }
 
 
-def read_pid_status(pid):
+def read_pid_status(pid='self'):
     """
     Returns the system process sstatus.
 
