@@ -28,10 +28,14 @@ class TimeoutError(Exception):
     pass
 
 
-class IOpipe(object):
+class IOpipeCore(object):
+    """
+    The stock IOpipe agent, without any plugins loaded.
+    """
+
     def __init__(self, token=None, url=None, debug=None, plugins=None, **options):
         self.plugins = []
-        if plugins is not None:
+        if plugins is not None and isinstance(plugins, list):
             self.plugins = self.load_plugins(plugins)
             options['plugins'] = self.plugins
 
@@ -176,7 +180,17 @@ class IOpipe(object):
         def instantiate(plugin):
             return plugin() if inspect.isclass(plugin) else plugin
 
-        return [instantiate(p) for p in plugins if is_plugin(p)]
+        loaded_plugins = []
+        plugins_seen = []
+
+        for plugin in reversed(plugins):
+            if not is_plugin(plugin) or plugin.name in plugins_seen:
+                continue
+            # Build the plugins list in reverse to restore original order
+            loaded_plugins.insert(0, instantiate(plugin))
+            plugins_seen.append(plugin.name)
+
+        return loaded_plugins
 
     def run_hooks(self, name, event=None, context=None):
         """

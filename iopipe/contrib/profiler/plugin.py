@@ -1,4 +1,4 @@
-from concurrent.futures import wait
+from concurrent.futures import Future, wait
 from distutils.util import strtobool
 import logging
 import os
@@ -63,7 +63,8 @@ class ProfilerPlugin(Plugin):
         if self.profile is not None:
             self.context.iopipe.label('@iopipe/plugin-profiler')
             if self.signed_request is not None:
-                wait([self.signed_request])
+                if isinstance(self.signed_request, Future):
+                    wait([self.signed_request])
                 self.signed_request = self.signed_request.result()
             if self.signed_request is not None and 'signedRequest' in self.signed_request:
                 with tempfile.NamedTemporaryFile(delete=False) as stats_file:

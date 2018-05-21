@@ -162,8 +162,10 @@ By default, the IOpipe agent comes pre-loaded with all the bundled plugins in `i
 
 ```python
 from iopipe import IOpipeCore
+from iopipe.contrib.trace import TracePlugin
 
-iopipe = IOpipeCore()
+# Load IOpipe with only the trace plugin
+iopipe = IOpipeCore(plugins=[TracePlugin()])
 
 @iopipe
 def handler(event, context):
