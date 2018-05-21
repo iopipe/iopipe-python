@@ -27,7 +27,7 @@ setup(
     },
     install_requires=install_requires,
     setup_requires=['pytest-runner'],
-    tests_require=['jmespath>=0.7.1,<1.0.0', 'mock', 'pytest', 'pytest-benchmark', 'requests'],
+    tests_require=['flake8', 'jmespath>=0.7.1,<1.0.0', 'mock', 'pytest', 'pytest-benchmark', 'requests'],
     zip_safe=True,
     classifiers=[
         'Development Status :: 5 - Production/Stable',
