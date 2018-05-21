@@ -16,6 +16,14 @@ logger = logging.getLogger('iopipe')
 logger.setLevel(logging.INFO)
 
 
+class MockFuture(object):
+    def __init__(self, func, *args, **kwargs):
+        self._result = func(*args, **kwargs)
+
+    def result(self):
+        return self._result
+
+
 class TimeoutError(Exception):
     pass
 
@@ -191,6 +199,11 @@ class IOpipe(object):
         Submit a function call to be run as a future in a thread pool. This
         should be an I/O bound operation.
         """
+        # This mode will run futures synchronously. This should only be used
+        # for benchmarking purposes.
+        if self.config['sync_http'] is True:
+            return MockFuture(func, *args, **kwargs)
+
         future = self.pool.submit(func, *args, **kwargs)
         self.futures.append(future)
         return future

@@ -107,3 +107,13 @@ def test_timeouts_disable(mock_send_report, handler_that_timeouts, mock_context)
     assert iopipe.report.report['errors'] != {}
     assert iopipe.report.report['errors']['name'] == 'Exception'
     assert iopipe.report.report['errors']['message'] == 'Should timeout before this is raised'
+
+
+@mock.patch('iopipe.report.send_report', autospec=True)
+def test_sync_http(mock_send_report, handler_with_sync_http, mock_context):
+    """Assert that the agent still works synchronously"""
+    iopipe, handler = handler_with_sync_http
+
+    handler({}, mock_context)
+
+    assert iopipe.report.sent

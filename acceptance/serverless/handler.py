@@ -28,6 +28,8 @@ iopipe_with_logging_tmp = IOpipe(debug=True, plugins=[logger_plugin_tmp])
 profiler_plugin = ProfilerPlugin(enabled=True)
 iopipe_with_profiling = IOpipe(debug=True, plugins=[profiler_plugin])
 
+iopipe_with_sync_http = IOpipe(sync_http=True)
+
 trace_plugin = TracePlugin()
 iopipe_with_tracing = IOpipe(debug=True, plugins=[trace_plugin])
 
@@ -121,6 +123,11 @@ def profiling(event, context):
 
 @iopipe
 def success(event, context):
+    return {'message': 'Invocation successful'}
+
+
+@iopipe_with_sync_http
+def sync_http(event, context):
     return {'message': 'Invocation successful'}
 
 
