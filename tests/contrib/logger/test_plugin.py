@@ -2,7 +2,6 @@ from datetime import datetime
 import json
 import mock
 import sys
-import tempfile
 
 import pytest
 
@@ -79,6 +78,7 @@ def test__logger_plugin__use_tmp(mock_send_report, mock_get_signed_request, mock
     stream = iopipe.plugins[0].handler.stream
 
     assert hasattr(stream, 'file')
+    assert stream.closed
 
 
 @mock.patch('iopipe.contrib.logger.plugin.upload_log_data', autospec=True)

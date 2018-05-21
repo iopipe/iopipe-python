@@ -58,7 +58,7 @@ class LoggerPlugin(Plugin):
         self.context.iopipe.register('log', LogWrapper(self.logger, context), force=True)
 
         if self.use_tmp is True:
-            self.handler.stream = tempfile.NamedTemporaryFile(mode='w')
+            self.handler.stream = tempfile.NamedTemporaryFile(delete=False, mode='w')
         else:
             self.handler.stream = StringIO()
 
@@ -76,11 +76,15 @@ class LoggerPlugin(Plugin):
 
     def pre_report(self, report):
         if self.handler.stream.tell():
+            stream = self.handler.stream
+            if hasattr(stream, 'file'):
+                stream = stream.name
+                self.handler.stream.close()
             if self.signed_request is not None:
                 wait([self.signed_request])
                 self.signed_request = self.signed_request.result()
             if self.signed_request is not None and 'signedRequest' in self.signed_request:
-                self.iopipe.submit_future(upload_log_data, self.signed_request['signedRequest'], self.handler.stream)
+                self.iopipe.submit_future(upload_log_data, self.signed_request['signedRequest'], stream)
                 if 'jwtAccess' in self.signed_request:
                     plugin = next((p for p in report.plugins if p['name'] == self.name))
                     if 'uploads' not in plugin:
@@ -89,3 +93,7 @@ class LoggerPlugin(Plugin):
 
     def post_report(self, report):
         pass
+
+    def __del__(self):
+        if self.handler and self.handler.stream:
+            self.handler.stream.close()

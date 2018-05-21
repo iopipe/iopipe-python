@@ -47,6 +47,7 @@ class ProfilerPlugin(Plugin):
         self.context = context
         self.profile = None
         self.signed_request = None
+        self.stats_file = None
 
         if self.enabled:
             self.signed_request = self.iopipe.submit_future(get_signed_request, self.iopipe.config['token'],
@@ -65,9 +66,11 @@ class ProfilerPlugin(Plugin):
                 wait([self.signed_request])
                 self.signed_request = self.signed_request.result()
             if self.signed_request is not None and 'signedRequest' in self.signed_request:
-                stats_file = tempfile.NamedTemporaryFile()
-                self.profile.dump_stats(stats_file.name)
-                self.iopipe.submit_future(upload_profiler_report, self.signed_request['signedRequest'], stats_file)
+                with tempfile.NamedTemporaryFile(delete=False) as stats_file:
+                    self.profile.dump_stats(stats_file.name)
+                    self.iopipe.submit_future(upload_profiler_report, self.signed_request['signedRequest'],
+                                              stats_file.name)
+                    self.stats_file = stats_file.name
                 if 'jwtAccess' in self.signed_request:
                     plugin = next((p for p in report.plugins if p['name'] == self.name))
                     if 'uploads' not in plugin:
