@@ -1,0 +1,31 @@
+service: iopipe-py-acceptance-test-serverless-wsgi
+
+provider:
+  name: aws
+  runtime: python3.6
+  stage: master
+  region: us-west-2
+  role: ${env:IAM_ROLE}
+  environment:
+    IOPIPE_TOKEN: ${env:IOPIPE_TOKEN}
+
+package:
+  exclude:
+    - ./**
+  include:
+    - api.py
+    - wsgi_wrapper.py
+
+custom:
+  wsgi:
+    app: api.app
+
+functions:
+  api:
+    events:
+      - http: ANY /
+      - http: ANY {proxy+}
+    handler: wsgi_wrapper.handler
+
+plugins:
+  - serverless-wsgi
