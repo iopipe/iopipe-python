@@ -21,18 +21,11 @@ custom:
     app: api.app
 
 functions:
-  py2-api:
+  api:
     events:
       - http: ANY /
       - http: ANY {proxy+}
     handler: wsgi_wrapper.handler
-    runtime: python2.7
-  py3-api:
-    events:
-      - http: ANY /
-      - http: ANY {proxy+}
-    handler: wsgi_wrapper.handler
-    runtime: python3.6
 
 plugins:
   - serverless-wsgi

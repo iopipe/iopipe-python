@@ -90,6 +90,7 @@ ENV/
 
 # node.js
 node_modules
+.serverless
 
 .pytest_cache
 .requirements

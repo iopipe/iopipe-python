@@ -483,11 +483,14 @@ If you're using the [serverless-wsgi](https://github.com/logandk/serverless-wsgi
 The easiest way to do this is to create a `wsgi_wrapper.py` module in your project's root with the following:
 
 ```python
+import imp
+
 from iopipe import IOpipe
-from wsgi import handler
+
+wsgi = imp.load_source('wsgi', 'wsgi.py')
 
 iopipe = IOpipe()
-handler = iopipe(handler)
+handler = iopipe(wsgi.handler)
 ```
 
 Then in your `serverless.yml`, instead of this:

@@ -1,5 +1,8 @@
+import imp
+
 from iopipe import IOpipe
-from wsgi import handler
+
+wsgi = imp.load_source('wsgi', 'wsgi.py')
 
 iopipe = IOpipe()
-handler = iopipe(handler)
+handler = iopipe(wsgi.handler)
