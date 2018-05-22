@@ -92,6 +92,11 @@ def iopipe():
 
 
 @pytest.fixture
+def default_iopipe():
+    return IOpipe('test-suite', 'https://metrics-api.iopipe.com', True)
+
+
+@pytest.fixture
 def default_iopipe_override():
     return IOpipe('test-suite', 'https://metrics-api.iopipe.com', True, plugins=[TracePlugin(auto_measure=False)])
 
