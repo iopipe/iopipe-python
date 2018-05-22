@@ -29,4 +29,5 @@ deployment:
     branch: master
     commands:
       - python setup.py build --build-lib acceptance/serverless
-      - cd acceptance/serverless && serverless deploy
+      - cd acceptance/serverless && sls deploy
+      - cd acceptance/serverless-wsgi && yarn && sls deploy

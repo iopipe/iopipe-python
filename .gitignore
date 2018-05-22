@@ -92,3 +92,4 @@ ENV/
 node_modules
 
 .pytest_cache
+.requirements
