@@ -29,7 +29,7 @@ iopipe_with_logging_tmp = IOpipeCore(debug=True, plugins=[logger_plugin_tmp])
 profiler_plugin = ProfilerPlugin(enabled=True)
 iopipe_with_profiling = IOpipeCore(debug=True, plugins=[profiler_plugin])
 
-iopipe_with_sync_http = IOpipe(sync_http=True)
+iopipe_with_sync_http = IOpipe(debug=True, sync_http=True)
 
 trace_plugin = TracePlugin()
 iopipe_with_tracing = IOpipeCore(debug=True, plugins=[trace_plugin])
