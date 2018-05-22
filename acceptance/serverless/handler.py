@@ -9,29 +9,30 @@ try:
 except ImportError:
     from urllib2 import urlopen
 
-from iopipe import IOpipe
+from iopipe import IOpipe, IOpipeCore
 from iopipe.contrib.eventinfo import EventInfoPlugin
 from iopipe.contrib.logger import LoggerPlugin
 from iopipe.contrib.profiler import ProfilerPlugin
 from iopipe.contrib.trace import TracePlugin
 
 iopipe = IOpipe(debug=True)
+
 eventinfo_plugin = EventInfoPlugin()
-iopipe_with_eventinfo = IOpipe(debug=True, plugins=[eventinfo_plugin])
+iopipe_with_eventinfo = IOpipeCore(debug=True, plugins=[eventinfo_plugin])
 
 logger_plugin = LoggerPlugin()
-iopipe_with_logging = IOpipe(debug=True, plugins=[logger_plugin])
+iopipe_with_logging = IOpipeCore(debug=True, plugins=[logger_plugin])
 
 logger_plugin_tmp = LoggerPlugin(use_tmp=True)
-iopipe_with_logging_tmp = IOpipe(debug=True, plugins=[logger_plugin_tmp])
+iopipe_with_logging_tmp = IOpipeCore(debug=True, plugins=[logger_plugin_tmp])
 
 profiler_plugin = ProfilerPlugin(enabled=True)
-iopipe_with_profiling = IOpipe(debug=True, plugins=[profiler_plugin])
+iopipe_with_profiling = IOpipeCore(debug=True, plugins=[profiler_plugin])
 
 iopipe_with_sync_http = IOpipe(sync_http=True)
 
 trace_plugin = TracePlugin()
-iopipe_with_tracing = IOpipe(debug=True, plugins=[trace_plugin])
+iopipe_with_tracing = IOpipeCore(debug=True, plugins=[trace_plugin])
 
 
 @iopipe_with_eventinfo
