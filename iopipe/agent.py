@@ -183,6 +183,8 @@ class IOpipeCore(object):
         loaded_plugins = []
         plugins_seen = []
 
+        # Iterate over plugins in reverse to permit users to override default
+        # plugin config
         for plugin in reversed(plugins):
             if not is_plugin(plugin) or plugin.name in plugins_seen:
                 continue
