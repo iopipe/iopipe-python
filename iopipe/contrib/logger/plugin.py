@@ -1,4 +1,4 @@
-from concurrent.futures import wait
+from concurrent.futures import Future, wait
 import logging
 import sys
 import tempfile
@@ -81,7 +81,8 @@ class LoggerPlugin(Plugin):
                 stream = stream.name
                 self.handler.stream.close()
             if self.signed_request is not None:
-                wait([self.signed_request])
+                if isinstance(self.signed_request, Future):
+                    wait([self.signed_request])
                 self.signed_request = self.signed_request.result()
             if self.signed_request is not None and 'signedRequest' in self.signed_request:
                 self.iopipe.submit_future(upload_log_data, self.signed_request['signedRequest'], stream)

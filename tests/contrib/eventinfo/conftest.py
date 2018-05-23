@@ -2,14 +2,14 @@ import json
 import os
 import pytest
 
-from iopipe import IOpipe
+from iopipe import IOpipeCore
 from iopipe.contrib.eventinfo import EventInfoPlugin
 
 
 @pytest.fixture
 def iopipe_with_eventinfo():
     plugin = EventInfoPlugin()
-    return IOpipe(token='test-suite', url='https://metrics-api.iopipe.com', debug=True, plugins=[plugin])
+    return IOpipeCore(token='test-suite', url='https://metrics-api.iopipe.com', debug=True, plugins=[plugin])
 
 
 @pytest.fixture

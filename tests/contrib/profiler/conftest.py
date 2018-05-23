@@ -1,14 +1,14 @@
 import pytest
 import time
 
-from iopipe import IOpipe
+from iopipe import IOpipeCore
 from iopipe.contrib.profiler import ProfilerPlugin
 
 
 @pytest.fixture
 def iopipe_with_profiler():
     plugin = ProfilerPlugin(enabled=True)
-    return IOpipe(token='test-suite', url='https://metrics-api.iopipe.com', debug=True, plugins=[plugin])
+    return IOpipeCore(token='test-suite', url='https://metrics-api.iopipe.com', debug=True, plugins=[plugin])
 
 
 @pytest.fixture
