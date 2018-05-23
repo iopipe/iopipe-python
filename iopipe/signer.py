@@ -41,8 +41,8 @@ def get_signed_request(token, context, extension):
         response = requests.post(
             url,
             json={
-                'arn': context.invokedFunctionArn,
-                'requestId': context.awsRequestId,
+                'arn': context.invoked_function_arn,
+                'requestId': context.aws_request_id,
                 'timestamp': int(time.time() * 1000),
                 'extension': extension
             },
