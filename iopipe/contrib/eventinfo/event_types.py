@@ -21,9 +21,13 @@ class EventType(object):
             return collect_all_keys(self.event, '@iopipe/event-info.%s' % self.type, self.exclude_keys)
         event_info = {}
         for key in self.keys:
-            value = get_value(self.event, key)
+            if isinstance(key, tuple):
+                old_key, new_key = key
+            else:
+                old_key = new_key = key
+            value = get_value(self.event, old_key)
             if value is not None:
-                event_info['@iopipe/event-info.%s.%s' % (self.type, key)] = value
+                event_info['@iopipe/event-info.%s.%s' % (self.type, new_key)] = value
         event_info['@iopipe/event-info.eventType'] = self.type
         return event_info
 
@@ -152,6 +156,24 @@ class Scheduled(EventType):
         return super(Scheduled, self).has_required_keys() and get_value(self.event, 'source') == 'aws.events'
 
 
+class ServerlessLambda(EventType):
+    type = 'apiGateway'
+    keys = [
+        ('headers.["X-Amz-Cf-Id"]', 'headers.X-Amz-Cf-Id'),
+        ('headers.["X-Amzn-Trace-Id"]', 'headers.X-Amzn-Trace-Id'),
+        ('identity.accountId', 'requestContext.accountId'),
+        ('identity.userAgent', 'requestContext.identity.userAgent'),
+        ('method', 'httpMethod'),
+        ('method', 'requestContext.httpMethod'),
+        ('stage', 'requestContext.stage'),
+    ]
+    required_keys = [
+        'identity.userAgent',
+        'identity.sourceIp',
+        'identity.accountId',
+    ]
+
+
 class SNS(EventType):
     type = 'sns'
     keys = [
@@ -177,7 +199,7 @@ class SNS(EventType):
             get_value(self.event, 'Records[0].eventSource') == 'aws:sns'
 
 
-EVENT_TYPES = [AlexaSkill, ApiGateway, CloudFront, Firehose, Kinesis, S3, Scheduled, SNS]
+EVENT_TYPES = [AlexaSkill, ApiGateway, CloudFront, Firehose, Kinesis, S3, Scheduled, ServerlessLambda, SNS]
 
 
 def metrics_for_event_type(event, context):

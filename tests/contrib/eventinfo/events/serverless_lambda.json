@@ -1,0 +1,47 @@
+{
+  "body": {},
+  "method": "GET",
+  "principalId": "1234",
+  "stage": "dev",
+  "cognitoPoolClaims": {
+    "sub": ""
+  },
+  "enhancedAuthContext": {},
+  "headers": {
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Accept-Language": "en-GB,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4",
+    "CloudFront-Forwarded-Proto": "https",
+    "CloudFront-Is-Desktop-Viewer": "true",
+    "CloudFront-Is-Mobile-Viewer": "false",
+    "CloudFront-Is-SmartTV-Viewer": "false",
+    "CloudFront-Is-Tablet-Viewer": "false",
+    "CloudFront-Viewer-Country": "GB",
+    "Host": "ec5ycylws8.execute-api.us-east-1.amazonaws.com",
+    "upgrade-insecure-requests": "1",
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36",
+    "Via": "2.0 f165ce34daf8c0da182681179e863c24.cloudfront.net (CloudFront)",
+    "X-Amz-Cf-Id": "l06CAg2QsrALeQcLAUSxGXbm8lgMoMIhR2AjKa4AiKuaVnnGsOFy5g==",
+    "X-Amzn-Trace-Id": "Root=1-5970ef3e249c0321b2eef14aa513ae",
+    "X-Forwarded-For": "94.117.120.169, 116.132.62.73",
+    "X-Forwarded-Port": "443",
+    "X-Forwarded-Proto": "https"
+  },
+  "query": {},
+  "path": {},
+  "identity": {
+    "cognitoIdentityPoolId": "",
+    "accountId": "1234",
+    "cognitoIdentityId": "",
+    "caller": "",
+    "apiKey": "",
+    "sourceIp": "94.197.120.169",
+    "accessKey": "",
+    "cognitoAuthenticationType": "",
+    "cognitoAuthenticationProvider": "",
+    "userArn": "",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36",
+    "user": ""
+  },
+  "stageVariables": {}
+}

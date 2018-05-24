@@ -51,3 +51,8 @@ def event_kinesis():
 @pytest.fixture
 def event_scheduled():
     return _load_event('scheduled')
+
+
+@pytest.fixture
+def event_serverless_lambda():
+    return _load_event('serverless_lambda')
