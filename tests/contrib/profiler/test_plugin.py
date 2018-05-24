@@ -27,3 +27,4 @@ def test__profiler_plugin(mock_send_report, mock_get_signed_request, mock_upload
     assert len(plugin['uploads']) == 1
     assert plugin['uploads'][0] == 'foobar'
     assert '@iopipe/plugin-profiler' in iopipe.report.labels
+    assert '@iopipe/metrics' not in iopipe.report.labels

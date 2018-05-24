@@ -43,6 +43,9 @@ class IOpipeContext(object):
 
         self.instance.report.custom_metrics.append(event)
 
+        if not name.startswith('@iopipe'):
+            self.label('@iopipe/metrics')
+
     log = metric
 
     def label(self, name):

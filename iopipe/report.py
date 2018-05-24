@@ -138,9 +138,6 @@ class Report(object):
         if error:
             self.retain_error(error, frame)
 
-        if self.custom_metrics:
-            self.labels.add('@iopipe/metrics')
-
         self.report['environment']['host']['boot_id'] = system.read_bootid()
 
         # convert labels to list for sending
