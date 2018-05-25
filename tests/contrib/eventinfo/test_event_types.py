@@ -63,10 +63,13 @@ def test__event_types__serverless_lambda(event_serverless_lambda):
     event_info = event.collect()
     assert event_info != {}
 
-    expected_keys = ['@iopipe/event-info.eventType'
-                     ] + ['@iopipe/event-info.apiGateway.%s' % key[1] for key in event.keys]
+    expected_keys = [
+        '@iopipe/event-info.eventType',
+        '@iopipe/event-info.eventType.source',
+    ] + ['@iopipe/event-info.apiGateway.%s' % key[1] for key in event.keys]
     assert list(event_info.keys()).sort() == expected_keys.sort()
     assert all([
         get_value(event_serverless_lambda, old_key) == event_info['@iopipe/event-info.apiGateway.%s' % new_key]
         for old_key, new_key in event.keys
     ])
+    assert event_info['@iopipe/event-info.eventType.source'] == event.source

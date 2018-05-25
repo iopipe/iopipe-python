@@ -5,6 +5,7 @@ class EventType(object):
     keys = []
     exclude_keys = []
     required_keys = []
+    source = None
 
     def __init__(self, event):
         self.event = event
@@ -29,6 +30,8 @@ class EventType(object):
             if value is not None:
                 event_info['@iopipe/event-info.%s.%s' % (self.type, new_key)] = value
         event_info['@iopipe/event-info.eventType'] = self.type
+        if self.source:
+            event_info['@iopipe/event-info.eventType.source'] = self.source
         return event_info
 
 
@@ -158,6 +161,7 @@ class Scheduled(EventType):
 
 class ServerlessLambda(EventType):
     type = 'apiGateway'
+    source = 'slsIntegrationLambda'
     keys = [
         ('headers.["X-Amz-Cf-Id"]', 'headers.X-Amz-Cf-Id'),
         ('headers.["X-Amzn-Trace-Id"]', 'headers.X-Amzn-Trace-Id'),
