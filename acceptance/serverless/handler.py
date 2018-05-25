@@ -9,7 +9,7 @@ try:
 except ImportError:
     from urllib2 import urlopen
 
-from iopipe import constants, IOpipe, IOpipeCore
+from iopipe import IOpipe, IOpipeCore
 from iopipe.contrib.eventinfo import EventInfoPlugin
 from iopipe.contrib.logger import LoggerPlugin
 from iopipe.contrib.profiler import ProfilerPlugin
@@ -68,10 +68,14 @@ def caught_error(event, context):
         context.iopipe.error(e)
 
 
-@iopipe
 def coldstart(event, context):
-    if not constants.COLDSTART:
-        sys.exit(1)
+    @iopipe
+    def handler(event, context):
+        pass
+
+    handler(event, context)
+
+    sys.exit(1)
 
 
 @iopipe
