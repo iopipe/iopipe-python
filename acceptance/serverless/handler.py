@@ -48,8 +48,9 @@ def api_trigger(event, context):
     gateway_url = os.getenv('PY_API_GATEWAY_URL')
     context.iopipe.metric('gateway_url', gateway_url or '')
     if gateway_url is not None:
-        with urlopen(gateway_url) as r:
-            context.iopipe.metric('response_status', getattr(r, 'status', getattr(r, 'code')))
+        response = urlopen(gateway_url)
+        context.iopipe.metric('response_status', getattr(response, 'status', getattr(response, 'code')))
+        response.close()
 
 
 def baseline(event, context):
