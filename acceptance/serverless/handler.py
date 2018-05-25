@@ -68,8 +68,13 @@ def caught_error(event, context):
         context.iopipe.error(e)
 
 
-@iopipe
 def coldstart(event, context):
+    @iopipe
+    def handler(event, context):
+        pass
+
+    handler(event, context)
+
     sys.exit(1)
 
 
