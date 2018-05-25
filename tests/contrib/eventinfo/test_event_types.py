@@ -1,4 +1,5 @@
 from iopipe.contrib.eventinfo import event_types as et
+from iopipe.contrib.eventinfo.util import get_value
 
 
 def test__event_types__alexa_skill(event_alexa_skill):
@@ -65,3 +66,7 @@ def test__event_types__serverless_lambda(event_serverless_lambda):
     expected_keys = ['@iopipe/event-info.eventType'
                      ] + ['@iopipe/event-info.apiGateway.%s' % key[1] for key in event.keys]
     assert list(event_info.keys()).sort() == expected_keys.sort()
+    assert all([
+        get_value(event_serverless_lambda, old_key) == event_info['@iopipe/event-info.apiGateway.%s' % new_key]
+        for old_key, new_key in event.keys
+    ])
