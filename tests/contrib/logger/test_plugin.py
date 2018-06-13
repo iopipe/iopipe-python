@@ -50,6 +50,7 @@ def test__logger_plugin(mock_send_report, mock_get_signed_request, mock_upload_l
         assert 'timestamp' in json_msg
         assert isinstance(datetime.strptime(json_msg['timestamp'], '%Y-%m-%d %H:%M:%S.%f'), datetime)
         assert '@iopipe/plugin-logger' in iopipe.report.labels
+        assert '@iopipe/metrics' not in iopipe.report.labels
 
 
 @mock.patch('iopipe.contrib.logger.plugin.upload_log_data', autospec=True)

@@ -12,6 +12,7 @@ def test__trace_plugin(mock_send_report, handler_with_trace, mock_context):
     assert len(iopipe.report.report['performanceEntries']) == 3
     assert any([e['name'] == 'measure:foo' for e in iopipe.report.report['performanceEntries']])
     assert '@iopipe/plugin-trace' in iopipe.report.labels
+    assert '@iopipe/metrics' not in iopipe.report.labels
 
 
 @mock.patch('iopipe.report.send_report', autospec=True)
