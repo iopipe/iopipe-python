@@ -5,25 +5,25 @@
 
 This package provides analytics and distributed tracing for event-driven applications running on AWS Lambda.
 
-- [Installation](#installation)
-- [Usage](#usage)
-  - [Configuration](#configuration)
-  - [Reporting Exceptions](#reporting-exceptions)
-  - [Custom Metrics](#custom-metrics)
-  - [Labels](#labels)
-  - [Core Agent](#core-agent)
-- [Plugins](#plugins)
-  - [Event Info Plugin](#event-info-plugin)
-  - [Logger Plugin](#logger-plugin)
-  - [Profiler Plugin](#profiler-plugin)
-  - [Trace Plugin](#trace-plugin)
-  - [Creating Plugins](#creating-plugins)
-- [Supported Python Versions](#supported-python-versions)
-- [Framework Integration](#framework-integration)
-  - [Chalice](#chalice)
-  - [Serverless](#serverless)
-  - [Zappa](#zappa)
-- [License](#license)
+- [Installation](https://github.com/iopipe/iopipe-python#installation)
+- [Usage](https://github.com/iopipe/iopipe-python#usage)
+  - [Configuration](https://github.com/iopipe/iopipe-python#configuration)
+  - [Reporting Exceptions](https://github.com/iopipe/iopipe-python#reporting-exceptions)
+  - [Custom Metrics](https://github.com/iopipe/iopipe-python#custom-metrics)
+  - [Labels](https://github.com/iopipe/iopipe-python#labels)
+  - [Core Agent](https://github.com/iopipe/iopipe-python#core-agent)
+- [Plugins](https://github.com/iopipe/iopipe-python#plugins)
+  - [Event Info Plugin](https://github.com/iopipe/iopipe-python#event-info-plugin)
+  - [Logger Plugin](https://github.com/iopipe/iopipe-python#logger-plugin)
+  - [Profiler Plugin](https://github.com/iopipe/iopipe-python#profiler-plugin)
+  - [Trace Plugin](https://github.com/iopipe/iopipe-python#trace-plugin)
+  - [Creating Plugins](https://github.com/iopipe/iopipe-python#creating-plugins)
+- [Supported Python Versions](https://github.com/iopipe/iopipe-python#supported-python-versions)
+- [Framework Integration](https://github.com/iopipe/iopipe-python#framework-integration)
+  - [Chalice](https://github.com/iopipe/iopipe-python#chalice)
+  - [Serverless](https://github.com/iopipe/iopipe-python#serverless)
+  - [Zappa](https://github.com/iopipe/iopipe-python#zappa)
+- [License](https://github.com/iopipe/iopipe-python#license)
 
 ## Installation
 
@@ -69,7 +69,7 @@ def handler(event, context):
   pass
 ```
 
- The agent comes preloaded with the [Event Info](#event-info-plugin), [Logger](#logger-plugin), [Profiler](#profiler-plugin) and [Trace](#trace-plugin) plugins. See the relevant plugin sections for usage.
+ The agent comes preloaded with the [Event Info](https://github.com/iopipe/iopipe-python#event-info-plugin), [Logger](https://github.com/iopipe/iopipe-python#logger-plugin), [Profiler](https://github.com/iopipe/iopipe-python#profiler-plugin) and [Trace](https://github.com/iopipe/iopipe-python#trace-plugin) plugins. See the relevant plugin sections for usage.
 
 ### Configuration
 
@@ -172,7 +172,7 @@ def handler(event, context):
 pass
 ```
 
-# Plugins
+## Plugins
 
 IOpipe's functionality can be extended through plugins. Plugins hook into the agent lifecycle to allow you to perform additional analytics.
 
@@ -493,7 +493,7 @@ $ echo "iopipe" >> requirements.txt
 
 Now Serverless will `pip install -r requirements.txt` when packaging your functions.
 
-Keep in mind you still need to add the `@iopipe` decorator to your functions. See [Usage](#usage) for details.
+Keep in mind you still need to add the `@iopipe` decorator to your functions. See [Usage](https://github.com/iopipe/iopipe-python#usage) for details.
 
 Be sure to check out the [serverless-python-requirements](https://github.com/UnitedIncome/serverless-python-requirements) `README` as the plugin has a number of useful features for compiling AWS Lambda compatible Python packages.
 
