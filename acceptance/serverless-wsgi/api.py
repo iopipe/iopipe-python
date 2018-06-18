@@ -3,11 +3,11 @@ from flask import Flask
 app = Flask(__name__)
 
 
-@app.route('/cats')
+@app.route("/cats")
 def cats():
-    return 'Cats'
+    return "Cats"
 
 
-@app.route('/dogs/<id>')
+@app.route("/dogs/<id>")
 def dog(id):
-    return 'Dog'
+    return "Dog"

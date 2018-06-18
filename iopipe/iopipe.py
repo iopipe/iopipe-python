@@ -12,10 +12,10 @@ class IOpipe(IOpipeCore):
     """
 
     def __init__(self, *args, **kwargs):
-        configured_plugins = kwargs.pop('plugins', None)
+        configured_plugins = kwargs.pop("plugins", None)
         plugins = [EventInfoPlugin(), LoggerPlugin(), ProfilerPlugin(), TracePlugin()]
         if configured_plugins is not None and isinstance(plugins, list):
             plugins = plugins + configured_plugins
-        kwargs['plugins'] = plugins
+        kwargs["plugins"] = plugins
 
         super(IOpipe, self).__init__(*args, **kwargs)

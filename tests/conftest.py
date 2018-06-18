@@ -12,20 +12,25 @@ from iopipe.compat import string_types
 from iopipe.contrib.trace import TracePlugin
 
 SCHEMA_JSON = None
-SCHEMA_JSON_URL = 'https://raw.githubusercontent.com/iopipe/iopipe/master/src/schema.json'
+SCHEMA_JSON_URL = (
+    "https://raw.githubusercontent.com/iopipe/iopipe/master/src/schema.json"
+)
 
 
 class MockContext(object):
-    aws_request_id = '0'
-    log_group_name = 'mock-group'
-    log_stream_name = 'mock-stream'
+    aws_request_id = "0"
+    log_group_name = "mock-group"
+    log_stream_name = "mock-stream"
     memory_limit_in_mb = 500
 
-    def __init__(self, name='handler', version='$LATEST'):
+    def __init__(self, name="handler", version="$LATEST"):
         self.function_name = name
         self.function_version = version
-        self.invoked_function_arn = 'arn:aws:lambda:us-east-1:1:function:%s:%s' % (name, version)
-        self.remaining_time_in_millis = float('inf')
+        self.invoked_function_arn = "arn:aws:lambda:us-east-1:1:function:%s:%s" % (
+            name,
+            version,
+        )
+        self.remaining_time_in_millis = float("inf")
         self.iopipe = mock.Mock()
 
     def get_remaining_time_in_millis(self):
@@ -53,14 +58,14 @@ def _assert_valid_schema(obj, schema=None, path=None, optional_fields=None):
 
     if isinstance(obj, dict):
         for key in obj:
-            key_path = '.'.join(path + [key])
+            key_path = ".".join(path + [key])
             assert key in schema, "%s not in schema" % key_path
 
     for key in schema:
-        key_path = '.'.join(path + [key])
+        key_path = ".".join(path + [key])
 
         if key_path not in optional_fields:
-            assert key in obj, '%s is required' % key_path
+            assert key in obj, "%s is required" % key_path
 
         if key not in obj:
             continue
@@ -70,15 +75,17 @@ def _assert_valid_schema(obj, schema=None, path=None, optional_fields=None):
         elif isinstance(obj[key], list):
             for item in obj[key]:
                 if isinstance(item, dict):
-                    _assert_valid_schema(item, schema[key][0], path + [key], optional_fields)
-        elif schema[key] == 'b':
-            assert isinstance(obj[key], bool), '%s not a boolean' % key_path
-        elif schema[key] == 'i':
-            assert isinstance(obj[key], int), '%s not a integer' % key_path
-        elif schema[key] == 'n':
-            assert isinstance(obj[key], numbers.Number), '%s not a number' % key_path
-        elif schema[key] == 's':
-            assert isinstance(obj[key], string_types), '%s not a string' % key_path
+                    _assert_valid_schema(
+                        item, schema[key][0], path + [key], optional_fields
+                    )
+        elif schema[key] == "b":
+            assert isinstance(obj[key], bool), "%s not a boolean" % key_path
+        elif schema[key] == "i":
+            assert isinstance(obj[key], int), "%s not a integer" % key_path
+        elif schema[key] == "n":
+            assert isinstance(obj[key], numbers.Number), "%s not a number" % key_path
+        elif schema[key] == "s":
+            assert isinstance(obj[key], string_types), "%s not a string" % key_path
 
 
 @pytest.fixture
@@ -88,27 +95,32 @@ def assert_valid_schema():
 
 @pytest.fixture
 def iopipe():
-    return IOpipeCore('test-suite', 'https://metrics-api.iopipe.com', True)
+    return IOpipeCore("test-suite", "https://metrics-api.iopipe.com", True)
 
 
 @pytest.fixture
 def default_iopipe():
-    return IOpipe('test-suite', 'https://metrics-api.iopipe.com', True)
+    return IOpipe("test-suite", "https://metrics-api.iopipe.com", True)
 
 
 @pytest.fixture
 def default_iopipe_override():
-    return IOpipe('test-suite', 'https://metrics-api.iopipe.com', True, plugins=[TracePlugin(auto_measure=False)])
+    return IOpipe(
+        "test-suite",
+        "https://metrics-api.iopipe.com",
+        True,
+        plugins=[TracePlugin(auto_measure=False)],
+    )
 
 
 @pytest.fixture
 def iopipe_with_sync_http():
-    return IOpipe('test-suite', 'https://metrics-api.iopipe.com', True, sync_http=True)
+    return IOpipe("test-suite", "https://metrics-api.iopipe.com", True, sync_http=True)
 
 
 @pytest.fixture
 def mock_context():
-    return MockContext('handler', '$LATEST')
+    return MockContext("handler", "$LATEST")
 
 
 @pytest.fixture
@@ -124,14 +136,14 @@ def handler(iopipe):
 def handler_with_events(iopipe):
     @iopipe.decorator
     def _handler_with_events(event, context):
-        iopipe.log('key1', 2)
-        iopipe.log('key2', 'qualitative value')
-        context.iopipe.log('key3', 3)
-        context.iopipe.log('key4', 'second qualitative value')
-        context.iopipe.metric('key5', 4)
-        context.iopipe.metric('key6', 'third qualitative value')
-        context.iopipe.metric('key7', Decimal(12.3))
-        context.iopipe.metric('a' * 129, 'this will be dropped')
+        iopipe.log("key1", 2)
+        iopipe.log("key2", "qualitative value")
+        context.iopipe.log("key3", 3)
+        context.iopipe.log("key4", "second qualitative value")
+        context.iopipe.metric("key5", 4)
+        context.iopipe.metric("key6", "third qualitative value")
+        context.iopipe.metric("key7", Decimal(12.3))
+        context.iopipe.metric("a" * 129, "this will be dropped")
 
     return iopipe, _handler_with_events
 
@@ -140,12 +152,12 @@ def handler_with_events(iopipe):
 def handler_with_labels(iopipe):
     @iopipe.decorator
     def _handler_with_labels(event, context):
-        context.iopipe.label('a-label')
-        context.iopipe.label('a-label')  # duplicates are dropped
-        context.iopipe.label(u'another-label')  # works with unicode
+        context.iopipe.label("a-label")
+        context.iopipe.label("a-label")  # duplicates are dropped
+        context.iopipe.label(u"another-label")  # works with unicode
         # These will be dropped
         context.iopipe.label(22)
-        context.iopipe.label('a' * 129)  # too long
+        context.iopipe.label("a" * 129)  # too long
 
     return iopipe, _handler_with_labels
 
@@ -164,7 +176,7 @@ def handler_that_timeouts(iopipe):
     @iopipe.decorator
     def _handler_that_timeouts(event, context):
         time.sleep(2)
-        raise Exception('Should timeout before this is raised')
+        raise Exception("Should timeout before this is raised")
 
     return iopipe, _handler_that_timeouts
 

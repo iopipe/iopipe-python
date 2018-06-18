@@ -19,9 +19,9 @@ def get_signer_hostname():
     :returns: The signer hostname
     :rtype str
     """
-    region = os.getenv('AWS_REGION', '')
-    region = region if region and region in SUPPORTED_REGIONS else 'us-west-2'
-    return 'signer.{region}.iopipe.com'.format(region=region)
+    region = os.getenv("AWS_REGION", "")
+    region = region if region and region in SUPPORTED_REGIONS else "us-west-2"
+    return "signer.{region}.iopipe.com".format(region=region)
 
 
 def get_signed_request(token, context, extension):
@@ -34,27 +34,26 @@ def get_signed_request(token, context, extension):
     :returns: A signed request URL
     :rtype: str
     """
-    url = 'https://{hostname}/'.format(hostname=get_signer_hostname())
+    url = "https://{hostname}/".format(hostname=get_signer_hostname())
 
     try:
-        logger.debug('Requesting signed request URL from %s', url)
+        logger.debug("Requesting signed request URL from %s", url)
         response = requests.post(
             url,
             json={
-                'arn': context.invoked_function_arn,
-                'requestId': context.aws_request_id,
-                'timestamp': int(time.time() * 1000),
-                'extension': extension
+                "arn": context.invoked_function_arn,
+                "requestId": context.aws_request_id,
+                "timestamp": int(time.time() * 1000),
+                "extension": extension,
             },
-            headers={
-                'Authorization': token,
-            })
+            headers={"Authorization": token},
+        )
         response.raise_for_status()
     except Exception as e:
-        logger.debug('Error requesting signed request URL: %s', e)
-        if hasattr(e, 'response'):
+        logger.debug("Error requesting signed request URL: %s", e)
+        if hasattr(e, "response"):
             logger.debug(e.response.content)
     else:
         response = response.json()
-        logger.debug('Signed request URL received for %s', response['url'])
+        logger.debug("Signed request URL received for %s", response["url"])
         return response

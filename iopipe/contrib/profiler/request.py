@@ -17,16 +17,16 @@ def upload_profiler_report(url, filename):
     :param filename: The profiler report file.
     """
     try:
-        logger.debug('Uploading profiler report to IOpipe')
-        with open(filename, 'rb') as data:
+        logger.debug("Uploading profiler report to IOpipe")
+        with open(filename, "rb") as data:
             response = requests.put(url, data=data)
         response.raise_for_status()
     except Exception as e:
-        logger.debug('Error while uploading profiler report: %s', e)
-        if hasattr(e, 'response'):
+        logger.debug("Error while uploading profiler report: %s", e)
+        if hasattr(e, "response"):
             logger.debug(e.response.content)
     else:
-        logger.debug('Profiler report uploaded successfully')
+        logger.debug("Profiler report uploaded successfully")
     finally:
         if os.path.isfile(filename):
             os.remove(filename)

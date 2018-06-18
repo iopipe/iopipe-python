@@ -10,12 +10,16 @@ def get_plugin_meta(plugins):
     :returns: A list of dicts containing plugin meta data.
     :rtype: list
     """
-    return [{
-        'name': p.name,
-        'version': p.version,
-        'homepage': p.homepage,
-        'enabled': p.enabled
-    } for p in plugins if is_plugin(p)]
+    return [
+        {
+            "name": p.name,
+            "version": p.version,
+            "homepage": p.homepage,
+            "enabled": p.enabled,
+        }
+        for p in plugins
+        if is_plugin(p)
+    ]
 
 
 def is_plugin(plugin):
@@ -39,7 +43,7 @@ def with_metaclass(meta, *bases):
         def __new__(cls, name, this_bases, d):
             return meta(name, bases, d)
 
-    return type.__new__(metaclass, 'temporary_class', (), {})
+    return type.__new__(metaclass, "temporary_class", (), {})
 
 
 class Plugin(with_metaclass(abc.ABCMeta, object)):

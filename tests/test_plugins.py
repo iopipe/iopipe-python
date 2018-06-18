@@ -18,15 +18,15 @@ def test_plugins_incomplete_interface():
     class IncompletePlugin2(IncompletePlugin1):
         @property
         def name(self):
-            return 'incomplete-plugin'
+            return "incomplete-plugin"
 
         @property
         def version(self):
-            return '0.1.0'
+            return "0.1.0"
 
         @property
         def homepage(self):
-            return 'https://github.com/iopipe'
+            return "https://github.com/iopipe"
 
         @property
         def enabled(self):
@@ -73,9 +73,11 @@ def test_is_plugin():
 
 
 def test_get_plugin_meta():
-    assert get_plugin_meta([TracePlugin()]) == [{
-        'name': 'trace',
-        'version': '1.1.0',
-        'homepage': 'https://github.com/iopipe/iopipe-python#trace-plugin',
-        'enabled': True,
-    }]
+    assert get_plugin_meta([TracePlugin()]) == [
+        {
+            "name": "trace",
+            "version": "1.1.0",
+            "homepage": "https://github.com/iopipe/iopipe-python#trace-plugin",
+            "enabled": True,
+        }
+    ]

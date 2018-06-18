@@ -7,7 +7,14 @@ try:
 except ImportError:
     from urllib.parse import urlparse
 
-SUPPORTED_REGIONS = ['ap-northeast-1', 'ap-southeast-2', 'eu-west-1', 'us-east-2', 'us-west-1', 'us-west-2']
+SUPPORTED_REGIONS = [
+    "ap-northeast-1",
+    "ap-southeast-2",
+    "eu-west-1",
+    "us-east-2",
+    "us-west-1",
+    "us-west-2",
+]
 
 
 def get_collector_path(base_url=None):
@@ -19,13 +26,13 @@ def get_collector_path(base_url=None):
     :rtype: str
     """
     if not base_url:
-        return '/v0/event'
+        return "/v0/event"
     event_url = urlparse(base_url)
-    event_path = urljoin(event_url.path, 'v0/event')
-    if not event_path.startswith('/'):
-        event_path = '/%s' % event_path
+    event_path = urljoin(event_url.path, "v0/event")
+    if not event_path.startswith("/"):
+        event_path = "/%s" % event_path
     if event_url.query:
-        event_path = '?'.join([event_path, event_url.query])
+        event_path = "?".join([event_path, event_url.query])
     return event_path
 
 
@@ -39,10 +46,10 @@ def get_hostname(config_url=None):
     :returns: The collector's hostname.
     :rtype: str
     """
-    region_string = ''
+    region_string = ""
     if config_url:
         return urlparse(config_url).hostname
-    aws_region = os.getenv('AWS_REGION')
+    aws_region = os.getenv("AWS_REGION")
     if aws_region and aws_region in SUPPORTED_REGIONS:
-        region_string = '.%s' % aws_region
-    return 'metrics-api%s.iopipe.com' % region_string
+        region_string = ".%s" % aws_region
+    return "metrics-api%s.iopipe.com" % region_string

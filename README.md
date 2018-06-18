@@ -23,6 +23,8 @@ This package provides analytics and distributed tracing for event-driven applica
   - [Chalice](https://github.com/iopipe/iopipe-python#chalice)
   - [Serverless](https://github.com/iopipe/iopipe-python#serverless)
   - [Zappa](https://github.com/iopipe/iopipe-python#zappa)
+- [Contributing](https://github.com/iopipe/iopipe-python#contributing)
+- [Running Tests](https://github.com/iopipe/iopipe-python#running-tests)
 - [License](https://github.com/iopipe/iopipe-python#license)
 
 ## Installation
@@ -551,6 +553,43 @@ Then in your `zappa_settings.json` file include the following:
 ```
 
 Where `module-path.to.lambda_handler` is the Python module path to the `lambda_handler` you created above. For example, if you put it in `myproject/__init__.py` the path would be `myproject.lambda_handler`.
+
+## Contributing
+
+Contributions are welcome. We use the [black](https://github.com/ambv/black) code formatter.
+
+```bash
+pip install black
+```
+
+We recommend using it with [pre-commit](https://pre-commit.com/#install):
+
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+Using these together will auto format your git commits.
+
+## Running Tests
+
+If you have `tox` installed, you can run the Python 2.7 and 3.6 tests with:
+
+```bash
+tox
+```
+
+If you don't have `tox` installed you can also run:
+
+```bash
+python setup.py test
+```
+
+We also have make tasks to run tests in `lambci/lambda:build-python` Docker containers:
+
+```bash
+make test
+```
 
 ## License
 

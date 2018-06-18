@@ -5,8 +5,8 @@ import time
 
 class JSONFormatter(logging.Formatter):
     converter = time.gmtime
-    default_time_format = '%Y-%m-%d %H:%M:%S'
-    default_msec_format = '%s.%03d'
+    default_time_format = "%Y-%m-%d %H:%M:%S"
+    default_msec_format = "%s.%03d"
 
     def formatTime(self, record, datefmt=None):
         """Override to make Python 2/3 compatible"""
@@ -22,18 +22,19 @@ class JSONFormatter(logging.Formatter):
             if not record.exc_text:
                 record.exc_text = self.formatException(record.exc_info)
         if record.exc_text:
-            if record.message[-1:] != '\n':
-                record.message = record.message + '\n'
+            if record.message[-1:] != "\n":
+                record.message = record.message + "\n"
             record.message = record.message + record.exc_text
-        if hasattr(record, 'stack_info') and record.stack_info:
-            if record.message[-1:] != '\n':
-                record.message = record.message + '\n'
+        if hasattr(record, "stack_info") and record.stack_info:
+            if record.message[-1:] != "\n":
+                record.message = record.message + "\n"
             record.message = record.message + self.formatStack(record.stack_info)
         return json.dumps(
             {
-                'message': record.message,
-                'name': record.name,
-                'severity': record.levelname,
-                'timestamp': record.asctime,
+                "message": record.message,
+                "name": record.name,
+                "severity": record.levelname,
+                "timestamp": record.asctime,
             },
-            sort_keys=True)
+            sort_keys=True,
+        )
