@@ -3,7 +3,9 @@ import time
 
 from iopipe.monotonic import monotonic
 
-Entry = collections.namedtuple('Entry', ['name', 'startTime', 'duration', 'entryType', 'timestamp'])
+Entry = collections.namedtuple(
+    "Entry", ["name", "startTime", "duration", "entryType", "timestamp"]
+)
 
 
 def time_in_millis(time=None, offset=0):
@@ -16,14 +18,17 @@ def get_offset(timeline):
     return timeline.offset or timeline.init_time
 
 
-def mark_data(timeline, name, start_time=None, duration=0, entry_type='mark', timestamp=None):
+def mark_data(
+    timeline, name, start_time=None, duration=0, entry_type="mark", timestamp=None
+):
     data = timeline.data or []
     entry = Entry(
         name=name,
         startTime=start_time or time_in_millis(offset=get_offset(timeline)),
         duration=duration,
         entryType=entry_type,
-        timestamp=timestamp or int(time.time() * 1000))
+        timestamp=timestamp or int(time.time() * 1000),
+    )
     data.append(entry)
     data.sort(key=lambda i: i.startTime)
     return data
@@ -50,7 +55,9 @@ class Timeline(object):
     def measure(self, name, start, end=None):
         start_mark = self.get_entries_by_name(start)
         start_mark = start_mark[-1] if start_mark else None
-        start_time = start_mark.startTime if start_mark else self.init_time - get_offset(self)
+        start_time = (
+            start_mark.startTime if start_mark else self.init_time - get_offset(self)
+        )
         timestamp = start_mark.timestamp if start_mark else None
 
         end_time = self.now()
@@ -62,13 +69,19 @@ class Timeline(object):
         duration = end_time - start_time
 
         self.data = mark_data(
-            self, name=name, start_time=start_time, duration=duration, entry_type='measure', timestamp=timestamp)
+            self,
+            name=name,
+            start_time=start_time,
+            duration=duration,
+            entry_type="measure",
+            timestamp=timestamp,
+        )
 
     def clear_marks(self):
-        self.data = [d for d in self.data if d['entryType'] != 'mark']
+        self.data = [d for d in self.data if d["entryType"] != "mark"]
 
     def clear_measures(self):
-        self.data = [d for d in self.data if d['entryType'] != 'measure']
+        self.data = [d for d in self.data if d["entryType"] != "measure"]
 
     def clear(self):
         self.data = []

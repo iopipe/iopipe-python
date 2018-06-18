@@ -13,7 +13,7 @@ def read_bootid():
     :returns: The system bood it.
     :rtype: str
     """
-    with open('/proc/sys/kernel/random/boot_id') as bootid_file:
+    with open("/proc/sys/kernel/random/boot_id") as bootid_file:
         return bootid_file.readline()
 
 
@@ -24,13 +24,16 @@ def read_disk():
     :returns: Disk usage (total, used, percentage used)
     :rtype dict
     """
-    s = os.statvfs('/tmp')
+    s = os.statvfs("/tmp")
     return {
         # This should report as 500MB, if not may need to be hardcoded
         # https://aws.amazon.com/lambda/faqs/
-        'totalMiB': (s.f_blocks * s.f_bsize) / MB_FACTOR,
-        'usedMiB': ((s.f_blocks - s.f_bfree) * s.f_frsize) / MB_FACTOR,
-        'usedPercentage': round((((s.f_blocks - s.f_bfree) * s.f_frsize) / (s.f_blocks * s.f_bsize)) * 100, 2)
+        "totalMiB": (s.f_blocks * s.f_bsize) / MB_FACTOR,
+        "usedMiB": ((s.f_blocks - s.f_bfree) * s.f_frsize) / MB_FACTOR,
+        "usedPercentage": round(
+            (((s.f_blocks - s.f_bfree) * s.f_frsize) / (s.f_blocks * s.f_bsize)) * 100,
+            2,
+        ),
     }
 
 
@@ -52,7 +55,7 @@ def read_meminfo():
     :rtype: dict
     """
     data = {}
-    with open('/proc/meminfo') as meminfo_file:
+    with open("/proc/meminfo") as meminfo_file:
         for row in meminfo_file:
             line = row.split(":")
             # Example content:
@@ -64,7 +67,7 @@ def read_meminfo():
     return data
 
 
-def read_pid_stat(pid='self'):
+def read_pid_stat(pid="self"):
     """
     Returns system process stat information.
 
@@ -72,17 +75,17 @@ def read_pid_stat(pid='self'):
     :returns: The system stat information.
     :rtype: dict
     """
-    with open('/proc/%s/stat' % (pid, )) as f:
-        stat = f.readline().split(' ')
+    with open("/proc/%s/stat" % (pid,)) as f:
+        stat = f.readline().split(" ")
     return {
-        'utime': int(stat[13]),
-        'stime': int(stat[14]),
-        'cutime': int(stat[15]),
-        'cstime': int(stat[16]),
+        "utime": int(stat[13]),
+        "stime": int(stat[14]),
+        "cutime": int(stat[15]),
+        "cstime": int(stat[16]),
     }
 
 
-def read_pid_status(pid='self'):
+def read_pid_status(pid="self"):
     """
     Returns the system process sstatus.
 
@@ -91,11 +94,11 @@ def read_pid_status(pid='self'):
     :rtype: dict
     """
     data = {}
-    with open("/proc/%s/status" % (pid, )) as status_file:
+    with open("/proc/%s/status" % (pid,)) as status_file:
         for row in status_file:
-            line = row.split(':')
-            status_value = line[1].rstrip('\t\n kB').lstrip()
-            if line[0] in ['FDSize', 'Threads', 'VmRSS']:
+            line = row.split(":")
+            status_value = line[1].rstrip("\t\n kB").lstrip()
+            if line[0] in ["FDSize", "Threads", "VmRSS"]:
                 try:
                     data[line[0]] = int(status_value)
                 except ValueError:
@@ -111,21 +114,23 @@ def read_stat():
     :rtype: list
     """
     data = []
-    with open('/proc/stat') as stat_file:
+    with open("/proc/stat") as stat_file:
         for line in stat_file:
-            cpu_stat = line.split(' ')
+            cpu_stat = line.split(" ")
             if cpu_stat[0][:3] != "cpu":
                 break
             # First cpu line is aggregation of following lines, skip it
             if len(cpu_stat[0]) == 3:
                 continue
-            data.append({
-                'times': {
-                    'user': int(cpu_stat[1]),
-                    'nice': int(cpu_stat[2]),
-                    'sys': int(cpu_stat[3]),
-                    'idle': int(cpu_stat[4]),
-                    'irq': int(cpu_stat[6])
+            data.append(
+                {
+                    "times": {
+                        "user": int(cpu_stat[1]),
+                        "nice": int(cpu_stat[2]),
+                        "sys": int(cpu_stat[3]),
+                        "idle": int(cpu_stat[4]),
+                        "irq": int(cpu_stat[6]),
+                    }
                 }
-            })
+            )
     return data

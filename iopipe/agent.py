@@ -12,7 +12,7 @@ from .report import Report
 
 logging.basicConfig()
 
-logger = logging.getLogger('iopipe')
+logger = logging.getLogger("iopipe")
 logger.setLevel(logging.INFO)
 
 
@@ -37,43 +37,47 @@ class IOpipeCore(object):
         self.plugins = []
         if plugins is not None and isinstance(plugins, list):
             self.plugins = self.load_plugins(plugins)
-            options['plugins'] = self.plugins
+            options["plugins"] = self.plugins
 
-        self.run_hooks('pre:setup')
+        self.run_hooks("pre:setup")
 
         if token is not None:
-            options['token'] = token
+            options["token"] = token
         if url is not None:
-            options['url'] = url
+            options["url"] = url
         if debug is not None:
-            options['debug'] = debug
+            options["debug"] = debug
 
         self.config = set_config(**options)
-        self.config['plugins'] = self.load_plugins(self.config['plugins'])
+        self.config["plugins"] = self.load_plugins(self.config["plugins"])
         self.futures = []
-        self.pool = futures.ThreadPoolExecutor(thread_name_prefix='iopipe')
+        self.pool = futures.ThreadPoolExecutor(thread_name_prefix="iopipe")
         self.report = None
 
-        if self.config['debug']:
+        if self.config["debug"]:
             logger.setLevel(logging.DEBUG)
 
-        self.run_hooks('post:setup')
+        self.run_hooks("post:setup")
 
     def __del__(self):
         self.pool.shutdown()
 
     def log(self, key, value):
         if self.report is None:
-            warnings.warn('Attempting to log metrics before function decorated with IOpipe. '
-                          'This metric will not be recorded.')
+            warnings.warn(
+                "Attempting to log metrics before function decorated with IOpipe. "
+                "This metric will not be recorded."
+            )
             return
 
         self.report.context.iopipe.log(key, value)
 
     def error(self, error):
         if self.report is None:
-            warnings.warn('An exception occurred before function was decorated with IOpipe. '
-                          'This exception will not be recorded.')
+            warnings.warn(
+                "An exception occurred before function was decorated with IOpipe. "
+                "This exception will not be recorded."
+            )
             raise error
 
         self.report.context.iopipe.error(error)
@@ -83,21 +87,23 @@ class IOpipeCore(object):
     def __call__(self, func):
         @functools.wraps(func)
         def wrapped(event, context):
-            logger.debug('%s wrapped with IOpipe decorator' % repr(func))
+            logger.debug("%s wrapped with IOpipe decorator" % repr(func))
 
             context = ContextWrapper(context, self)
 
-            self.run_hooks('pre:invoke', event=event, context=context)
+            self.run_hooks("pre:invoke", event=event, context=context)
 
             # if env var IOPIPE_ENABLED is set to False skip reporting
-            if self.config['enabled'] is False:
-                logger.debug('IOpipe agent disabled, skipping reporting')
+            if self.config["enabled"] is False:
+                logger.debug("IOpipe agent disabled, skipping reporting")
                 return func(event, context)
 
             # If a token is not present, skip reporting
-            if not self.config['token']:
-                warnings.warn('Your function is decorated with iopipe, but a valid token was not found. '
-                              'Set the IOPIPE_TOKEN environment variable with your IOpipe project token.')
+            if not self.config["token"]:
+                warnings.warn(
+                    "Your function is decorated with iopipe, but a valid token was not found. "
+                    "Set the IOPIPE_TOKEN environment variable with your IOpipe project token."
+                )
                 return func(event, context)
 
             self.report = Report(self, context)
@@ -105,18 +111,24 @@ class IOpipeCore(object):
             signal.signal(signal.SIGALRM, self.handle_timeout)
 
             # Disable timeout if timeout_window <= 0, or if our context doesn't have a get_remaining_time_in_millis
-            if self.config['timeout_window'] > 0 and \
-                    hasattr(context, 'get_remaining_time_in_millis') and \
-                    callable(context.get_remaining_time_in_millis):
-                timeout_duration = (context.get_remaining_time_in_millis() / 1000.0) - self.config['timeout_window']
+            if (
+                self.config["timeout_window"] > 0
+                and hasattr(context, "get_remaining_time_in_millis")
+                and callable(context.get_remaining_time_in_millis)
+            ):
+                timeout_duration = (
+                    context.get_remaining_time_in_millis() / 1000.0
+                ) - self.config["timeout_window"]
 
                 # The timeout_duration cannot be a negative number, disable if it is
                 timeout_duration = max([0, timeout_duration])
 
                 # Maximum execution time is 10 minutes, make sure timeout doesn't exceed that minus the timeout window
-                timeout_duration = min([timeout_duration, 60 * 60 * 10 - self.config['timeout_window']])
+                timeout_duration = min(
+                    [timeout_duration, 60 * 60 * 10 - self.config["timeout_window"]]
+                )
 
-                logger.debug('Setting timeout duration to %s' % timeout_duration)
+                logger.debug("Setting timeout duration to %s" % timeout_duration)
 
                 # Using signal.setitimer instead of signal.alarm because the latter only accepts integers and we want to
                 # be able to timeout at millisecond granularity
@@ -127,23 +139,23 @@ class IOpipeCore(object):
             try:
                 result = func(event, context)
             except Exception as e:
-                self.run_hooks('post:invoke', event=event, context=context)
+                self.run_hooks("post:invoke", event=event, context=context)
 
                 # This prevents this block from being executed a second time in the event that a timeout occurs and an
                 # exception is subsequently raised within the handler
                 if self.report.sent is False:
                     self.report.prepare(e)
-                    self.run_hooks('pre:report')
+                    self.run_hooks("pre:report")
                     self.report.send()
-                    self.run_hooks('post:report')
+                    self.run_hooks("post:report")
 
                 raise e
             else:
-                self.run_hooks('post:invoke', event=event, context=context)
+                self.run_hooks("post:invoke", event=event, context=context)
                 self.report.prepare()
-                self.run_hooks('pre:report')
+                self.run_hooks("pre:report")
                 self.report.send()
-                self.run_hooks('post:report')
+                self.run_hooks("post:report")
             finally:
                 signal.setitimer(signal.ITIMER_REAL, 0)
                 self.wait_for_futures()
@@ -163,11 +175,11 @@ class IOpipeCore(object):
         :param signum: The signal number being handled.
         :param frame: The stack frame when signal was raised.
         """
-        logger.debug('Function is about to timeout, sending report')
-        self.report.prepare(TimeoutError('Timeout Exceeded.'), frame)
-        self.run_hooks('pre:report')
+        logger.debug("Function is about to timeout, sending report")
+        self.report.prepare(TimeoutError("Timeout Exceeded."), frame)
+        self.run_hooks("pre:report")
         self.report.send()
-        self.run_hooks('post:report')
+        self.run_hooks("post:report")
         self.wait_for_futures()
 
     def load_plugins(self, plugins):
@@ -199,12 +211,12 @@ class IOpipeCore(object):
         Runs plugin hooks for each registered plugin.
         """
         hooks = {
-            'pre:setup': lambda p: p.pre_setup(self),
-            'post:setup': lambda p: p.post_setup(self),
-            'pre:invoke': lambda p: p.pre_invoke(event, context),
-            'post:invoke': lambda p: p.post_invoke(event, context),
-            'pre:report': lambda p: p.pre_report(self.report),
-            'post:report': lambda p: p.post_report(self.report),
+            "pre:setup": lambda p: p.pre_setup(self),
+            "post:setup": lambda p: p.post_setup(self),
+            "pre:invoke": lambda p: p.pre_invoke(event, context),
+            "post:invoke": lambda p: p.post_invoke(event, context),
+            "pre:report": lambda p: p.pre_report(self.report),
+            "post:report": lambda p: p.post_report(self.report),
         }
 
         if name in hooks:
@@ -217,7 +229,7 @@ class IOpipeCore(object):
         """
         # This mode will run futures synchronously. This should only be used
         # for benchmarking purposes.
-        if self.config['sync_http'] is True:
+        if self.config["sync_http"] is True:
             return MockFuture(func, *args, **kwargs)
 
         future = self.pool.submit(func, *args, **kwargs)

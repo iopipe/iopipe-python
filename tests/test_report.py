@@ -11,20 +11,21 @@ def test_report_linux_system_success(iopipe, mock_context, assert_valid_schema):
     assert_valid_schema(
         report.report,
         optional_fields=[
-            'environment.runtime.vendor',
-            'environment.runtime.vmVendor',
-            'environment.runtime.vmVersion',
-            'environment.nodejs',
-            'errors.count',
-            'errors.message',
-            'errors.name',
-            'errors.stack',
-            'errors.stackHash',
-            'labels',
-            'memory',
-            'projectId',
-            'performanceEntries',
-        ])
+            "environment.runtime.vendor",
+            "environment.runtime.vmVendor",
+            "environment.runtime.vmVersion",
+            "environment.nodejs",
+            "errors.count",
+            "errors.message",
+            "errors.name",
+            "errors.stack",
+            "errors.stackHash",
+            "labels",
+            "memory",
+            "projectId",
+            "performanceEntries",
+        ],
+    )
 
 
 def test_report_linux_system_error(iopipe, mock_context, assert_valid_schema):
@@ -32,31 +33,35 @@ def test_report_linux_system_error(iopipe, mock_context, assert_valid_schema):
     report = Report(iopipe, mock_context)
 
     try:
-        raise Exception('Uh oh, this happened')
+        raise Exception("Uh oh, this happened")
     except Exception as e:
         report.prepare(e)
 
     assert_valid_schema(
         report.report,
         optional_fields=[
-            'environment.runtime.vendor',
-            'environment.runtime.vmVendor',
-            'environment.runtime.vmVersion',
-            'environment.nodejs',
-            'errors.count',
-            'errors.stackHash',
-            'labels',
-            'memory',
-            'projectId',
-            'performanceEntries',
-        ])
+            "environment.runtime.vendor",
+            "environment.runtime.vmVendor",
+            "environment.runtime.vmVersion",
+            "environment.nodejs",
+            "errors.count",
+            "errors.stackHash",
+            "labels",
+            "memory",
+            "projectId",
+            "performanceEntries",
+        ],
+    )
 
 
 def test_report_samlocal(monkeypatch, iopipe, mock_context):
     """Assert that if invoked by sam local that the function name is overridden"""
-    monkeypatch.setattr(os, 'environ', {'AWS_SAM_LOCAL': True})
+    monkeypatch.setattr(os, "environ", {"AWS_SAM_LOCAL": True})
 
     report = Report(iopipe, mock_context)
     report.prepare()
 
-    assert report.report['aws']['invokedFunctionArn'] == 'arn:aws:lambda:local:0:function:handler'
+    assert (
+        report.report["aws"]["invokedFunctionArn"]
+        == "arn:aws:lambda:local:0:function:handler"
+    )

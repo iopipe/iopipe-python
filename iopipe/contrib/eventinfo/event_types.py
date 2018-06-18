@@ -18,8 +18,10 @@ class EventType(object):
         return all(has_key(self.event, key) for key in self.required_keys)
 
     def collect(self):
-        if self.keys == 'all':
-            return collect_all_keys(self.event, '@iopipe/event-info.%s' % self.type, self.exclude_keys)
+        if self.keys == "all":
+            return collect_all_keys(
+                self.event, "@iopipe/event-info.%s" % self.type, self.exclude_keys
+            )
         event_info = {}
         for key in self.keys:
             if isinstance(key, tuple):
@@ -28,190 +30,177 @@ class EventType(object):
                 old_key = new_key = key
             value = get_value(self.event, old_key)
             if value is not None:
-                event_info['@iopipe/event-info.%s.%s' % (self.type, new_key)] = value
-        event_info['@iopipe/event-info.eventType'] = self.type
+                event_info["@iopipe/event-info.%s.%s" % (self.type, new_key)] = value
+        event_info["@iopipe/event-info.eventType"] = self.type
         if self.source:
-            event_info['@iopipe/event-info.eventType.source'] = self.source
+            event_info["@iopipe/event-info.eventType.source"] = self.source
         return event_info
 
 
 class AlexaSkill(EventType):
-    type = 'alexaSkill'
-    keys = 'all'
+    type = "alexaSkill"
+    keys = "all"
     exclude_keys = [
-        'context.System.apiAccessToken',
-        'context.System.user.accessToken',
-        'context.System.user.permissions.consentToken',
+        "context.System.apiAccessToken",
+        "context.System.user.accessToken",
+        "context.System.user.permissions.consentToken",
     ]
     required_keys = [
-        'context.System',
-        'request.requestId',
-        'session.attributes',
-        'session.user',
+        "context.System",
+        "request.requestId",
+        "session.attributes",
+        "session.user",
     ]
 
 
 class ApiGateway(EventType):
-    type = 'apiGateway'
+    type = "apiGateway"
     keys = [
-        'httpMethod',
-        'path',
-        'requestContext.accountId',
-        'requestContext.httpMethod',
-        'requestContext.identity.userAgent',
-        'requestContext.requestId',
-        'requestContext.resourcePath',
-        'requestContext.stage',
-        'resource',
+        "httpMethod",
+        "path",
+        "requestContext.accountId",
+        "requestContext.httpMethod",
+        "requestContext.identity.userAgent",
+        "requestContext.requestId",
+        "requestContext.resourcePath",
+        "requestContext.stage",
+        "resource",
     ]
-    required_keys = [
-        'headers',
-        'httpMethod',
-        'path',
-        'requestContext',
-        'resource',
-    ]
+    required_keys = ["headers", "httpMethod", "path", "requestContext", "resource"]
 
 
 class CloudFront(EventType):
-    type = 'cloudFront'
+    type = "cloudFront"
     keys = [
-        'Records[0].cf.config.distributionId',
-        'Records[0].cf.request.clientIp',
-        'Records[0].cf.request.headers.host[0].value',
+        "Records[0].cf.config.distributionId",
+        "Records[0].cf.request.clientIp",
+        "Records[0].cf.request.headers.host[0].value",
         'Records[0].cf.request.headers.["user-agent"][0].value',
-        'Records[0].cf.request.method',
-        'Records[0].cf.request.uri',
+        "Records[0].cf.request.method",
+        "Records[0].cf.request.uri",
     ]
-    required_keys = ['Records[0].cf']
+    required_keys = ["Records[0].cf"]
 
 
 class Firehose(EventType):
-    type = 'firehose'
-    keys = [
-        'deliveryStreamArn',
-        'region',
-    ]
+    type = "firehose"
+    keys = ["deliveryStreamArn", "region"]
     required_keys = [
-        'deliveryStreamArn',
-        'records[0]',
-        'records[0].kinesisRecordMetadata',
+        "deliveryStreamArn",
+        "records[0]",
+        "records[0].kinesisRecordMetadata",
     ]
 
 
 class Kinesis(EventType):
-    type = 'kinesis'
-    keys = [
-        'Records.length',
-        'Records[0].awsRegion',
-        'Records[0].eventSourceARN',
-    ]
-    required_keys = [
-        'Records[0].eventVersion',
-        'Records[0].eventSource',
-    ]
+    type = "kinesis"
+    keys = ["Records.length", "Records[0].awsRegion", "Records[0].eventSourceARN"]
+    required_keys = ["Records[0].eventVersion", "Records[0].eventSource"]
 
     def has_required_keys(self):
-        return super(Kinesis, self).has_required_keys() and \
-            get_value(self.event, 'Records[0].eventVersion') == '1.0' and \
-            get_value(self.event, 'Records[0].eventSource') == 'aws:kinesis'
+        return (
+            super(Kinesis, self).has_required_keys()
+            and get_value(self.event, "Records[0].eventVersion") == "1.0"
+            and get_value(self.event, "Records[0].eventSource") == "aws:kinesis"
+        )
 
 
 class S3(EventType):
-    type = 's3'
+    type = "s3"
     keys = [
-        'Records[0].awsRegion',
-        'Records[0].eventName',
-        'Records[0].eventTime',
-        'Records[0].requestParameters.sourceIPAddress',
+        "Records[0].awsRegion",
+        "Records[0].eventName",
+        "Records[0].eventTime",
+        "Records[0].requestParameters.sourceIPAddress",
         'Records[0].responseElements["x-amz-id-2"]',
         'Records[0].responseElements["x-amz-request-id"]',
-        'Records[0].s3.bucket.arn',
-        'Records[0].s3.bucket.name',
-        'Records[0].s3.object.key',
-        'Records[0].s3.object.sequencer',
-        'Records[0].s3.object.size',
-        'Records[0].userIdentity.principalId',
+        "Records[0].s3.bucket.arn",
+        "Records[0].s3.bucket.name",
+        "Records[0].s3.object.key",
+        "Records[0].s3.object.sequencer",
+        "Records[0].s3.object.size",
+        "Records[0].userIdentity.principalId",
     ]
-    required_keys = [
-        'Records[0].eventVersion',
-        'Records[0].eventSource',
-    ]
+    required_keys = ["Records[0].eventVersion", "Records[0].eventSource"]
 
     def has_required_keys(self):
-        return super(S3, self).has_required_keys() and \
-            get_value(self.event, 'Records[0].eventVersion') == '2.0' and \
-            get_value(self.event, 'Records[0].eventSource') == 'aws:s3'
+        return (
+            super(S3, self).has_required_keys()
+            and get_value(self.event, "Records[0].eventVersion") == "2.0"
+            and get_value(self.event, "Records[0].eventSource") == "aws:s3"
+        )
 
 
 class Scheduled(EventType):
-    type = 'scheduled'
-    keys = [
-        'account',
-        'id',
-        'region',
-        'resources[0]',
-        'time',
-    ]
-    required_keys = ['source']
+    type = "scheduled"
+    keys = ["account", "id", "region", "resources[0]", "time"]
+    required_keys = ["source"]
 
     def has_required_keys(self):
-        return super(Scheduled, self).has_required_keys() and get_value(self.event, 'source') == 'aws.events'
+        return (
+            super(Scheduled, self).has_required_keys()
+            and get_value(self.event, "source") == "aws.events"
+        )
 
 
 class ServerlessLambda(EventType):
-    type = 'apiGateway'
-    source = 'slsIntegrationLambda'
+    type = "apiGateway"
+    source = "slsIntegrationLambda"
     keys = [
-        ('headers.["X-Amz-Cf-Id"]', 'headers.X-Amz-Cf-Id'),
-        ('headers.["X-Amzn-Trace-Id"]', 'headers.X-Amzn-Trace-Id'),
-        ('identity.accountId', 'requestContext.accountId'),
-        ('identity.userAgent', 'requestContext.identity.userAgent'),
-        ('method', 'httpMethod'),
-        ('method', 'requestContext.httpMethod'),
-        ('stage', 'requestContext.stage'),
+        ('headers.["X-Amz-Cf-Id"]', "headers.X-Amz-Cf-Id"),
+        ('headers.["X-Amzn-Trace-Id"]', "headers.X-Amzn-Trace-Id"),
+        ("identity.accountId", "requestContext.accountId"),
+        ("identity.userAgent", "requestContext.identity.userAgent"),
+        ("method", "httpMethod"),
+        ("method", "requestContext.httpMethod"),
+        ("stage", "requestContext.stage"),
     ]
-    required_keys = [
-        'identity.userAgent',
-        'identity.sourceIp',
-        'identity.accountId',
-    ]
+    required_keys = ["identity.userAgent", "identity.sourceIp", "identity.accountId"]
 
 
 class SNS(EventType):
-    type = 'sns'
+    type = "sns"
     keys = [
-        'Records[0].EventSubscriptionArn',
-        'Records[0].Sns.MessageId',
-        'Records[0].Sns.Signature',
-        'Records[0].Sns.SignatureVersion',
-        'Records[0].Sns.SigningCertUrl',
-        'Records[0].Sns.UnsubscribeUrl',
-        'Records[0].Sns.Subject',
-        'Records[0].Sns.Timestamp',
-        'Records[0].Sns.TopicArn',
-        'Records[0].Sns.Type',
+        "Records[0].EventSubscriptionArn",
+        "Records[0].Sns.MessageId",
+        "Records[0].Sns.Signature",
+        "Records[0].Sns.SignatureVersion",
+        "Records[0].Sns.SigningCertUrl",
+        "Records[0].Sns.UnsubscribeUrl",
+        "Records[0].Sns.Subject",
+        "Records[0].Sns.Timestamp",
+        "Records[0].Sns.TopicArn",
+        "Records[0].Sns.Type",
     ]
-    required_keys = [
-        'Records[0].eventVersion',
-        'Records[0].eventSource',
-    ]
+    required_keys = ["Records[0].eventVersion", "Records[0].eventSource"]
 
     def has_required_keys(self):
-        return super(SNS, self).has_required_keys() and \
-            get_value(self.event, 'Records[0].eventVersion') == '1.0' and \
-            get_value(self.event, 'Records[0].eventSource') == 'aws:sns'
+        return (
+            super(SNS, self).has_required_keys()
+            and get_value(self.event, "Records[0].eventVersion") == "1.0"
+            and get_value(self.event, "Records[0].eventSource") == "aws:sns"
+        )
 
 
-EVENT_TYPES = [AlexaSkill, ApiGateway, CloudFront, Firehose, Kinesis, S3, Scheduled, ServerlessLambda, SNS]
+EVENT_TYPES = [
+    AlexaSkill,
+    ApiGateway,
+    CloudFront,
+    Firehose,
+    Kinesis,
+    S3,
+    Scheduled,
+    ServerlessLambda,
+    SNS,
+]
 
 
 def metrics_for_event_type(event, context):
     for EventType in EVENT_TYPES:
         event_type = EventType(event)
         if event_type.has_required_keys():
-            context.iopipe.label('@iopipe/plugin-event-info')
-            context.iopipe.label('@iopipe/aws-%s' % event_type.slug)
+            context.iopipe.label("@iopipe/plugin-event-info")
+            context.iopipe.label("@iopipe/aws-%s" % event_type.slug)
             event_info = event_type.collect()
             [context.iopipe.metric(k, v) for k, v in event_info.items()]
             break

@@ -37,19 +37,18 @@ iopipe_with_tracing = IOpipeCore(debug=True, plugins=[trace_plugin])
 
 @iopipe_with_eventinfo
 def api_gateway(event, context):
-    return {
-        'statusCode': 200,
-        'body': json.dumps({'success': True}),
-    }
+    return {"statusCode": 200, "body": json.dumps({"success": True})}
 
 
 @iopipe_with_eventinfo
 def api_trigger(event, context):
-    gateway_url = os.getenv('PY_API_GATEWAY_URL')
-    context.iopipe.metric('gateway_url', gateway_url or '')
+    gateway_url = os.getenv("PY_API_GATEWAY_URL")
+    context.iopipe.metric("gateway_url", gateway_url or "")
     if gateway_url is not None:
         response = urlopen(gateway_url)
-        context.iopipe.metric('response_status', getattr(response, 'status', getattr(response, 'code')))
+        context.iopipe.metric(
+            "response_status", getattr(response, "status", getattr(response, "code"))
+        )
         response.close()
 
 
@@ -64,12 +63,13 @@ def baseline_coldstart(event, context):
 @iopipe
 def caught_error(event, context):
     try:
-        raise Exception('Caught exception')
+        raise Exception("Caught exception")
     except Exception as e:
         context.iopipe.error(e)
 
 
 def coldstart(event, context):
+
     @iopipe
     def handler(event, context):
         pass
@@ -81,15 +81,15 @@ def coldstart(event, context):
 
 @iopipe
 def custom_metrics(event, context):
-    context.iopipe.metric('time', time.time())
-    context.iopipe.metric('a-metric', 'value')
-    context.iopipe.label('has-metrics')
+    context.iopipe.metric("time", time.time())
+    context.iopipe.metric("a-metric", "value")
+    context.iopipe.label("has-metrics")
 
 
 @iopipe_with_logging
 def logging(event, context):
     # This should still work (backwards compatibility)
-    context.iopipe.log('time', time.time())
+    context.iopipe.log("time", time.time())
 
     context.iopipe.log.debug("I'm a debug message.")
     context.iopipe.log.info("I'm an info message.")
@@ -98,19 +98,19 @@ def logging(event, context):
     context.iopipe.log.critical("I'm a critical message.")
 
     try:
-        raise ValueError('I have no values.')
+        raise ValueError("I have no values.")
     except Exception as e:
         context.iopipe.log.exception(e)
 
 
 @iopipe_with_logging_tmp
 def logging_tmp(event, context):
-    with open('text.json') as f:
+    with open("text.json") as f:
         text = json.load(f)
 
     for _ in range(15000):
-        level = random.choice(['debug', 'info', 'warn', 'error', 'critical'])
-        random_text = random.choice(text['text'])
+        level = random.choice(["debug", "info", "warn", "error", "critical"])
+        random_text = random.choice(text["text"])
         getattr(context.iopipe.log, level)(random_text)
 
 
@@ -125,32 +125,32 @@ def fib(n):
 @iopipe_with_profiling
 def profiling(event, context):
     fib_number = fib(10)
-    context.iopipe.metric('fib number', fib_number)
+    context.iopipe.metric("fib number", fib_number)
 
 
 @iopipe
 def success(event, context):
-    return {'message': 'Invocation successful'}
+    return {"message": "Invocation successful"}
 
 
 @iopipe_with_sync_http
 def sync_http(event, context):
-    return {'message': 'Invocation successful'}
+    return {"message": "Invocation successful"}
 
 
 @iopipe
 def timeout(event, context):
     time.sleep(2)
-    return {'message': 'Invocation success'}
+    return {"message": "Invocation success"}
 
 
 @iopipe_with_tracing
 def tracing(event, context):
-    context.iopipe.mark.start('foobar')
+    context.iopipe.mark.start("foobar")
     time.sleep(1)
-    context.iopipe.mark.end('foobar')
+    context.iopipe.mark.end("foobar")
 
 
 @iopipe
 def uncaught_error(event, context):
-    raise Exception('Invocation uncaught exception')
+    raise Exception("Invocation uncaught exception")

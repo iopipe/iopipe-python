@@ -19,8 +19,8 @@ def _get_parser(path):
 
 
 def get_value(obj, path):
-    if path.endswith('.length'):
-        path = path.replace('.length', '|length(@)')
+    if path.endswith(".length"):
+        path = path.replace(".length", "|length(@)")
     parser = _get_parser(path)
     return parser.search(obj)
 
@@ -44,14 +44,14 @@ def collect_all_keys(obj, initial_path, exclude_keys=None):
             for i, value in enumerate(o):
                 flatten(value, path + [str(i)])
         else:
-            if exclude_keys and '.'.join(path[1:]) in exclude_keys:
+            if exclude_keys and ".".join(path[1:]) in exclude_keys:
                 return
-            out['.'.join(path)] = o
+            out[".".join(path)] = o
 
     flatten(obj)
     return out
 
 
 def slugify(name):
-    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1-\2', name)
-    return re.sub('([a-z0-9])([A-Z])', r'\1-\2', s1).lower()
+    s1 = re.sub("(.)([A-Z][a-z]+)", r"\1-\2", name)
+    return re.sub("([a-z0-9])([A-Z])", r"\1-\2", s1).lower()

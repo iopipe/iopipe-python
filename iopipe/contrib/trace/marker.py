@@ -19,11 +19,15 @@ class Marker(object):
             self.contexts.pop()
 
     def start(self, name):
-        self.timeline.mark('start:%s' % name)
-        self.context.iopipe.label('@iopipe/plugin-trace')
+        self.timeline.mark("start:%s" % name)
+        self.context.iopipe.label("@iopipe/plugin-trace")
 
     def end(self, name):
-        self.timeline.mark('end:%s' % name)
+        self.timeline.mark("end:%s" % name)
 
     def measure(self, name, start=None, end=None):
-        self.timeline.measure('measure:%s' % name, 'start:%s' % (start or name), 'end:%s' % (end or start or name))
+        self.timeline.measure(
+            "measure:%s" % name,
+            "start:%s" % (start or name),
+            "end:%s" % (end or start or name),
+        )
