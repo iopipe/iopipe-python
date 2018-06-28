@@ -9,9 +9,7 @@ jobs:
           command: make test-python2
 
   build-py36:
-    working_directory: /var/lib/iopipe
-    docker:
-      - image: lambci/lambda:build-python3.6
+    machine: true
     steps:
       - checkout
       - run:
@@ -22,24 +20,19 @@ jobs:
             black --check tests
       - run:
           name: Run tests
-          command: |
-            pip install -U setuptools
-            python setup.py test
+          command: make test-python3
 
   acceptance:
     working_directory: ~/iopipe-python
     docker:
-      - image: circleci/python:3.6-stretch
+      - image: circleci/python:3.6-stretch-node-browsers
     steps:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
       - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
       - run:
-          name: Install node.js, npm and serverless
-          command: |
-            curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
-            sudo apt-get install -y nodejs
-            sudo npm install -g serverless
+          name: Install serverless
+          command: sudo npm install -g serverless
       - run:
           name: Deploy acceptance tests
           command: |
