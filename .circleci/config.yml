@@ -1,16 +1,12 @@
 version: 2
 jobs:
   build-py27:
-    working_directory: /var/lib/iopipe
-    docker:
-      - image: lambci/lambda:build-python2.7
+    machine: true
     steps:
       - checkout
       - run:
           name: Run tests
-          command: |
-            pip install -U setuptools
-            python setup.py test
+          command: make test-python2
 
   build-py36:
     working_directory: /var/lib/iopipe
