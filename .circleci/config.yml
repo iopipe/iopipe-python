@@ -6,8 +6,6 @@ jobs:
       - image: lambci/lambda:build-python2.7
     steps:
       - checkout
-      - run: sudo chown -R circleci:circleci /usr/local/bin
-      - run: sudo chown -R circleci:circleci /usr/local/lib/python2.7/site-packages
       - run:
           name: Run tests
           command: |
@@ -20,8 +18,6 @@ jobs:
       - image: lambci/lambda:build-python3.6
     steps:
       - checkout
-      - run: sudo chown -R circleci:circleci /usr/local/bin
-      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
       - run:
           name: Check code style
           command: |
