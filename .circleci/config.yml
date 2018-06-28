@@ -3,7 +3,7 @@ jobs:
   build-py27:
     working_directory: ~/iopipe-python
     docker:
-      - image: circleci/python:2.7
+      - image: circleci/python:2.7-stretch
     steps:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
@@ -17,7 +17,7 @@ jobs:
   build-py36:
     working_directory: ~/iopipe-python
     docker:
-      - image: circleci/python:3.6
+      - image: circleci/python:3.6-stretch
     steps:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
@@ -37,7 +37,7 @@ jobs:
   acceptance:
     working_directory: ~/iopipe-python
     docker:
-      - image: circleci/python:3.6
+      - image: circleci/python:3.6-stretch
     steps:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
@@ -58,7 +58,7 @@ jobs:
   release:
     working_directory: ~/iopipe-python
     docker:
-      - image: circleci/python:3.6
+      - image: circleci/python:3.6-stretch
     steps:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
