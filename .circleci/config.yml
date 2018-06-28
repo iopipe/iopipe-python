@@ -1,0 +1,84 @@
+version: 2
+jobs:
+  build-py27:
+    working_directory: ~/iopipe-python
+    docker:
+      - image: circleci/python:2.7
+    steps:
+      - checkout
+      - run:
+          name: Run tests
+          command: python setup.py test
+
+  build-py36:
+    working_directory: ~/iopipe-python
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - checkout
+      - run:
+          name: Check code style
+          command: |
+            pip install black==18.6b2
+            black --check iopipe
+            black --check tests
+      - run:
+          name: Run tests
+          command: python setup.py test
+
+  acceptance:
+    working_directory: ~/iopipe-python
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - checkout
+      - run:
+          name: Install node.js, npm and serverless
+          command: |
+            curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+            sudo apt-get install -y nodejs
+            sudo npm install -g serverless
+      - run:
+          name: Deploy acceptance tests
+          command: |
+            python setup.py build --build-lib acceptance/serverless
+            cd acceptance/serverless && sls deploy
+            cd acceptance/serverless-wsgi && npm install && sls deploy
+
+  release:
+    working_directory: ~/iopipe-python
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - checkout
+      - run:
+          name: Install release dependencies
+          command: |
+            sudo apt-get install -y pandoc
+            pip install -U pypandoc setuptools twine
+      - run:
+          name: Release package
+          command: |
+            python setup.py sdist
+            twine upload dist/* -u $PYPI_USERNAME -p "$PYPI_PASSWORD"
+
+workflows:
+  version: 2
+  build-all:
+    jobs:
+      - build-py27
+      - build-py36
+      - acceptance:
+          requires:
+            - build-py27
+            - build-py36
+          filters:
+            branches:
+              only: master
+      - release:
+          requires:
+            - build-py27
+            - build-py36
+          filters:
+            tags:
+             only: /v[0-9]+(\.[0-9]+)*/
