@@ -26,23 +26,6 @@ jobs:
             cd acceptance/serverless && sls deploy
             cd acceptance/serverless-wsgi && npm install && sls deploy
 
-  code-style:
-    working_directory: ~/iopipe-python
-    docker:
-      - image: circleci/python:3.6-stretch
-    steps:
-      - checkout
-      - run: sudo chown -R circleci:circleci /usr/local/bin
-      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
-      - run:
-          name: Check code style
-          command: |
-            pip install black==18.6b2
-            black --check iopipe
-            black --check tests
-
-  release:
-    working_directory: ~/iopipe-python
     docker:
       - image: circleci/python:3.6-stretch
     steps:
@@ -65,18 +48,15 @@ workflows:
   build-all:
     jobs:
       - build
-      - code-style
       - acceptance:
           requires:
             - build
-            - code-style
           filters:
             branches:
               only: master
       - release:
           requires:
             - build
-            - coe-style
           filters:
             tags:
              only: /v[0-9]+(\.[0-9]+)*/
