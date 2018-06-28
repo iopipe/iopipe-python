@@ -1,9 +1,9 @@
 version: 2
 jobs:
   build-py27:
-    working_directory: ~/iopipe-python
+    working_directory: /var/lib/iopipe
     docker:
-      - image: circleci/python:2.7-stretch
+      - image: lambci/lambda:build-python2.7
     steps:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
@@ -15,9 +15,9 @@ jobs:
             python setup.py test
 
   build-py36:
-    working_directory: ~/iopipe-python
+    working_directory: /var/lib/iopipe
     docker:
-      - image: circleci/python:3.6-stretch
+      - image: lambci/lambda:build-python3.6
     steps:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
