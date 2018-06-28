@@ -10,7 +10,9 @@ jobs:
       - run: sudo chown -R circleci:circleci /usr/local/lib/python2.7/site-packages
       - run:
           name: Run tests
-          command: python setup.py test
+          command: |
+            pip install -U setuptools
+            python setup.py test
 
   build-py36:
     working_directory: ~/iopipe-python
@@ -28,7 +30,9 @@ jobs:
             black --check tests
       - run:
           name: Run tests
-          command: python setup.py test
+          command: |
+            pip install -U setuptools
+            python setup.py test
 
   acceptance:
     working_directory: ~/iopipe-python
