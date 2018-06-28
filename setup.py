@@ -33,6 +33,7 @@ setup(
         "mock",
         "pytest",
         "pytest-benchmark",
+        "pytest-catchlog",
         "requests",
     ],
     zip_safe=True,
