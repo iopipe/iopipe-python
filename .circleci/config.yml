@@ -1,0 +1,123 @@
+version: 2
+jobs:
+  build-py27:
+    working_directory: ~/iopipe-python
+    docker:
+      - image: circleci/python:2.7
+    steps:
+      - checkout
+      - run: sudo chown -R circleci:circleci /usr/local/bin
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python2.7/site-packages
+      - run:
+          name: Run tests
+          command: python setup.py test
+
+  build-py36:
+    working_directory: ~/iopipe-python
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - checkout
+      - run: sudo chown -R circleci:circleci /usr/local/bin
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
+      - run:
+          name: Run tests
+          command: python setup.py test
+
+  code-style:
+    working_directory: ~/iopipe-python
+    docker:
+      - image: circleci/python:3.6-stretch
+    steps:
+      - checkout
+      - run: sudo chown -R circleci:circleci /usr/local/bin
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
+      - run:
+          name: Check code style
+          command: |
+            pip install black==18.6b2
+            black --check --line-length=88 --safe iopipe
+            black --check --line-length=88 --safe tests
+
+  coverage:
+    working_directory: ~/iopipe-python
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - checkout
+      - run: sudo chown -R circleci:circleci /usr/local/bin
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
+      - run:
+          name: Generate coverage report
+          command: python setup.py test --addopts="--cov iopipe"
+      - run:
+          name: Upload coverage report
+          command: |
+            pip install -U codecov
+            codecov
+
+  acceptance:
+    working_directory: ~/iopipe-python
+    docker:
+      - image: circleci/python:3.6-stretch-node-browsers
+    steps:
+      - checkout
+      - run: sudo chown -R circleci:circleci /usr/local/bin
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
+      - run:
+          name: Install serverless
+          command: sudo npm install -g serverless
+      - run:
+          name: Deploy acceptance tests
+          command: |
+            python setup.py build --build-lib acceptance/serverless
+            cd acceptance/serverless && sls deploy
+            cd acceptance/serverless-wsgi && npm install && sls deploy
+
+  release:
+    working_directory: ~/iopipe-python
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - checkout
+      - run: sudo chown -R circleci:circleci /usr/local/bin
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
+      - run:
+          name: Install release dependencies
+          command: |
+            sudo apt-get install -y pandoc
+            sudo pip install -U pypandoc setuptools twine
+      - run:
+          name: Release package
+          command: |
+            python setup.py sdist
+            twine upload dist/*
+
+workflows:
+  version: 2
+  build-all:
+    jobs:
+      - build-py27
+      - build-py36
+      - code-style
+      - coverage
+      - acceptance:
+          requires:
+            - build-py27
+            - build-py36
+            - code-style
+          filters:
+            branches:
+              only: master
+            tags:
+              ignore: /.*/
+      - release:
+          requires:
+            - build-py27
+            - build-py36
+            - code-style
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+             only: /^v[0-9]+(\.[0-9]+)*/

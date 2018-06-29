@@ -51,7 +51,7 @@ class IOpipeCore(object):
         self.config = set_config(**options)
         self.config["plugins"] = self.load_plugins(self.config["plugins"])
         self.futures = []
-        self.pool = futures.ThreadPoolExecutor(thread_name_prefix="iopipe")
+        self.pool = futures.ThreadPoolExecutor()
         self.report = None
 
         if self.config["debug"]:

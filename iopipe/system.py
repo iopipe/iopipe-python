@@ -13,8 +13,8 @@ def read_bootid():
     :returns: The system bood it.
     :rtype: str
     """
-    with open("/proc/sys/kernel/random/boot_id") as bootid_file:
-        return bootid_file.readline()
+    with open("/proc/sys/kernel/random/boot_id", "rb") as bootid_file:
+        return bootid_file.readline().decode("ascii")
 
 
 def read_disk():
@@ -55,15 +55,15 @@ def read_meminfo():
     :rtype: dict
     """
     data = {}
-    with open("/proc/meminfo") as meminfo_file:
+    with open("/proc/meminfo", "rb") as meminfo_file:
         for row in meminfo_file:
-            line = row.split(":")
+            fields = row.split()
             # Example content:
             # MemTotal:                3801016 kB
             # MemFree:                 1840972 kB
             # MemAvailable:        3287752 kB
             # HugePages_Total:             0
-            data[line[0]] = int(line[1].lstrip().rstrip(" kB\n")) * 1024
+            data[fields[0].decode("ascii")[:-1]] = int(fields[1]) * 1024
     return data
 
 
@@ -75,8 +75,8 @@ def read_pid_stat(pid="self"):
     :returns: The system stat information.
     :rtype: dict
     """
-    with open("/proc/%s/stat" % (pid,)) as f:
-        stat = f.readline().split(" ")
+    with open("/proc/%s/stat" % (pid,), "rb") as f:
+        stat = f.readline().split()
     return {
         "utime": int(stat[13]),
         "stime": int(stat[14]),
@@ -94,15 +94,14 @@ def read_pid_status(pid="self"):
     :rtype: dict
     """
     data = {}
-    with open("/proc/%s/status" % (pid,)) as status_file:
+    with open("/proc/%s/status" % (pid,), "rb") as status_file:
         for row in status_file:
-            line = row.split(":")
-            status_value = line[1].rstrip("\t\n kB").lstrip()
-            if line[0] in ["FDSize", "Threads", "VmRSS"]:
+            fields = row.split()
+            if fields and fields[0] in [b"VmRSS:", b"Threads:", b"FDSize:"]:
                 try:
-                    data[line[0]] = int(status_value)
+                    data[fields[0].decode("ascii")[:-1]] = int(fields[1])
                 except ValueError:
-                    data[line[0]] = status_value
+                    data[fields[0].decode("ascii")[:-1]] = fields[1].decode("ascii")
     return data
 
 
@@ -114,10 +113,10 @@ def read_stat():
     :rtype: list
     """
     data = []
-    with open("/proc/stat") as stat_file:
+    with open("/proc/stat", "rb") as stat_file:
         for line in stat_file:
-            cpu_stat = line.split(" ")
-            if cpu_stat[0][:3] != "cpu":
+            cpu_stat = line.split()
+            if cpu_stat[0][:3] != b"cpu":
                 break
             # First cpu line is aggregation of following lines, skip it
             if len(cpu_stat[0]) == 3:

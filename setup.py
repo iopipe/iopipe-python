@@ -29,10 +29,13 @@ setup(
     install_requires=install_requires,
     setup_requires=["pytest-runner"],
     tests_require=[
+        "coverage",
         "jmespath>=0.7.1,<1.0.0",
         "mock",
         "pytest",
         "pytest-benchmark",
+        "pytest-catchlog",
+        "pytest-cov",
         "requests",
     ],
     zip_safe=True,

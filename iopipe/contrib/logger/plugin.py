@@ -104,7 +104,3 @@ class LoggerPlugin(Plugin):
 
     def post_report(self, report):
         pass
-
-    def __del__(self):
-        if self.handler and self.handler.stream:
-            self.handler.stream.close()
