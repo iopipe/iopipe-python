@@ -10,7 +10,7 @@ def test_send_report(mock_session):
     send_report({"foo": "bar"}, set_config())
 
     mock_session.post.assert_called_once_with(
-        "https://metrics-api.iopipe.com/v0/event", json={"foo": "bar"}, timeout=5
+        "https://metrics-api.iopipe.com/v0/event", json={"foo": "bar"}, timeout=5.0
     )
 
 

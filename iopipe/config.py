@@ -44,7 +44,7 @@ def set_config(**config):
     try:
         config["network_timeout"] = int(config["network_timeout"]) / 1000.0
     except ValueError:
-        config["network_timeout"] = 5
+        config["network_timeout"] = 5.0
 
     if "." in str(config["timeout_window"]):
         warnings.warn(
