@@ -52,7 +52,9 @@ jobs:
           command: python setup.py test --addopts="--cov iopipe"
       - run:
           name: Upload coverage report
-          command: bash <(curl -s https://codecov.io/bash)
+          command: |
+            pip install -U codecov
+            codecov
 
   acceptance:
     working_directory: ~/iopipe-python
