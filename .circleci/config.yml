@@ -4,29 +4,29 @@ jobs:
     working_directory: ~/iopipe-python
     docker:
       - image: circleci/python:2.7
-    environment:
-      IOPIPE_TOKEN: ""
     steps:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
       - run: sudo chown -R circleci:circleci /usr/local/lib/python2.7/site-packages
       - run:
           name: Run tests
-          command: python setup.py test
+          command: |
+            unset IOPIPE_DEBUG IOPIPE_ENABLED IOPIPE_TIMEOUT_WINDOW IOPIPE_TOKEN
+            python setup.py test
 
   build-py36:
     working_directory: ~/iopipe-python
     docker:
       - image: circleci/python:3.6
-    environment:
-      IOPIPE_TOKEN: ""
     steps:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
       - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
       - run:
           name: Run tests
-          command: python setup.py test
+          command: |
+            unset IOPIPE_DEBUG IOPIPE_ENABLED IOPIPE_TIMEOUT_WINDOW IOPIPE_TOKEN
+            python setup.py test
 
   code-style:
     working_directory: ~/iopipe-python
@@ -47,15 +47,15 @@ jobs:
     working_directory: ~/iopipe-python
     docker:
       - image: circleci/python:3.6
-    environment:
-      IOPIPE_TOKEN: ""
     steps:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
       - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
       - run:
           name: Generate coverage report
-          command: python setup.py test --addopts="--cov iopipe"
+          command: |
+            unset IOPIPE_DEBUG IOPIPE_ENABLED IOPIPE_TIMEOUT_WINDOW IOPIPE_TOKEN
+            python setup.py test --addopts="--cov iopipe"
       - run:
           name: Upload coverage report
           command: |
