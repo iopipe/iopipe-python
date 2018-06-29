@@ -1,7 +1,17 @@
 # IOpipe Analytics & Distributed Tracing Agent for Python
 
-[![PyPI version](https://badge.fury.io/py/iopipe.svg)](https://badge.fury.io/py/iopipe)
-[![Slack](https://img.shields.io/badge/chat-slack-ff69b4.svg)](https://iopipe.now.sh)
+[![Build Status][1]][2] [![Code Coverage][3]][4] [![PyPI version][5]][6] [![Apache 2.0][7]][8] [![Slack][9]][10]
+
+[1]: https://circleci.com/gh/iopipe/iopipe-python.svg?style=svg
+[2]: https://circleci.com/gh/iopipe/iopipe-python
+[3]: https://codecov.io/gh/iopipe/iopipe-python/branch/master/graph/badge.svg
+[4]: https://codecov.io/gh/iopipe/iopipe-python
+[5]: https://badge.fury.io/py/iopipe.svg)](
+[6]: https://badge.fury.io/py/iopipe
+[7]: https://img.shields.io/badge/License-Apache%202.0-blue.svg
+[8]: https://github.com/iopipe/iopipe-python/blob/master/LICENSE
+[9]: https://img.shields.io/badge/chat-slack-ff69b4.svg
+[10]: https://iopipe.now.sh
 
 This package provides analytics and distributed tracing for event-driven applications running on AWS Lambda.
 
