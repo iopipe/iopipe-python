@@ -23,6 +23,18 @@ jobs:
             black --check --line-length=88 --safe iopipe
             black --check --line-length=88 --safe tests
 
+  build-py36:
+    working_directory: ~/iopipe-python
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - checkout
+      - run: sudo chown -R circleci:circleci /usr/local/bin
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
+      - run:
+          name: Run tests
+          command: python setup.py test
+
   acceptance:
     working_directory: ~/iopipe-python
     docker:
@@ -65,6 +77,7 @@ workflows:
   build-all:
     jobs:
       - build
+      - build-py36
       - code-style
       - acceptance:
           requires:
