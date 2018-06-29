@@ -78,7 +78,7 @@ jobs:
           command: |
             python setup.py build --build-lib acceptance/serverless
             cd acceptance/serverless && sls deploy
-            cd acceptance/serverless-wsgi && npm install && sls deploy
+            cd ../serverless-wsgi && npm install && sls deploy
 
   release:
     working_directory: ~/iopipe-python
