@@ -17,6 +17,7 @@ logger.setLevel(logging.INFO)
 
 
 class MockFuture(object):
+
     def __init__(self, func, *args, **kwargs):
         self._result = func(*args, **kwargs)
 
@@ -51,7 +52,7 @@ class IOpipeCore(object):
         self.config = set_config(**options)
         self.config["plugins"] = self.load_plugins(self.config["plugins"])
         self.futures = []
-        self.pool = futures.ThreadPoolExecutor(thread_name_prefix="iopipe")
+        self.pool = futures.ThreadPoolExecutor()
         self.report = None
 
         if self.config["debug"]:
@@ -85,6 +86,7 @@ class IOpipeCore(object):
     err = error
 
     def __call__(self, func):
+
         @functools.wraps(func)
         def wrapped(event, context):
             logger.debug("%s wrapped with IOpipe decorator" % repr(func))
