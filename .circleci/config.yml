@@ -4,6 +4,11 @@ jobs:
     working_directory: ~/iopipe-python
     docker:
       - image: circleci/python:2.7
+        environment:
+          IOPIPE_DEBUG: ""
+          IOPIPE_ENABLED: ""
+          IOPIPE_TOKEN: ""
+          IOPIPE_TIMEOUT_WINDOW: ""
     steps:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
@@ -16,6 +21,11 @@ jobs:
     working_directory: ~/iopipe-python
     docker:
       - image: circleci/python:3.6
+        environment:
+          IOPIPE_DEBUG: ""
+          IOPIPE_ENABLED: ""
+          IOPIPE_TOKEN: ""
+          IOPIPE_TIMEOUT_WINDOW: ""
     steps:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
