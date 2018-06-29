@@ -39,6 +39,21 @@ jobs:
             black --check --line-length=88 --safe iopipe
             black --check --line-length=88 --safe tests
 
+  coverage:
+    working_directory: ~/iopipe-python
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - checkout
+      - run: sudo chown -R circleci:circleci /usr/local/bin
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
+      - run:
+          name: Generate coverage report
+          command: python setup.py test --addopts="--cov iopipe"
+      - run:
+          name: Upload coverage report
+          command: bash <(curl -s https://codecov.io/bash)
+
   acceptance:
     working_directory: ~/iopipe-python
     docker:
@@ -60,7 +75,7 @@ jobs:
   release:
     working_directory: ~/iopipe-python
     docker:
-      - image: circleci/python:3.6-stretch
+      - image: circleci/python:3.6
     steps:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
@@ -83,6 +98,7 @@ workflows:
       - build-py27
       - build-py36
       - code-style
+      - coverage
       - acceptance:
           requires:
             - build-py27
