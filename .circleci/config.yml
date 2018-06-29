@@ -20,8 +20,8 @@ jobs:
           name: Check code style
           command: |
             pip install black==18.6b2
-            black --check iopipe
-            black --check tests
+            black --check --line-length=88 --safe iopipe
+            black --check --line-length=88 --safe tests
 
   acceptance:
     working_directory: ~/iopipe-python

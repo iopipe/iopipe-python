@@ -17,7 +17,6 @@ logger.setLevel(logging.INFO)
 
 
 class MockFuture(object):
-
     def __init__(self, func, *args, **kwargs):
         self._result = func(*args, **kwargs)
 
@@ -86,7 +85,6 @@ class IOpipeCore(object):
     err = error
 
     def __call__(self, func):
-
         @functools.wraps(func)
         def wrapped(event, context):
             logger.debug("%s wrapped with IOpipe decorator" % repr(func))
