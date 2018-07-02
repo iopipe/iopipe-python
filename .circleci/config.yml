@@ -104,9 +104,29 @@ workflows:
   build-all:
     jobs:
       - build-py27
+          filters:
+            branches:
+              only: /.*/
+            tags:
+             only: /.*/
       - build-py36
+          filters:
+            branches:
+              only: /.*/
+            tags:
+             only: /.*/
       - code-style
+          filters:
+            branches:
+              only: /.*/
+            tags:
+             only: /.*/
       - coverage
+          filters:
+            branches:
+              only: /.*/
+            tags:
+             only: /.*/
       - acceptance:
           requires:
             - build-py27
@@ -126,4 +146,4 @@ workflows:
             branches:
               ignore: /.*/
             tags:
-             only: /^v[0-9]+(\.[0-9]+)*/
+             only: /^v.*/
