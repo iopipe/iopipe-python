@@ -108,25 +108,25 @@ workflows:
             branches:
               only: /.*/
             tags:
-             only: /.*/
+              only: /.*/
       - build-py36
           filters:
             branches:
               only: /.*/
             tags:
-             only: /.*/
+              only: /.*/
       - code-style
           filters:
             branches:
               only: /.*/
             tags:
-             only: /.*/
+              only: /.*/
       - coverage
           filters:
             branches:
               only: /.*/
             tags:
-             only: /.*/
+              only: /.*/
       - acceptance:
           requires:
             - build-py27
@@ -146,4 +146,4 @@ workflows:
             branches:
               ignore: /.*/
             tags:
-             only: /^v.*/
+              only: /^v.*/
