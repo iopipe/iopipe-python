@@ -103,25 +103,25 @@ workflows:
   version: 2
   build-all:
     jobs:
-      - build-py27
+      - build-py27:
           filters:
             branches:
               only: /.*/
             tags:
               only: /.*/
-      - build-py36
+      - build-py36:
           filters:
             branches:
               only: /.*/
             tags:
               only: /.*/
-      - code-style
+      - code-style:
           filters:
             branches:
               only: /.*/
             tags:
               only: /.*/
-      - coverage
+      - coverage:
           filters:
             branches:
               only: /.*/
