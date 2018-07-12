@@ -22,10 +22,10 @@ def upload_log_data(url, stream_or_file):
         logger.debug("Uploading log data to IOpipe")
         if isinstance(stream_or_file, StringIO):
             stream_or_file.seek(0)
-            response = requests.put(url, data=stream_or_file)
+            response = requests.put(url, data=stream_or_file, timeout=None)
         else:
-            with open(stream_or_file) as data:
-                response = requests.put(url, data=data)
+            with open(stream_or_file, "rb") as data:
+                response = requests.put(url, data=data, timeout=None)
         response.raise_for_status()
     except Exception as e:
         logger.debug("Error while uploading log data: %s", e)

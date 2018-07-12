@@ -108,7 +108,7 @@ def logging_tmp(event, context):
     with open("text.json") as f:
         text = json.load(f)
 
-    for _ in range(15000):
+    for _ in range(5):
         level = random.choice(["debug", "info", "warn", "error", "critical"])
         random_text = random.choice(text["text"])
         getattr(context.iopipe.log, level)(random_text)
