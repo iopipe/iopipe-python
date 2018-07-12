@@ -82,6 +82,8 @@ class LoggerPlugin(Plugin):
     def pre_report(self, report):
         if self.handler.stream.tell():
             stream = self.handler.stream
+            if hasattr(stream, "getvalue"):
+                stream = StringIO(stream.getvalue())
             if hasattr(stream, "file"):
                 stream = stream.name
                 self.handler.stream.close()
