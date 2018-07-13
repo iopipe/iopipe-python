@@ -172,13 +172,13 @@ class SNS(EventType):
         "Records[0].Sns.TopicArn",
         "Records[0].Sns.Type",
     ]
-    required_keys = ["Records[0].eventVersion", "Records[0].eventSource"]
+    required_keys = ["Records[0].EventVersion", "Records[0].EventSource"]
 
     def has_required_keys(self):
         return (
             super(SNS, self).has_required_keys()
-            and get_value(self.event, "Records[0].eventVersion") == "1.0"
-            and get_value(self.event, "Records[0].eventSource") == "aws:sns"
+            and get_value(self.event, "Records[0].EventVersion") == "1.0"
+            and get_value(self.event, "Records[0].EventSource") == "aws:sns"
         )
 
 

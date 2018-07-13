@@ -54,6 +54,11 @@ def event_kinesis():
 
 
 @pytest.fixture
+def event_sns():
+    return _load_event("sns")
+
+
+@pytest.fixture
 def event_scheduled():
     return _load_event("scheduled")
 
