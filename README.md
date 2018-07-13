@@ -81,7 +81,7 @@ def handler(event, context):
   pass
 ```
 
- The agent comes preloaded with the [Event Info](https://github.com/iopipe/iopipe-python#event-info-plugin), [Logger](https://github.com/iopipe/iopipe-python#logger-plugin), [Profiler](https://github.com/iopipe/iopipe-python#profiler-plugin) and [Trace](https://github.com/iopipe/iopipe-python#trace-plugin) plugins. See the relevant plugin sections for usage.
+ The agent comes preloaded with the [Event Info](https://github.com/iopipe/iopipe-python#event-info-plugin), [Profiler](https://github.com/iopipe/iopipe-python#profiler-plugin) and [Trace](https://github.com/iopipe/iopipe-python#trace-plugin) plugins. See the relevant plugin sections for usage.
 
 ### Configuration
 
