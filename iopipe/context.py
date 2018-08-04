@@ -40,7 +40,8 @@ class IOpipeContext(object):
         event = {"name": name}
 
         # Add numerical values to report
-        # We typecast decimals as strings: not JSON serializable and casting to floats can result in rounding errors.
+        # We typecast decimals as strings: not JSON serializable and casting to floats
+        # can result in rounding errors.
         if isinstance(value, numbers.Number) and not isinstance(value, decimal.Decimal):
             event["n"] = value
         else:
@@ -84,6 +85,17 @@ class IOpipeContext(object):
         self.instance.report.send()
         self.instance.run_hooks("post:report")
         raise error
+
+    def http_trace(self, trace, request, response):
+        if self.instance.report is None:
+            return
+
+        entry = trace._asdict()
+        entry["type"] = entry.pop("entryType")
+        entry["request"] = request._asdict()
+        entry["response"] = response._asdict()
+
+        self.instance.report.http_trace_entries.append(entry)
 
     def register(self, name, value, force=False):
         if not hasattr(self, name) or force:

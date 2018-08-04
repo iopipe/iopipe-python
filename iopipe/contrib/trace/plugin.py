@@ -45,7 +45,7 @@ class TracePlugin(Plugin):
         context.iopipe.register("mark", Marker(self.timeline, context))
 
         if self.auto_http is True:
-            patch_requests(context, self.auto_measure, self.http_filter)
+            patch_requests(context, self.http_filter)
 
     def post_invoke(self, event, context):
         context.iopipe.unregister("mark")
@@ -56,9 +56,8 @@ class TracePlugin(Plugin):
     def pre_report(self, report):
         if self.auto_measure:
             add_timeline_measures(self.timeline)
-        report.report["performanceEntries"] = [
-            e._asdict() for e in self.timeline.get_entries()
-        ]
+        for entry in self.timeline.get_entries():
+            report.performance_entries.append(entry._asdict())
 
     def post_report(self, report):
         pass

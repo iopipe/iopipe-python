@@ -1,3 +1,4 @@
+import collections
 import functools
 import uuid
 
@@ -25,17 +26,28 @@ REQUEST_KEYS = [("method", "method"), ("url", "url")]
 
 RESPONSE_KEYS = [("status_code", "statusCode")]
 
-URLPARSE_KEYS = [
-    ("fragment", "hash"),
-    ("hostname", "hostname"),
-    ("path", "path"),
-    ("port", "port"),
-    ("query", "query"),
-    ("scheme", "protocol"),
-]
+Request = collections.namedtuple(
+    "Request",
+    [
+        "hash",
+        "headers",
+        "hostname",
+        "method",
+        "path",
+        "pathname",
+        "port",
+        "protocol",
+        "query",
+        "url",
+    ],
+)
+
+Response = collections.namedtuple(
+    "Response", ["headers", "statusCode", "statusMessage"]
+)
 
 
-def patch_session_send(context, auto_measure, http_filter):
+def patch_session_send(context, http_filter):
     """
     Monkey patches requests' Session class, if available. Overloads the
     send method to add tracing and metrics collection.
@@ -47,15 +59,15 @@ def patch_session_send(context, auto_measure, http_filter):
         id = str(uuid.uuid4())
         with context.iopipe.mark(id):
             response = original_session_send(self, *args, **kwargs)
-        if not auto_measure:
-            context.iopipe.mark.measure(id)
-        collect_metrics_for_response(response, context, id, http_filter)
+        trace = context.iopipe.mark.measure(id)
+        context.iopipe.mark.delete(id)
+        collect_metrics_for_response(response, context, trace, http_filter)
         return response
 
     Session.send = send
 
 
-def patch_botocore_session_send(context, auto_measure, http_filter):
+def patch_botocore_session_send(context, http_filter):
     """
     Monkey patches botocore's vendored requests, if available. Overloads the
     Session class' send method to add tracing and metric collection.
@@ -67,9 +79,9 @@ def patch_botocore_session_send(context, auto_measure, http_filter):
         id = str(uuid.uuid4())
         with context.iopipe.mark(id):
             response = original_botocore_session_send(self, *args, **kwargs)
-        if not auto_measure:
-            context.iopipe.mark.measure(id)
-        collect_metrics_for_response(response, context, id, http_filter)
+        trace = context.iopipe.mark.measure(id)
+        context.iopipe.mark.delete(id)
+        collect_metrics_for_response(response, context, trace, http_filter)
         return response
 
     BotocoreSession.send = send
@@ -87,9 +99,9 @@ def restore_botocore_session_send():
         BotocoreSession.send = original_botocore_session_send
 
 
-def patch_requests(context, auto_measure, http_filter):
-    patch_session_send(context, auto_measure, http_filter)
-    patch_botocore_session_send(context, auto_measure, http_filter)
+def patch_requests(context, http_filter):
+    patch_session_send(context, http_filter)
+    patch_botocore_session_send(context, http_filter)
 
 
 def restore_requests():
@@ -97,42 +109,55 @@ def restore_requests():
     restore_botocore_session_send()
 
 
-def collect_metrics_for_response(response, context, id, http_filter):
+def collect_metrics_for_response(http_response, context, trace, http_filter):
     """
     Collects relevant metrics from a requests Response object and adds them to
     the IOpipe context.
     """
     if http_filter is not None and callable(http_filter):
-        response = http_filter(response)
-        if response is False:
-            context.iopipe.mark.delete(id)
+        http_response = http_filter(http_response)
+        if http_response is False:
             return
 
-    prefix = functools.partial("@iopipe/trace.{}.{}".format, id)
-    context.iopipe.metric(prefix("type"), "autoHttp")
+    request = None
+    if hasattr(http_response, "request"):
+        parsed_url = None
+        if hasattr(http_response.request, "url"):
+            parsed_url = urlparse(http_response.request.url)
 
-    for old_key, new_key in REQUEST_KEYS:
-        if hasattr(response.request, old_key):
-            context.iopipe.metric(
-                prefix("request.%s" % new_key), getattr(response.request, old_key)
-            )
+        request_headers = []
+        if hasattr(http_response.request, "headers"):
+            request_headers = [
+                {"key": k, "string": v}
+                for k, v in http_response.request.headers.items()
+                if k not in EXCLUDE_HEADERS
+            ]
 
-    parsed_url = urlparse(response.request.url)
-    for old_key, new_key in URLPARSE_KEYS:
-        context.iopipe.metric(
-            prefix("request.%s" % new_key), getattr(parsed_url, old_key)
-        )
+    request = Request(
+        hash=getattr(parsed_url, "fragment"),
+        headers=request_headers,
+        hostname=getattr(parsed_url, "hostname"),
+        method=getattr(http_response.request, "method"),
+        path=getattr(parsed_url, "path"),
+        pathname=None,
+        port=getattr(parsed_url, "port"),
+        protocol=getattr(parsed_url, "scheme"),
+        query=getattr(parsed_url, "query"),
+        url=getattr(http_response.request, "url"),
+    )
 
-    for key, value in response.request.headers.items():
-        if key not in EXCLUDE_HEADERS:
-            context.iopipe.metric(prefix("request.headers.%s" % key), value)
+    response_headers = []
+    if hasattr(http_response, "headers"):
+        response_headers = [
+            {"key": k, "string": v}
+            for k, v in http_response.headers.items()
+            if k not in EXCLUDE_HEADERS
+        ]
 
-    for old_key, new_key in RESPONSE_KEYS:
-        if hasattr(response, old_key):
-            context.iopipe.metric(
-                prefix("response.%s" % new_key), getattr(response, old_key)
-            )
+    response = Response(
+        headers=response_headers,
+        statusCode=getattr(http_response, "status_code"),
+        statusMessage=None,
+    )
 
-    for key, value in response.headers.items():
-        if key not in EXCLUDE_HEADERS:
-            context.iopipe.metric(prefix("response.headers.%s" % key), value)
+    context.iopipe.http_trace(trace, request, response)
