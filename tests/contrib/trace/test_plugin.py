@@ -72,7 +72,37 @@ def test__trace_plugin__auto_http__http(
 
     traces = iopipe.report.http_trace_entries
 
+    # There are two traces because of the http -> https redirect
     assert len(traces) == 2
+
+    for trace in traces:
+        for key in ["name", "startTime", "duration", "type", "timestamp"]:
+            assert key in trace
+
+        for key in [
+            "hash",
+            "headers",
+            "hostname",
+            "method",
+            "path",
+            "pathname",
+            "port",
+            "protocol",
+            "query",
+            "url",
+        ]:
+            assert key in trace["request"]
+
+        for header in trace["request"]["headers"]:
+            assert "key" in header
+            assert "string" in header
+
+        for key in ["headers", "statusCode", "statusMessage"]:
+            assert key in trace["response"]
+
+        for header in trace["response"]["headers"]:
+            assert "key" in header
+            assert "string" in header
 
 
 @mock.patch("iopipe.report.send_report", autospec=True)
@@ -88,6 +118,35 @@ def test_trace_plugin__auto_http__https(
     traces = iopipe.report.http_trace_entries
 
     assert len(traces) == 1
+
+    for trace in traces:
+        for key in ["name", "startTime", "duration", "type", "timestamp"]:
+            assert key in trace
+
+        for key in [
+            "hash",
+            "headers",
+            "hostname",
+            "method",
+            "path",
+            "pathname",
+            "port",
+            "protocol",
+            "query",
+            "url",
+        ]:
+            assert key in trace["request"]
+
+        for header in trace["request"]["headers"]:
+            assert "key" in header
+            assert "string" in header
+
+        for key in ["headers", "statusCode", "statusMessage"]:
+            assert key in trace["response"]
+
+        for header in trace["response"]["headers"]:
+            assert "key" in header
+            assert "string" in header
 
 
 @mock.patch("iopipe.report.send_report", autospec=True)

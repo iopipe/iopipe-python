@@ -1,5 +1,4 @@
 import collections
-import functools
 import uuid
 
 try:
@@ -21,10 +20,6 @@ if BotocoreSession is not None:
     original_botocore_session_send = BotocoreSession.send
 
 EXCLUDE_HEADERS = ["Authorization", "Cookie", "Proxy-Authorization", "Set-Cookie"]
-
-REQUEST_KEYS = [("method", "method"), ("url", "url")]
-
-RESPONSE_KEYS = [("status_code", "statusCode")]
 
 Request = collections.namedtuple(
     "Request",
@@ -139,7 +134,8 @@ def collect_metrics_for_response(http_response, context, trace, http_filter):
         hostname=getattr(parsed_url, "hostname"),
         method=getattr(http_response.request, "method"),
         path=getattr(parsed_url, "path"),
-        pathname=None,
+        # TODO: Determine if this is redundant
+        pathname=getattr(parsed_url, "path"),
         port=getattr(parsed_url, "port"),
         protocol=getattr(parsed_url, "scheme"),
         query=getattr(parsed_url, "query"),
