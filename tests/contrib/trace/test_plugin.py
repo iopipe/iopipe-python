@@ -158,3 +158,18 @@ def test_trace_plugin__auto_http__filter(
     handler({}, mock_context)
 
     assert len(iopipe.report.http_trace_entries) == 0
+
+
+@mock.patch("iopipe.report.send_report", autospec=True)
+def test_trace_plugin__auto_http__filter_request(
+    mock_send_report, handler_with_trace_auto_http_filter_request, mock_context
+):
+    iopipe, handler = handler_with_trace_auto_http_filter_request
+
+    handler({}, mock_context)
+
+    traces = iopipe.report.http_trace_entries
+
+    assert len(traces) == 1
+    assert "request" not in traces[0]
+    assert "response" in traces[0]

@@ -114,6 +114,32 @@ def handler_with_trace_auto_http_filter(iopipe_with_trace_auto_http_filter):
 
 
 @pytest.fixture
+def iopipe_with_trace_auto_http_filter_request():
+    def http_filter(response):
+        delattr(response, "request")
+        return response
+
+    plugin = TracePlugin(auto_http=True, http_filter=http_filter)
+    return IOpipeCore(
+        token="test-suite",
+        url="https://metrics-api.iopipe.com",
+        debug=True,
+        plugins=[plugin],
+    )
+
+
+@pytest.fixture
+def handler_with_trace_auto_http_filter_request(
+    iopipe_with_trace_auto_http_filter_request
+):
+    @iopipe_with_trace_auto_http_filter_request
+    def _handler(event, context):
+        requests.get("https://www.iopipe.com/")
+
+    return iopipe_with_trace_auto_http_filter_request, _handler
+
+
+@pytest.fixture
 def marker(timeline, mock_context):
     return Marker(timeline, mock_context)
 

@@ -92,8 +92,10 @@ class IOpipeContext(object):
 
         entry = trace._asdict()
         entry["type"] = entry.pop("entryType")
-        entry["request"] = request._asdict()
-        entry["response"] = response._asdict()
+        if request is not None:
+            entry["request"] = request._asdict()
+        if response is not None:
+            entry["response"] = response._asdict()
 
         self.instance.report.http_trace_entries.append(entry)
 
