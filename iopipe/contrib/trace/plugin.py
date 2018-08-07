@@ -28,7 +28,7 @@ class TracePlugin(Plugin):
         """
         self.auto_measure = auto_measure
         self.auto_http = auto_http is True or strtobool(
-            os.getenv("IOPIPE_TRACE_AUTO_HTTP", "false")
+            os.getenv("IOPIPE_TRACE_AUTO_HTTP_ENABLED", "false")
         )
         self.http_filter = http_filter
 
