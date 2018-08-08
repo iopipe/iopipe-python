@@ -19,7 +19,23 @@ if Session is not None:
 if BotocoreSession is not None:
     original_botocore_session_send = BotocoreSession.send
 
-EXCLUDE_HEADERS = ["Authorization", "Cookie", "Proxy-Authorization", "Set-Cookie"]
+INCLUDE_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "age",
+    "cache-control",
+    "connection",
+    "content-encoding",
+    "content-length",
+    "content-type",
+    "date",
+    "etag",
+    "host",
+    "server",
+    "strict-transport-security",
+    "user-agent",
+    "vary",
+]
 
 Request = collections.namedtuple(
     "Request",
@@ -125,7 +141,7 @@ def collect_metrics_for_response(http_response, context, trace, http_filter):
             request_headers = [
                 {"key": k, "string": v}
                 for k, v in http_response.request.headers.items()
-                if k not in EXCLUDE_HEADERS
+                if k.lower() in INCLUDE_HEADERS
             ]
 
         request = Request(
@@ -147,7 +163,7 @@ def collect_metrics_for_response(http_response, context, trace, http_filter):
         response_headers = [
             {"key": k, "string": v}
             for k, v in http_response.headers.items()
-            if k not in EXCLUDE_HEADERS
+            if k.lower() in INCLUDE_HEADERS
         ]
 
     response = Response(
