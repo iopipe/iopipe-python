@@ -71,7 +71,7 @@ def patch_session_send(context, http_filter):
         with context.iopipe.mark(id):
             response = original_session_send(self, *args, **kwargs)
         trace = context.iopipe.mark.measure(id)
-        context.iopipe.mark.delete(id)
+        # context.iopipe.mark.delete(id)
         collect_metrics_for_response(response, context, trace, http_filter)
         return response
 
