@@ -1,4 +1,5 @@
 import pytest
+import requests
 
 from iopipe import IOpipeCore
 from iopipe.contrib.trace.marker import Marker
@@ -20,6 +21,31 @@ def iopipe_with_trace():
 @pytest.fixture
 def iopipe_with_trace_no_auto_measure():
     plugin = TracePlugin(auto_measure=False)
+    return IOpipeCore(
+        token="test-suite",
+        url="https://metrics-api.iopipe.com",
+        debug=True,
+        plugins=[plugin],
+    )
+
+
+@pytest.fixture
+def iopipe_with_trace_auto_http():
+    plugin = TracePlugin(auto_http=True)
+    return IOpipeCore(
+        token="test-suite",
+        url="https://metrics-api.iopipe.com",
+        debug=True,
+        plugins=[plugin],
+    )
+
+
+@pytest.fixture
+def iopipe_with_trace_auto_http_filter():
+    def http_filter(response):
+        return not response.request.url.startswith("https://www.iopipe.com")
+
+    plugin = TracePlugin(auto_http=True, http_filter=http_filter)
     return IOpipeCore(
         token="test-suite",
         url="https://metrics-api.iopipe.com",
@@ -58,6 +84,59 @@ def handler_with_trace_no_auto_measure(iopipe_with_trace_no_auto_measure):
         context.iopipe.mark.end("foo")
 
     return iopipe_with_trace_no_auto_measure, _handler
+
+
+@pytest.fixture
+def handler_with_trace_auto_http(iopipe_with_trace_auto_http):
+    @iopipe_with_trace_auto_http
+    def _handler(event, context):
+        requests.get("http://www.iopipe.com/")
+
+    return iopipe_with_trace_auto_http, _handler
+
+
+@pytest.fixture
+def handler_with_trace_auto_https(iopipe_with_trace_auto_http):
+    @iopipe_with_trace_auto_http
+    def _handler(event, context):
+        requests.get("https://www.iopipe.com/")
+
+    return iopipe_with_trace_auto_http, _handler
+
+
+@pytest.fixture
+def handler_with_trace_auto_http_filter(iopipe_with_trace_auto_http_filter):
+    @iopipe_with_trace_auto_http_filter
+    def _handler(event, context):
+        requests.get("https://www.iopipe.com/")
+
+    return iopipe_with_trace_auto_http_filter, _handler
+
+
+@pytest.fixture
+def iopipe_with_trace_auto_http_filter_request():
+    def http_filter(response):
+        delattr(response, "request")
+        return response
+
+    plugin = TracePlugin(auto_http=True, http_filter=http_filter)
+    return IOpipeCore(
+        token="test-suite",
+        url="https://metrics-api.iopipe.com",
+        debug=True,
+        plugins=[plugin],
+    )
+
+
+@pytest.fixture
+def handler_with_trace_auto_http_filter_request(
+    iopipe_with_trace_auto_http_filter_request
+):
+    @iopipe_with_trace_auto_http_filter_request
+    def _handler(event, context):
+        requests.get("https://www.iopipe.com/")
+
+    return iopipe_with_trace_auto_http_filter_request, _handler
 
 
 @pytest.fixture

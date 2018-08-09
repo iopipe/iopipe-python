@@ -4,10 +4,7 @@ import random
 import sys
 import time
 
-try:
-    from urllib.request import urlopen
-except ImportError:
-    from urllib2 import urlopen
+from botocore.vendored import requests
 
 from iopipe import IOpipe, IOpipeCore
 from iopipe.contrib.eventinfo import EventInfoPlugin
@@ -34,24 +31,25 @@ iopipe_with_sync_http = IOpipe(debug=True, sync_http=True)
 trace_plugin = TracePlugin()
 iopipe_with_tracing = IOpipeCore(debug=True, plugins=[trace_plugin])
 
+trace_plugin_auto_http = TracePlugin(auto_http=True)
+iopipe_with_auto_http = IOpipeCore(debug=True, plugins=[trace_plugin_auto_http])
+
 
 @iopipe_with_eventinfo
 def api_gateway(event, context):
     return {"statusCode": 200, "body": json.dumps({"success": True})}
 
 
-@iopipe_with_eventinfo
+@iopipe_with_auto_http
 def api_trigger(event, context):
     gateway_url = os.getenv("PY_API_GATEWAY_URL")
     context.iopipe.metric("gateway_url", gateway_url or "")
     if gateway_url is not None:
-        response = urlopen(gateway_url)
-        context.iopipe.metric(
-            "response_status", getattr(response, "status", getattr(response, "code"))
-        )
-        response.close()
+        response = requests.get(gateway_url)
+        context.iopipe.metric("response_status", response.status_code)
 
 
+@iopipe_with_auto_http
 def baseline(event, context):
     pass
 
@@ -69,7 +67,6 @@ def caught_error(event, context):
 
 
 def coldstart(event, context):
-
     @iopipe
     def handler(event, context):
         pass

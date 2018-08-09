@@ -40,7 +40,9 @@ class Report(object):
         self.context = context
 
         self.custom_metrics = []
+        self.http_trace_entries = []
         self.labels = set()
+        self.performance_entries = []
         self.plugins = get_plugin_meta(self.config["plugins"])
 
         self.report = {
@@ -64,7 +66,9 @@ class Report(object):
                 "os": {"linux": {}},
             },
             "errors": {},
+            "httpTraceEntries": self.http_trace_entries,
             "installMethod": self.config.get("install_method"),
+            "performanceEntries": self.performance_entries,
             "plugins": self.plugins,
             "processId": constants.PROCESS_ID,
             "timestamp": int(time.time() * 1000),
@@ -135,7 +139,7 @@ class Report(object):
         Prepare the report to be sent to IOpipe.
 
         :param error: An optional error to add to report.
-        :param frame: An optional stack frame to add to report in the event of a timeout.
+        :param frame: A stack frame to add to report in the event of a timeout.
         """
         if error:
             self.retain_error(error, frame)
