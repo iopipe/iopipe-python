@@ -145,17 +145,17 @@ def collect_metrics_for_response(http_response, context, trace, http_filter):
             ]
 
         request = Request(
-            hash=getattr(parsed_url, "fragment", None),
+            hash=getattr(parsed_url, "fragment", ""),
             headers=request_headers,
-            hostname=getattr(parsed_url, "hostname", None),
-            method=getattr(http_response.request, "method", None),
-            path=getattr(parsed_url, "path", None),
+            hostname=getattr(parsed_url, "hostname", ""),
+            method=getattr(http_response.request, "method", ""),
+            path=getattr(parsed_url, "path", ""),
             # TODO: Determine if this is redundant
-            pathname=getattr(parsed_url, "path", None),
-            port=getattr(parsed_url, "port", None),
-            protocol=getattr(parsed_url, "scheme", None),
-            query=getattr(parsed_url, "query", None),
-            url=getattr(http_response.request, "url", None),
+            pathname=getattr(parsed_url, "path", ""),
+            port=getattr(parsed_url, "port", ""),
+            protocol=getattr(parsed_url, "scheme", ""),
+            query=getattr(parsed_url, "query", ""),
+            url=getattr(http_response.request, "url", ""),
         )
 
     response_headers = []
@@ -168,8 +168,8 @@ def collect_metrics_for_response(http_response, context, trace, http_filter):
 
     response = Response(
         headers=response_headers,
-        statusCode=getattr(http_response, "status_code", None),
-        statusMessage=None,
+        statusCode=getattr(http_response, "status_code", ""),
+        statusMessage="",
     )
 
     context.iopipe.http_trace(trace, request, response)
