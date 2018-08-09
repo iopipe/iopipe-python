@@ -48,6 +48,17 @@ functions:
     handler: handler.api_trigger
     runtime: python3.6
 
+  py2-auto-http:
+    events:
+      - schedule: rate(10 minutes)
+    handler: handler.uto_http
+    runtime: python2.7
+  py3-auto-http:
+    events:
+      - schedule: rate(10 minutes)
+    handler: handler.uto_http
+    runtime: python3.6
+
   py2-baseline:
     events:
       - schedule: rate(10 minutes)

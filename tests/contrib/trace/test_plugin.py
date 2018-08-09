@@ -104,6 +104,8 @@ def test__trace_plugin__auto_http__http(
             assert "key" in header
             assert "string" in header
 
+    assert False is True
+
 
 @mock.patch("iopipe.report.send_report", autospec=True)
 def test_trace_plugin__auto_http__https(
