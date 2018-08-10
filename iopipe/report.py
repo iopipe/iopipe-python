@@ -1,3 +1,4 @@
+import copy
 import json
 import logging
 import os
@@ -191,4 +192,4 @@ class Report(object):
         logger.debug("Sending report to IOpipe:")
         logger.debug(json.dumps(self.report, indent=2, sort_keys=True))
 
-        self.client.submit_future(send_report, self.report, self.config)
+        self.client.submit_future(send_report, copy.deepcopy(self.report), self.config)
