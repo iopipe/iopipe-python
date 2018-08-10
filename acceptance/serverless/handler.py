@@ -51,7 +51,7 @@ def api_trigger(event, context):
 
 @iopipe_with_auto_http
 def auto_http(event, context):
-    requests.get("https://www.iopipe.com/")
+    requests.get("https://www.iopipe.com")
 
 
 @iopipe_with_auto_http
