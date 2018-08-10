@@ -4,7 +4,10 @@ import random
 import sys
 import time
 
-from botocore.vendored import requests
+try:
+    from botocore.vendored import requests
+except ImportError:
+    import requests
 
 from iopipe import IOpipe, IOpipeCore
 from iopipe.contrib.eventinfo import EventInfoPlugin
