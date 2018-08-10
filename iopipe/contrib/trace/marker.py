@@ -34,3 +34,16 @@ class Marker(object):
 
     def delete(self, name):
         self.timeline.delete(name)
+
+    def http_trace(self, trace, request, response):
+        if self.context.instance.report is None:
+            return
+
+        entry = trace._asdict()
+        entry["type"] = entry.pop("entryType")
+        if request is not None:
+            entry["request"] = request._asdict()
+        if response is not None:
+            entry["response"] = response._asdict()
+
+        self.context.instance.report.http_trace_entries.append(entry)

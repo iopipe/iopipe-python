@@ -70,8 +70,7 @@ def test__trace_plugin__auto_http__http(
 
     handler({}, mock_context)
 
-    assert len(iopipe.report.performance_entries) == 6
-    assert len(iopipe.report.report["performanceEntries"]) == 6
+    assert len(iopipe.report.performance_entries) == 0
 
     http_traces = iopipe.report.http_trace_entries
 
@@ -118,8 +117,7 @@ def test_trace_plugin__auto_http__https(
 
     handler({}, mock_context)
 
-    assert len(iopipe.report.performance_entries) == 3
-    assert len(iopipe.report.report["performanceEntries"]) == 3
+    assert len(iopipe.report.performance_entries) == 0
 
     http_traces = iopipe.report.http_trace_entries
 

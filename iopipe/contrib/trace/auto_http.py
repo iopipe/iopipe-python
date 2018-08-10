@@ -71,6 +71,7 @@ def patch_session_send(context, http_filter):
         with context.iopipe.mark(id):
             response = original_session_send(self, *args, **kwargs)
         trace = context.iopipe.mark.measure(id)
+        context.iopipe.mark.delete(id)
         collect_metrics_for_response(response, context, trace, http_filter)
         return response
 
@@ -90,6 +91,7 @@ def patch_botocore_session_send(context, http_filter):
         with context.iopipe.mark(id):
             response = original_botocore_session_send(self, *args, **kwargs)
         trace = context.iopipe.mark.measure(id)
+        context.iopipe.mark.delete(id)
         collect_metrics_for_response(response, context, trace, http_filter)
         return response
 
@@ -170,4 +172,4 @@ def collect_metrics_for_response(http_response, context, trace, http_filter):
         statusMessage=None,
     )
 
-    context.iopipe.http_trace(trace, request, response)
+    context.iopipe.mark.http_trace(trace, request, response)

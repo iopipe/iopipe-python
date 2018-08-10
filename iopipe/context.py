@@ -86,19 +86,6 @@ class IOpipeContext(object):
         self.instance.run_hooks("post:report")
         raise error
 
-    def http_trace(self, trace, request, response):
-        if self.instance.report is None:
-            return
-
-        entry = trace._asdict()
-        entry["type"] = entry.pop("entryType")
-        if request is not None:
-            entry["request"] = request._asdict()
-        if response is not None:
-            entry["response"] = response._asdict()
-
-        self.instance.report.http_trace_entries.append(entry)
-
     def register(self, name, value, force=False):
         if not hasattr(self, name) or force:
             setattr(self, name, value)
