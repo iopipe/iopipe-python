@@ -47,7 +47,7 @@ From your project directory:
 $ pip install iopipe -t .
 
 # If running locally or in other environments _besides_ AWS Lambda:
-$ pip install requests -t .
+$ pip install jmespath>=0.7.1,<1.0.0 requests -t .
 ```
 
 Your folder structure for the function should look similar to:
