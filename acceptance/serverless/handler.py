@@ -40,7 +40,7 @@ def api_gateway(event, context):
     return {"statusCode": 200, "body": json.dumps({"success": True})}
 
 
-@iopipe_with_auto_http
+@iopipe_with_eventinfo
 def api_trigger(event, context):
     gateway_url = os.getenv("PY_API_GATEWAY_URL")
     context.iopipe.metric("gateway_url", gateway_url or "")

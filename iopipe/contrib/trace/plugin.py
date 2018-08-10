@@ -56,8 +56,9 @@ class TracePlugin(Plugin):
     def pre_report(self, report):
         if self.auto_measure:
             add_timeline_measures(self.timeline)
+
         for entry in self.timeline.get_entries():
-            report.performance_entries.append(entry._asdict())
+            report.report["performanceEntries"].append(entry._asdict())
 
     def post_report(self, report):
         pass
