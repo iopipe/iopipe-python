@@ -70,10 +70,10 @@ def test__trace_plugin__auto_http__http(
 
     handler({}, mock_context)
 
-    traces = iopipe.report.performance_entries
-    http_traces = iopipe.report.http_trace_entries
+    assert len(iopipe.report.performance_entries) == 6
+    assert len(iopipe.report.report["performanceEntries"]) == 6
 
-    assert len(traces) == 6
+    http_traces = iopipe.report.http_trace_entries
 
     # There are two http traces because of the http -> https redirect
     assert len(http_traces) == 2
@@ -118,10 +118,11 @@ def test_trace_plugin__auto_http__https(
 
     handler({}, mock_context)
 
-    traces = iopipe.report.performance_entries
+    assert len(iopipe.report.performance_entries) == 3
+    assert len(iopipe.report.report["performanceEntries"]) == 3
+
     http_traces = iopipe.report.http_trace_entries
 
-    assert len(traces) == 3
     assert len(http_traces) == 1
 
     for trace in http_traces:
