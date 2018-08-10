@@ -50,12 +50,12 @@ functions:
 
   py2-auto-http:
     events:
-      - schedule: rate(10 minutes)
+      - schedule: rate(5 minutes)
     handler: handler.auto_http
     runtime: python2.7
   py3-auto-http:
     events:
-      - schedule: rate(10 minutes)
+      - schedule: rate(5 minutes)
     handler: handler.auto_http
     runtime: python3.6
 
