@@ -12,7 +12,7 @@ except (ImportError, OSError):
 
 install_requires = []
 if sys.version_info[0] == 2:
-    install_requires.append("futures")
+    install_requires.append("futures==3.1.1")
 
 setup(
     name="iopipe",
