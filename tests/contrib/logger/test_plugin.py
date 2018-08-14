@@ -133,6 +133,8 @@ def test__logger_plugin__use_tmp__disk_used(
     mock_context,
 ):
     """Asserts that disk usage increases when logging to disk"""
+    pytest.skip("Test is not deterministic in Circle CI")
+
     if not sys.platform.startswith("linux"):
         pytest.skip("this test requires linux, skipping")
 
