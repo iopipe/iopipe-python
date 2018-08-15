@@ -1,3 +1,6 @@
+from iopipe.compat import binary_types
+
+
 def add_timeline_measures(timeline):
     entries = timeline.get_entries_by_type("mark")
     measures = timeline.get_entries_by_type("measure")
@@ -14,3 +17,10 @@ def add_timeline_measures(timeline):
             measure_name = "measure:%s" % base_name
             if end_name in entry_names and measure_name not in measure_names:
                 timeline.measure(measure_name, name, end_name)
+
+
+def ensure_utf8(v):
+    """Ensures that a binary value is dedoced into utf-8"""
+    if isinstance(v, binary_types):
+        return v.decode("utf-8")
+    return v
