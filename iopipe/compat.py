@@ -6,7 +6,7 @@ PY3 = sys.version_info[0] == 3
 if PY3:
     from urllib.parse import urlparse
 
-    binary_Types = bytes
+    binary_types = bytes
     string_types = (str,)
     StringIO = io.StringIO
 else:
