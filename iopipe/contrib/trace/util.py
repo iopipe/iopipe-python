@@ -20,7 +20,7 @@ def add_timeline_measures(timeline):
 
 
 def ensure_utf8(v):
-    """Ensures that a binary value is dedoced into utf-8"""
+    """Ensures that a binary value is decoded into utf-8"""
     if isinstance(v, binary_types):
         return v.decode("utf-8")
     return v
