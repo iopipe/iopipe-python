@@ -12,6 +12,7 @@ except ImportError:
     BotocoreSession = None
 
 from iopipe.compat import urlparse
+from .util import ensure_utf8
 
 if Session is not None:
     original_session_send = Session.send
@@ -67,7 +68,7 @@ def patch_session_send(context, http_filter):
         return
 
     def send(self, *args, **kwargs):
-        id = str(uuid.uuid4())
+        id = ensure_utf8(str(uuid.uuid4()))
         with context.iopipe.mark(id):
             response = original_session_send(self, *args, **kwargs)
         trace = context.iopipe.mark.measure(id)
@@ -139,36 +140,36 @@ def collect_metrics_for_response(http_response, context, trace, http_filter):
         request_headers = []
         if hasattr(http_response.request, "headers"):
             request_headers = [
-                {"key": k, "string": v}
+                {"key": ensure_utf8(k), "string": ensure_utf8(v)}
                 for k, v in http_response.request.headers.items()
                 if k.lower() in INCLUDE_HEADERS
             ]
 
         request = Request(
-            hash=getattr(parsed_url, "fragment", None),
+            hash=ensure_utf8(getattr(parsed_url, "fragment", None)),
             headers=request_headers,
-            hostname=getattr(parsed_url, "hostname", None),
-            method=getattr(http_response.request, "method", None),
-            path=getattr(parsed_url, "path", None),
+            hostname=ensure_utf8(getattr(parsed_url, "hostname", None)),
+            method=ensure_utf8(getattr(http_response.request, "method", None)),
+            path=ensure_utf8(getattr(parsed_url, "path", None)),
             # TODO: Determine if this is redundant
-            pathname=getattr(parsed_url, "path", None),
-            port=getattr(parsed_url, "port", None),
-            protocol=getattr(parsed_url, "scheme", None),
-            query=getattr(parsed_url, "query", None),
-            url=getattr(http_response.request, "url", None),
+            pathname=ensure_utf8(getattr(parsed_url, "path", None)),
+            port=ensure_utf8(getattr(parsed_url, "port", None)),
+            protocol=ensure_utf8(getattr(parsed_url, "scheme", None)),
+            query=ensure_utf8(getattr(parsed_url, "query", None)),
+            url=ensure_utf8(getattr(http_response.request, "url", None)),
         )
 
     response_headers = []
     if hasattr(http_response, "headers"):
         response_headers = [
-            {"key": k, "string": v}
+            {"key": ensure_utf8(k), "string": ensure_utf8(v)}
             for k, v in http_response.headers.items()
             if k.lower() in INCLUDE_HEADERS
         ]
 
     response = Response(
         headers=response_headers,
-        statusCode=getattr(http_response, "status_code", None),
+        statusCode=ensure_utf8(getattr(http_response, "status_code", None)),
         statusMessage=None,
     )
 
