@@ -140,7 +140,7 @@ def collect_metrics_for_response(http_response, context, trace, http_filter):
         request_headers = []
         if hasattr(http_response.request, "headers"):
             request_headers = [
-                {"key": k, "string": ensure_utf8(v)}
+                {"key": ensure_utf8(k), "string": ensure_utf8(v)}
                 for k, v in http_response.request.headers.items()
                 if k.lower() in INCLUDE_HEADERS
             ]
@@ -162,7 +162,7 @@ def collect_metrics_for_response(http_response, context, trace, http_filter):
     response_headers = []
     if hasattr(http_response, "headers"):
         response_headers = [
-            {"key": k, "string": ensure_utf8(v)}
+            {"key": ensure_utf8(k), "string": ensure_utf8(v)}
             for k, v in http_response.headers.items()
             if k.lower() in INCLUDE_HEADERS
         ]
