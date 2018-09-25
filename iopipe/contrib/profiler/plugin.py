@@ -26,10 +26,9 @@ class ProfilerPlugin(Plugin):
         """
         Instantiates the profiler plugin
 
-        :param enabled: Whether or not the profiler should be enabled for all invocations.
-                        Alternatively this plugin can be enabled/disabled via
-                        the `IOPIPE_PROFILER_ENABLED` environment
-                        variable.
+        :param enabled: Whether or not the profiler should be enabled for all
+                        invocations. Alternatively this plugin can be enabled/disabled
+                        via the `IOPIPE_PROFILER_ENABLED` environment variable.
         :type enabled: bool
         """
         self._enabled = enabled
@@ -65,10 +64,10 @@ class ProfilerPlugin(Plugin):
     def post_invoke(self, event, context):
         if self.profile is not None:
             self.profile.disable()
+            self.context.iopipe.label("@iopipe/plugin-profiler")
 
     def pre_report(self, report):
         if self.profile is not None:
-            self.context.iopipe.label("@iopipe/plugin-profiler")
             if self.signed_request is not None:
                 if isinstance(self.signed_request, Future):
                     wait([self.signed_request])
