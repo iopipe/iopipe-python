@@ -19,9 +19,12 @@ class EventType(object):
 
     def collect(self):
         if self.keys == "all":
-            return collect_all_keys(
+            event_info = collect_all_keys(
                 self.event, "@iopipe/event-info.%s" % self.type, self.exclude_keys
             )
+            event_info["@iopipe/event-info.eventType"] = self.type
+            return event_info
+
         event_info = {}
         for key in self.keys:
             if isinstance(key, tuple):
