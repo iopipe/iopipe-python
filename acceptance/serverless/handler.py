@@ -15,7 +15,7 @@ from iopipe.contrib.logger import LoggerPlugin
 from iopipe.contrib.profiler import ProfilerPlugin
 from iopipe.contrib.trace import TracePlugin
 
-iopipe = IOpipe(debug=True)
+iopipe = IOpipe(debug=True, url="https://metrics-dev-api-go.iopipe.com")
 
 eventinfo_plugin = EventInfoPlugin()
 iopipe_with_eventinfo = IOpipeCore(debug=True, plugins=[eventinfo_plugin])

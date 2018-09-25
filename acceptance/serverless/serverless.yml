@@ -1,4 +1,5 @@
-service: iopipe-py-acceptance-test-serverless
+uc
+ervice: iopipe-py-acceptance-test-serverless
 
 provider:
   name: aws
@@ -153,12 +154,12 @@ functions:
 
   py2-success:
     events:
-      - schedule: rate(10 minutes)
+      - schedule: rate(1 minute)
     handler: handler.success
     runtime: python2.7
   py3-success:
     events:
-      - schedule: rate(10 minutes)
+      - schedule: rate(1 minute)
     handler: handler.success
     runtime: python3.6
 
