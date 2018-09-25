@@ -1,4 +1,7 @@
 import mock
+import os
+
+from iopipe.contrib.eventinfo import EventInfoPlugin
 
 
 @mock.patch("iopipe.report.send_report", autospec=True)
@@ -89,3 +92,11 @@ def test__eventinfo_plugin__scheduled(
     event_type = [m for m in metrics if m["name"] == "@iopipe/event-info.eventType"]
     assert len(event_type) == 1
     assert event_type[0]["s"] == "scheduled"
+
+
+def test__eventinfo_plugin__enabled(monkeypatch):
+    monkeypatch.setattr(os, "environ", {"IOPIPE_EVENT_INFO_ENABLED": "true"})
+
+    plugin = EventInfoPlugin(enabled=False)
+
+    assert plugin.enabled is True
