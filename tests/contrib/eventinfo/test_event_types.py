@@ -7,9 +7,12 @@ def test__event_types__alexa_skill(event_alexa_skill):
     assert event.has_required_keys() is True
 
     event_info = event.collect()
-    assert event_info != {}
-    assert all([k.startswith("@iopipe/event-info.alexaSkill.") for k in event_info])
-    assert len(list(event_info.keys())) == 31
+    expected_keys = ["@iopipe/event-info.eventType"] + [
+        "@iopipe/event-info.alexaSkill.%s" % key for key in event.keys
+    ]
+    assert list(event_info.keys()).sort() == expected_keys.sort()
+
+    assert len(list(event_info.keys())) == 32
 
 
 def test__event_types__apigw(event_apigw):
