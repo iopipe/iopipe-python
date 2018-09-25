@@ -10,7 +10,10 @@ def test_send_report(mock_session):
     send_report({"foo": "bar"}, set_config())
 
     mock_session.post.assert_called_once_with(
-        "https://metrics-api.iopipe.com/v0/event", json={"foo": "bar"}, timeout=5.0
+        "https://metrics-api.iopipe.com/v0/event",
+        json={"foo": "bar"},
+        headers=mock.ANY,
+        timeout=5.0,
     )
 
 
@@ -20,5 +23,8 @@ def test_send_report_network_timeout(mock_session):
     send_report({"foo": "bar"}, set_config(network_timeout=60000))
 
     mock_session.post.assert_called_once_with(
-        "https://metrics-api.iopipe.com/v0/event", json={"foo": "bar"}, timeout=60
+        "https://metrics-api.iopipe.com/v0/event",
+        json={"foo": "bar"},
+        headers=mock.ANY,
+        timeout=60,
     )
