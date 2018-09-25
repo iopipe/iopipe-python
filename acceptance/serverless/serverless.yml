@@ -1,5 +1,4 @@
-uc
-ervice: iopipe-py-acceptance-test-serverless
+service: iopipe-py-acceptance-test-serverless
 
 provider:
   name: aws
