@@ -24,13 +24,13 @@ def get_signer_hostname():
     return "signer.{region}.iopipe.com".format(region=region)
 
 
-def get_signed_request(token, context, extension):
+def get_signed_request(config, context, extension):
     """
     Returns a signed request URL from IOpipe
 
-    :param token: The IOpipe token.
+    :param config: The IOpipe config
     :param context: The AWS context to request a signed URL
-    :param extension: The extension of the file to sign.
+    :param extension: The extension of the file to sign
     :returns: A signed request URL
     :rtype: str
     """
@@ -46,7 +46,8 @@ def get_signed_request(token, context, extension):
                 "timestamp": int(time.time() * 1000),
                 "extension": extension,
             },
-            headers={"Authorization": token},
+            headers={"Authorization": config["token"]},
+            timeout=config["network_timeout"],
         )
         response.raise_for_status()
     except Exception as e:

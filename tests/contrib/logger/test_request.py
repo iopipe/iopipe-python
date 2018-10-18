@@ -11,6 +11,6 @@ def test__upload_log_data__deletes_file(mock_requests):
     temp_file = tempfile.NamedTemporaryFile(delete=False)
     temp_file.close()
 
-    upload_log_data("", temp_file.name)
+    upload_log_data("", temp_file.name, {"network_timeout": 5})
 
     assert not os.path.exists(temp_file.name)

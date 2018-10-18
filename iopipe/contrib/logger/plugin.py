@@ -74,7 +74,7 @@ class LoggerPlugin(Plugin):
         self.handler.flush()
         if self.handler.stream.tell():
             self.signed_request = self.iopipe.submit_future(
-                get_signed_request, self.iopipe.config["token"], self.context, ".log"
+                get_signed_request, self.iopipe.config, self.context, ".log"
             )
         if self.redirect_stdout is True:
             sys.stdout = sys.__stdout__
@@ -96,7 +96,10 @@ class LoggerPlugin(Plugin):
                 and "signedRequest" in self.signed_request
             ):
                 self.iopipe.submit_future(
-                    upload_log_data, self.signed_request["signedRequest"], stream
+                    upload_log_data,
+                    self.signed_request["signedRequest"],
+                    stream,
+                    self.iopipe.config,
                 )
                 if "jwtAccess" in self.signed_request:
                     plugin = next((p for p in report.plugins if p["name"] == self.name))

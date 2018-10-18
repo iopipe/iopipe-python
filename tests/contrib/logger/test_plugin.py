@@ -32,10 +32,10 @@ def test__logger_plugin(
 
     handler({}, mock_context)
 
-    mock_get_signed_request.assert_called_once_with(
-        iopipe.config["token"], mock.ANY, ".log"
+    mock_get_signed_request.assert_called_once_with(iopipe.config, mock.ANY, ".log")
+    mock_upload_log_data.assert_called_once_with(
+        "https://mock_signed_url", mock.ANY, iopipe.config
     )
-    mock_upload_log_data.assert_called_once_with("https://mock_signed_url", mock.ANY)
 
     plugin = next((p for p in iopipe.report.plugins if p["name"] == "logger"))
     assert plugin["uploads"][0] == "foobar"

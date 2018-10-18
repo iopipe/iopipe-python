@@ -53,10 +53,7 @@ class ProfilerPlugin(Plugin):
 
         if self.enabled:
             self.signed_request = self.iopipe.submit_future(
-                get_signed_request,
-                self.iopipe.config["token"],
-                self.context,
-                ".cprofile",
+                get_signed_request, self.iopipe.config, self.context, ".cprofile"
             )
             self.profile = profile.Profile()
             self.profile.enable()
@@ -82,6 +79,7 @@ class ProfilerPlugin(Plugin):
                         upload_profiler_report,
                         self.signed_request["signedRequest"],
                         stats_file.name,
+                        self.iopipe.config,
                     )
                     self.stats_file = stats_file.name
                 if "jwtAccess" in self.signed_request:
