@@ -1,4 +1,5 @@
 import collections
+import copy
 import uuid
 
 try:
@@ -126,6 +127,7 @@ def collect_metrics_for_response(http_response, context, trace, http_filter):
     Collects relevant metrics from a requests Response object and adds them to
     the IOpipe context.
     """
+    http_response = copy.deepcopy(http_response)
     if http_filter is not None and callable(http_filter):
         http_response = http_filter(http_response)
         if http_response is False:
