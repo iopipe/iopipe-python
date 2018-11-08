@@ -15,7 +15,7 @@ class TracePlugin(Plugin):
     homepage = "https://github.com/iopipe/iopipe-python#trace-plugin"
     enabled = True
 
-    def __init__(self, auto_measure=True, auto_http=True, http_filter=None):
+    def __init__(self, auto_measure=True, auto_http=False, http_filter=None):
         """
         Instantiates the trace plugin
 

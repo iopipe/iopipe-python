@@ -51,7 +51,6 @@ def test__trace_plugin__valid_schema(
             "errors.name",
             "errors.stack",
             "errors.stackHash",
-            "eventType",
             "httpTraceEntries",
             "labels",
             "memory",
