@@ -86,6 +86,12 @@ class IOpipeContext(object):
         self.instance.run_hooks("post:report")
         raise error
 
+    def event_type(self, event_Type):
+        if self.instance.report is None:
+            return
+
+        self.instance.report.report["eventType"] = event_Type
+
     def register(self, name, value, force=False):
         if not hasattr(self, name) or force:
             setattr(self, name, value)

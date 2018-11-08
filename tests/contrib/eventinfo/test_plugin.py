@@ -27,6 +27,9 @@ def test__eventinfo_plugin__apigw(
     assert len(event_type) == 1
     assert event_type[0]["s"] == "apiGateway"
 
+    assert "eventType" in iopipe.report.report
+    assert iopipe.report.report["eventType"] == "aws-api-gateway"
+
 
 @mock.patch("iopipe.report.send_report", autospec=True)
 def test__eventinfo_plugin__cloudfront(
@@ -48,6 +51,9 @@ def test__eventinfo_plugin__cloudfront(
     event_type = [m for m in metrics if m["name"] == "@iopipe/event-info.eventType"]
     assert len(event_type) == 1
     assert event_type[0]["s"] == "cloudFront"
+
+    assert "eventType" in iopipe.report.report
+    assert iopipe.report.report["eventType"] == "aws-cloud-front"
 
 
 @mock.patch("iopipe.report.send_report", autospec=True)
@@ -71,6 +77,9 @@ def test__eventinfo_plugin__kinesis(
     assert len(event_type) == 1
     assert event_type[0]["s"] == "kinesis"
 
+    assert "eventType" in iopipe.report.report
+    assert iopipe.report.report["eventType"] == "aws-kinesis"
+
 
 @mock.patch("iopipe.report.send_report", autospec=True)
 def test__eventinfo_plugin__scheduled(
@@ -92,6 +101,9 @@ def test__eventinfo_plugin__scheduled(
     event_type = [m for m in metrics if m["name"] == "@iopipe/event-info.eventType"]
     assert len(event_type) == 1
     assert event_type[0]["s"] == "scheduled"
+
+    assert "eventType" in iopipe.report.report
+    assert iopipe.report.report["eventType"] == "aws-scheduled"
 
 
 def test__eventinfo_plugin__enabled(monkeypatch):
