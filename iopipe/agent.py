@@ -101,8 +101,9 @@ class IOpipeCore(object):
             # If a token is not present, skip reporting
             if not self.config["token"]:
                 warnings.warn(
-                    "Your function is decorated with iopipe, but a valid token was not found. "
-                    "Set the IOPIPE_TOKEN environment variable with your IOpipe project token."
+                    "Your function is decorated with iopipe, but a valid token was not "
+                    "found. Set the IOPIPE_TOKEN environment variable with your IOpipe "
+                    "project token."
                 )
                 return func(event, context)
 
@@ -110,7 +111,8 @@ class IOpipeCore(object):
 
             signal.signal(signal.SIGALRM, self.handle_timeout)
 
-            # Disable timeout if timeout_window <= 0, or if our context doesn't have a get_remaining_time_in_millis
+            # Disable timeout if timeout_window <= 0, or if our context doesn't have a
+            # get_remaining_time_in_millis method
             if (
                 self.config["timeout_window"] > 0
                 and hasattr(context, "get_remaining_time_in_millis")
@@ -123,15 +125,17 @@ class IOpipeCore(object):
                 # The timeout_duration cannot be a negative number, disable if it is
                 timeout_duration = max([0, timeout_duration])
 
-                # Maximum execution time is 10 minutes, make sure timeout doesn't exceed that minus the timeout window
+                # Maximum execution time is 15 minutes, make sure timeout doesn't
+                # exceed that minus the timeout window
                 timeout_duration = min(
-                    [timeout_duration, 60 * 60 * 10 - self.config["timeout_window"]]
+                    [timeout_duration, 60 * 60 * 15 - self.config["timeout_window"]]
                 )
 
                 logger.debug("Setting timeout duration to %s" % timeout_duration)
 
-                # Using signal.setitimer instead of signal.alarm because the latter only accepts integers and we want to
-                # be able to timeout at millisecond granularity
+                # Using signal.setitimer instead of signal.alarm because the latter
+                # only accepts integers and we want to be able to timeout at
+                # millisecond granularity
                 signal.setitimer(signal.ITIMER_REAL, timeout_duration)
 
             result = None
@@ -141,8 +145,9 @@ class IOpipeCore(object):
             except Exception as e:
                 self.run_hooks("post:invoke", event=event, context=context)
 
-                # This prevents this block from being executed a second time in the event that a timeout occurs and an
-                # exception is subsequently raised within the handler
+                # This prevents this block from being executed a second time in the
+                # event that a timeout occurs and an exception is subsequently raised
+                # within the handler
                 if self.report.sent is False:
                     self.report.prepare(e)
                     self.run_hooks("pre:report")
