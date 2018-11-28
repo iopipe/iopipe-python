@@ -208,14 +208,15 @@ def handler(event, context):
 
 When this plugin is installed, custom metrics will be created automatically for the following event source data:
 
-* Alexa Skill Kit
 * API Gateway
+* Alexa Skill Kit
 * CloudFront
 * Kinesis
 * Kinesis Firehose
 * S3
 * SES
 * SNS
+* SQS
 * Scheduled Events
 
 Now in your IOpipe invocation view you will see useful event information.
