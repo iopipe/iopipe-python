@@ -185,6 +185,28 @@ class SNS(EventType):
         )
 
 
+class SQS(EventType):
+    type = "sqs"
+    keys = [
+        "Records[0].attributes.ApproximateFirstReceiveTimestamp",
+        "Records[0].attributes.ApproximateReceiveCount",
+        "Records[0].attributes.SenderId",
+        "Records[0].attributes.SentTimestamp",
+        "Records[0].awsRegion",
+        "Records[0].eventSourceARN",
+        "Records[0].md5OfBody",
+        "Records[0].messageId",
+        "Records[0].receiptHandle",
+    ]
+    required_keys = ["Records[0].eventSource"]
+
+    def has_required_keys(self):
+        return (
+            super(SQS, self).has_required_keys()
+            and get_value(self.event, "Records[0].eventSource") == "aws:sqs"
+        )
+
+
 EVENT_TYPES = [
     AlexaSkill,
     ApiGateway,
@@ -195,6 +217,7 @@ EVENT_TYPES = [
     Scheduled,
     ServerlessLambda,
     SNS,
+    SQS,
 ]
 
 
