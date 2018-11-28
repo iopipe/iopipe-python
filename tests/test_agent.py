@@ -123,3 +123,15 @@ def test_sync_http(mock_send_report, handler_with_sync_http, mock_context):
     handler({}, mock_context)
 
     assert iopipe.report.sent
+
+
+def test_validate_context(iopipe, mock_context):
+    """Asserts that contexts are validated correctly"""
+    assert iopipe.validate_context(mock_context) is True
+
+    class InvalidContext(object):
+        pass
+
+    invalid_context = InvalidContext()
+
+    assert iopipe.validate_context(invalid_context) is False
