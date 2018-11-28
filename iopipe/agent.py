@@ -89,10 +89,6 @@ class IOpipeCore(object):
         def wrapped(event, context):
             logger.debug("%s wrapped with IOpipe decorator" % repr(func))
 
-            context = ContextWrapper(context, self)
-
-            self.run_hooks("pre:invoke", event=event, context=context)
-
             # if env var IOPIPE_ENABLED is set to False skip reporting
             if self.config["enabled"] is False:
                 logger.debug("IOpipe agent disabled, skipping reporting")
@@ -106,6 +102,15 @@ class IOpipeCore(object):
                     "project token."
                 )
                 return func(event, context)
+
+            # If context doesn't pass validation, skip reporting
+            if not self.validate_context(context):
+                logger.debug("Invalid context, skipping reporting")
+                return func(event, context)
+
+            context = ContextWrapper(context, self)
+
+            self.run_hooks("pre:invoke", event=event, context=context)
 
             self.report = Report(self, context)
 
@@ -244,7 +249,31 @@ class IOpipeCore(object):
     def wait_for_futures(self):
         """
         Wait for all futures to complete. This should be done at the end of an
-        invocation.
+        an invocation.
         """
         [future for future in futures.as_completed(self.futures)]
         self.futures = []
+
+    def validate_context(self, context):
+        """
+        Checks to see if we're working with a valid lambda context object.
+
+        :returns: True if valid, False if not
+        :rtype: bool
+        """
+        return all(
+            [
+                hasattr(context, attr)
+                for attr in [
+                    "aws_request_id",
+                    "function_name",
+                    "function_version",
+                    "get_remaining_time_in_millis",
+                    "invoked_function_arn",
+                    "log_group_name",
+                    "log_stream_name",
+                    "memory_limit_in_mb",
+                    "remaining_time_in_millis",
+                ]
+            ]
+        ) and callable(context.get_remaining_time_in_millis)
