@@ -59,6 +59,11 @@ def event_sns():
 
 
 @pytest.fixture
+def event_sqs():
+    return _load_event("sqs")
+
+
+@pytest.fixture
 def event_scheduled():
     return _load_event("scheduled")
 

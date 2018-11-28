@@ -100,3 +100,16 @@ def test__event_types__sns(event_sns):
         "@iopipe/event-info.sns.%s" % key for key in event.keys
     ]
     assert list(event_info.keys()).sort() == expected_keys.sort()
+
+
+def test__event_types__sqs(event_sqs):
+    event = et.SQS(event_sqs)
+    assert event.has_required_keys() is True
+
+    event_info = event.collect()
+    assert event_info != {}
+
+    expected_keys = ["@iopipe/event-info.eventType"] + [
+        "@iopipe/event-info.sqs.%s" % key for key in event.keys
+    ]
+    assert list(event_info.keys()).sort() == expected_keys.sort()
