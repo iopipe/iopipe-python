@@ -89,6 +89,8 @@ class IOpipeCore(object):
         def wrapped(event, context):
             logger.debug("%s wrapped with IOpipe decorator" % repr(func))
 
+            context = ContextWrapper(context, self)
+
             # if env var IOPIPE_ENABLED is set to False skip reporting
             if self.config["enabled"] is False:
                 logger.debug("IOpipe agent disabled, skipping reporting")
@@ -107,8 +109,6 @@ class IOpipeCore(object):
             if not self.validate_context(context):
                 logger.debug("Invalid context, skipping reporting")
                 return func(event, context)
-
-            context = ContextWrapper(context, self)
 
             self.run_hooks("pre:invoke", event=event, context=context)
 
