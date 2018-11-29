@@ -273,7 +273,6 @@ class IOpipeCore(object):
                     "log_group_name",
                     "log_stream_name",
                     "memory_limit_in_mb",
-                    "remaining_time_in_millis",
                 ]
             ]
         ) and callable(context.get_remaining_time_in_millis)
