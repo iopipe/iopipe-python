@@ -29,6 +29,7 @@ This package provides analytics and distributed tracing for event-driven applica
   - [Trace Plugin](https://github.com/iopipe/iopipe-python#trace-plugin)
   - [Creating Plugins](https://github.com/iopipe/iopipe-python#creating-plugins)
 - [Supported Python Versions](https://github.com/iopipe/iopipe-python#supported-python-versions)
+- [Lambda Layers](https://github.com/iopipe/iopipe-python#lambda-layers)
 - [Framework Integration](https://github.com/iopipe/iopipe-python#framework-integration)
   - [Chalice](https://github.com/iopipe/iopipe-python#chalice)
   - [Serverless](https://github.com/iopipe/iopipe-python#serverless)
@@ -463,7 +464,45 @@ A plugin has the following methods defined:
 
 ## Supported Python Versions
 
-This package supports Python 2.7 and 3.6, the runtimes supported by AWS Lambda.
+This package supports Python 2.7, 3.6 and 3.7, the runtimes supported by AWS Lambda.
+
+## Lambda Layers
+
+IOpipe publishes AWS LAmbda Layers which are publicly available on AWS. Using a framework that supports lambda layers (such as SAM), you can use the following ARNs for your runtime:
+
+* python3.6, python3.7: `arn:aws:lambda:$REGION:146318645305:layer:IOpipePython:$VERSION_NUMBER`
+* python2.7: `arn:aws:lambda:$REGION:146318645305:layer:IOpipePython27:$VERSION_NUMBER`
+
+Where `$REGION` is your AWS region and `$VERSION_NUMBER` is an integer representing theI Opipe release. You can get the version number via the [Releases](https://github.com/iopipe/iopipe-python/releases) page.
+
+Then in your SAM template (for example), you could add:
+
+```yaml
+Globals:
+  Function:
+    Layers:
+        - arn:aws:lambda:us-east-1:146318645305:layer:IOpipePython:1
+```
+
+And the IOpipe library will be included in your function automatically.
+
+You can also wrap your IOpipe functions without a code change using  layers. For example, in your SAM template you can do the following:
+
+```yaml
+Resources:
+  YourFunctionHere:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: path/to/your/code
+      # Automatically wraps the handler with IOpipe
+      Handler: iopipe.handler.wrapper
+      Runtime: python3.6
+      Environment:
+        Variables:
+          # Specifies which handler IOpipe should run
+          IOPIPE_HANDLER: path.to.your.handler
+          IOPIPE_TOKEN: "your token here"
+```
 
 ## Framework Integration
 
