@@ -501,7 +501,7 @@ Resources:
         Variables:
           # Specifies which handler IOpipe should run
           IOPIPE_HANDLER: path.to.your.handler
-          IOPIPE_TOKEN: "your token here"
+          IOPIPE_TOKEN: 'your token here'
 ```
 
 ## Framework Integration
