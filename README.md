@@ -468,12 +468,12 @@ This package supports Python 2.7, 3.6 and 3.7, the runtimes supported by AWS Lam
 
 ## Lambda Layers
 
-IOpipe publishes AWS LAmbda Layers which are publicly available on AWS. Using a framework that supports lambda layers (such as SAM), you can use the following ARNs for your runtime:
+IOpipe publishes AWS Lambda Layers which are publicly available on AWS. Using a framework that supports lambda layers (such as SAM), you can use the following ARNs for your runtime:
 
 * python3.6, python3.7: `arn:aws:lambda:$REGION:146318645305:layer:IOpipePython:$VERSION_NUMBER`
 * python2.7: `arn:aws:lambda:$REGION:146318645305:layer:IOpipePython27:$VERSION_NUMBER`
 
-Where `$REGION` is your AWS region and `$VERSION_NUMBER` is an integer representing theI Opipe release. You can get the version number via the [Releases](https://github.com/iopipe/iopipe-python/releases) page.
+Where `$REGION` is your AWS region and `$VERSION_NUMBER` is an integer representing the IOpipe release. You can get the version number via the [Releases](https://github.com/iopipe/iopipe-python/releases) page.
 
 Then in your SAM template (for example), you could add:
 
@@ -486,7 +486,7 @@ Globals:
 
 And the IOpipe library will be included in your function automatically.
 
-You can also wrap your IOpipe functions without a code change using  layers. For example, in your SAM template you can do the following:
+You can also wrap your IOpipe functions without a code change using layers. For example, in your SAM template you can do the following:
 
 ```yaml
 Resources:
