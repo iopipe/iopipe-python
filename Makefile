@@ -25,10 +25,13 @@ clean-test:
 lint:
 	flake8
 
-test: test-python2 test-python3
+test: test-python2.7 test-python3.6 test-python3.7
 
-test-python2: clean
-	docker-compose -f ${DOCKER_COMPOSE_YML} build --no-cache python2
+test-python2.7: clean
+	docker-compose -f ${DOCKER_COMPOSE_YML} build --no-cache python2.7
 
-test-python3: clean
-	docker-compose -f ${DOCKER_COMPOSE_YML} build --no-cache python3
+test-python3.6: clean
+	docker-compose -f ${DOCKER_COMPOSE_YML} build --no-cache python3.6
+
+test-python3.7: clean
+	docker-compose -f ${DOCKER_COMPOSE_YML} build --no-cache python3.7
