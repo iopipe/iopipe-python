@@ -55,6 +55,13 @@ class IOpipeContext(object):
     log = metric
 
     def label(self, name):
+        if self.instance.report is None:
+            warnings.warn(
+                "Attempting to add label before function decorated with IOpipe. "
+                "This label will not be recorded."
+            )
+            return
+
         if not isinstance(name, string_types):
             warnings.warn(
                 "Attempted to add a label that is not of type string. "
