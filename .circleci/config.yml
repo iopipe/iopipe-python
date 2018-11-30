@@ -28,6 +28,20 @@ jobs:
             unset AWS_REGION IOPIPE_DEBUG IOPIPE_ENABLED IOPIPE_TIMEOUT_WINDOW IOPIPE_TOKEN
             python setup.py test
 
+  build-py37:
+    working_directory: ~/iopipe-python
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - checkout
+      - run: sudo chown -R circleci:circleci /usr/local/bin
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
+      - run:
+          name: Run tests
+          command: |
+            unset AWS_REGION IOPIPE_DEBUG IOPIPE_ENABLED IOPIPE_TIMEOUT_WINDOW IOPIPE_TOKEN
+            python setup.py test
+
   code-style:
     working_directory: ~/iopipe-python
     docker:
@@ -115,6 +129,12 @@ workflows:
               only: /.*/
             tags:
               only: /.*/
+      - build-py37:
+          filters:
+            branches:
+              only: /.*/
+            tags:
+              only: /.*/
       - code-style:
           filters:
             branches:
@@ -131,6 +151,7 @@ workflows:
           requires:
             - build-py27
             - build-py36
+            - build-py37
             - code-style
           filters:
             branches:
@@ -141,6 +162,7 @@ workflows:
           requires:
             - build-py27
             - build-py36
+            - build-py37
             - code-style
           filters:
             branches:

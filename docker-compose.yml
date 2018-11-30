@@ -1,11 +1,16 @@
 version: '2'
 services:
-  python2:
+  python2.7:
     build:
       context: .
-      dockerfile: Dockerfile.python2
+      dockerfile: Dockerfile.python2.7
 
-  python3:
+  python3.6:
     build:
       context: .
-      dockerfile: Dockerfile.python3
+      dockerfile: Dockerfile.python3.6
+
+  python3.7:
+    build:
+      context: .
+      dockerfile: Dockerfile.python3.7

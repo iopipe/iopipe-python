@@ -31,7 +31,7 @@ def is_plugin(plugin):
     :rtype: bool
     """
     try:
-        return issubclass(plugin, Plugin) or isinstance(plugin, Plugin)
+        return isinstance(plugin, Plugin) or issubclass(plugin, Plugin)
     except TypeError:
         return False
 
