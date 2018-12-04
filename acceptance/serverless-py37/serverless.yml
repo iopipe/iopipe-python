@@ -1,0 +1,83 @@
+service: iopipe-py-acceptance-test-serverless-py37
+
+provider:
+  name: aws
+  runtime: python3.7
+  stage: master
+  region: us-west-2
+  role: ${env:IAM_ROLE}
+  environment:
+    IOPIPE_TOKEN: ${env:IOPIPE_TOKEN}
+
+package:
+  exclude:
+    - ./**
+  include:
+    - handler.py
+    - iopipe/**
+    - text.json
+
+functions:
+  api-gateway:
+    events:
+      - http:
+          path: /
+          method: get
+    handler: handler.api_gateway
+
+  auto-http:
+    events:
+      - schedule: rate(5 minutes)
+    handler: handler.auto_http
+
+  baseline:
+    events:
+      - schedule: rate(1 minute)
+    handler: handler.baseline
+
+  caught-error:
+    events:
+      - schedule: rate(1 minute)
+    handler: handler.caught_error
+
+  custom-metrics:
+    events:
+      - schedule: rate(1 minute)
+    handler: handler.custom_metrics
+
+  logging-tmp:
+    events:
+      - schedule: rate(1 hour)
+    handler: handler.logging_tmp
+    timeout: 30
+
+  profiling:
+    events:
+      - schedule: rate(1 minute)
+    handler: handler.profiling
+
+  success:
+    events:
+      - schedule: rate(1 minute)
+    handler: handler.success
+
+  sync-http:
+    events:
+      - schedule: rate(1 minute)
+    handler: handler.sync_http
+
+  timeout:
+    events:
+      - schedule: rate(1 minute)
+    handler: handler.timeout
+    timeout: 1
+
+  tracing:
+    events:
+      - schedule: rate(1 minute)
+    handler: handler.tracing
+
+  uncaught-error:
+    events:
+      - schedule: rate(1 minute)
+    handler: handler.uncaught_error

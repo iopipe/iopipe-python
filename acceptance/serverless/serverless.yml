@@ -32,13 +32,6 @@ functions:
           method: get
     handler: handler.api_gateway
     runtime: python3.6
-  py37-api-gateway:
-    events:
-      - http:
-          path: /
-          method: get
-    handler: handler.api_gateway
-    runtime: python3.7
 
   py2-api-trigger:
     environment:
@@ -65,11 +58,6 @@ functions:
       - schedule: rate(5 minutes)
     handler: handler.auto_http
     runtime: python3.6
-  py37-auto-http:
-    events:
-      - schedule: rate(5 minutes)
-    handler: handler.auto_http
-    runtime: python3.7
 
   py2-baseline:
     events:
@@ -81,11 +69,6 @@ functions:
       - schedule: rate(1 minute)
     handler: handler.baseline
     runtime: python3.6
-  py37-baseline:
-    events:
-      - schedule: rate(1 minute)
-    handler: handler.baseline
-    runtime: python3.7
 
   py2-base-coldstart:
     events:
@@ -97,11 +80,6 @@ functions:
       - schedule: rate(1 minute)
     handler: handler.baseline_coldstart
     runtime: python3.6
-  py37-base-coldstart:
-    events:
-      - schedule: rate(1 minute)
-    handler: handler.baseline_coldstart
-    runtime: python3.7
 
   py2-caught-error:
     events:
@@ -113,11 +91,6 @@ functions:
       - schedule: rate(1 minute)
     handler: handler.caught_error
     runtime: python3.6
-  py37-caught-error:
-    events:
-      - schedule: rate(1 minute)
-    handler: handler.caught_error
-    runtime: python3.7
 
   py2-coldstart:
     events:
@@ -129,11 +102,6 @@ functions:
       - schedule: rate(1 minute)
     handler: handler.coldstart
     runtime: python3.6
-  py37-coldstart:
-    events:
-      - schedule: rate(1 minute)
-    handler: handler.coldstart
-    runtime: python3.7
 
   py2-custom-metrics:
     events:
@@ -145,11 +113,6 @@ functions:
       - schedule: rate(1 minute)
     handler: handler.custom_metrics
     runtime: python3.6
-  py37-custom-metrics:
-    events:
-      - schedule: rate(1 minute)
-    handler: handler.custom_metrics
-    runtime: python3.7
 
   py2-logging:
     events:
@@ -162,12 +125,6 @@ functions:
       - schedule: rate(1 minute)
     handler: handler.logging
     runtime: python3.6
-    timeout: 30
-  py37-logging:
-    events:
-      - schedule: rate(1 minute)
-    handler: handler.logging
-    runtime: python3.7
     timeout: 30
 
   py2-logging-tmp:
@@ -182,12 +139,6 @@ functions:
     handler: handler.logging_tmp
     runtime: python3.6
     timeout: 30
-  py37-logging-tmp:
-    events:
-      - schedule: rate(1 hour)
-    handler: handler.logging_tmp
-    runtime: python3.7
-    timeout: 30
 
   py2-profiling:
     events:
@@ -199,11 +150,6 @@ functions:
       - schedule: rate(1 minute)
     handler: handler.profiling
     runtime: python3.6
-  py37-profiling:
-    events:
-      - schedule: rate(1 minute)
-    handler: handler.profiling
-    runtime: python3.7
 
   py2-success:
     events:
@@ -215,11 +161,6 @@ functions:
       - schedule: rate(1 minute)
     handler: handler.success
     runtime: python3.6
-  py37-success:
-    events:
-      - schedule: rate(1 minute)
-    handler: handler.success
-    runtime: python3.7
 
   py2-sync-http:
     events:
@@ -231,11 +172,6 @@ functions:
       - schedule: rate(1 minute)
     handler: handler.sync_http
     runtime: python3.6
-  py37-sync-http:
-    events:
-      - schedule: rate(1 minute)
-    handler: handler.sync_http
-    runtime: python3.7
 
   py2-timeout:
     events:
@@ -249,28 +185,6 @@ functions:
     handler: handler.timeout
     runtime: python3.6
     timeout: 1
-  py37-timeout:
-    events:
-      - schedule: rate(1 minute)
-    handler: handler.timeout
-    runtime: python3.7
-    timeout: 1
-
-  py2-tracing:
-    events:
-      - schedule: rate(1 minute)
-    handler: handler.tracing
-    runtime: python2.7
-  py3-tracing:
-    events:
-      - schedule: rate(1 minute)
-    handler: handler.tracing
-    runtime: python3.6
-  py37-tracing:
-    events:
-      - schedule: rate(1 minute)
-    handler: handler.tracing
-    runtime: python3.7
 
   py2-uncaught-error:
     events:
@@ -282,8 +196,3 @@ functions:
       - schedule: rate(1 minute)
     handler: handler.uncaught_error
     runtime: python3.6
-  py37-uncaught-error:
-    events:
-      - schedule: rate(1 minute)
-    handler: handler.uncaught_error
-    runtime: python3.7
