@@ -91,8 +91,9 @@ jobs:
           name: Deploy acceptance tests
           command: |
             python setup.py build --build-lib acceptance/serverless
-            cd acceptance/serverless && sls deploy --force
-            cd ../serverless-wsgi && npm install && sls deploy --force
+            cd acceptance/serverless && sls deploy --conceal
+            cd ../serverless-py37 && sls deploy --conceal
+            cd ../serverless-wsgi && npm install && sls deploy --conceal
 
   release:
     working_directory: ~/iopipe-python
