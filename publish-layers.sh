@@ -64,7 +64,8 @@ case "$1" in
               --version-number $py27_version \
               --statement-id public \
               --action lambda:GetLayerVersion \
-              --principal "*"
+              --principal "*" \
+              --region $region
             echo "Public permissions set for python2.7 layer version ${py27_version} in region ${region}"
         done
         ;;
@@ -83,7 +84,7 @@ case "$1" in
             bucket_name="iopipe-layers-${region}"
 
             echo "Uploading ${PY3X_DIST} to s3://${bucket_name}/${py3x_s3key}"
-            aws --region $region s3 cp $PY3X_DIST "s3://${bucket_name}/{$py3x_s3key}"
+            aws --region $region s3 cp $PY3X_DIST "s3://${bucket_name}/${py3x_s3key}"
 
             echo "Publishing python3.x layer to ${region}"
             py3x_version=$(aws lambda publish-layer-version \
