@@ -32,17 +32,17 @@ functions:
 
   baseline:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.baseline
 
   caught-error:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.caught_error
 
   custom-metrics:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.custom_metrics
 
   logging-tmp:
@@ -53,31 +53,31 @@ functions:
 
   profiling:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.profiling
 
   success:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.success
 
   sync-http:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.sync_http
 
   timeout:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.timeout
     timeout: 1
 
   tracing:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.tracing
 
   uncaught-error:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.uncaught_error

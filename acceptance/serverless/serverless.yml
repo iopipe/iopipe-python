@@ -37,14 +37,14 @@ functions:
     environment:
       PY_API_GATEWAY_URL: ${env:PY2_API_GATEWAY_URL}
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.api_trigger
     runtime: python2.7
   py3-api-trigger:
     environment:
       PY2_API_GATEWAY_URL: ${env:PY3_API_GATEWAY_URL}
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.api_trigger
     runtime: python3.6
 
@@ -61,68 +61,68 @@ functions:
 
   py2-baseline:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.baseline
     runtime: python2.7
   py3-baseline:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.baseline
     runtime: python3.6
 
   py2-base-coldstart:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.baseline_coldstart
     runtime: python2.7
   py3-base-coldstart:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.baseline_coldstart
     runtime: python3.6
 
   py2-caught-error:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.caught_error
     runtime: python2.7
   py3-caught-error:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.caught_error
     runtime: python3.6
 
   py2-coldstart:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.coldstart
     runtime: python2.7
   py3-coldstart:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.coldstart
     runtime: python3.6
 
   py2-custom-metrics:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.custom_metrics
     runtime: python2.7
   py3-custom-metrics:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.custom_metrics
     runtime: python3.6
 
   py2-logging:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.logging
     runtime: python2.7
     timeout: 30
   py3-logging:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.logging
     runtime: python3.6
     timeout: 30
@@ -142,57 +142,57 @@ functions:
 
   py2-profiling:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.profiling
     runtime: python2.7
   py3-profiling:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.profiling
     runtime: python3.6
 
   py2-success:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.success
     runtime: python2.7
   py3-success:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.success
     runtime: python3.6
 
   py2-sync-http:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.sync_http
     runtime: python2.7
   py3-sync-http:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.sync_http
     runtime: python3.6
 
   py2-timeout:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.timeout
     runtime: python2.7
     timeout: 1
   py3-timeout:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.timeout
     runtime: python3.6
     timeout: 1
 
   py2-uncaught-error:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.uncaught_error
     runtime: python2.7
   py3-uncaught-error:
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
     handler: handler.uncaught_error
     runtime: python3.6
