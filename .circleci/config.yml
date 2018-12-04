@@ -115,6 +115,22 @@ jobs:
             python setup.py sdist
             twine upload dist/*
 
+  publish-layers:
+    working_directory: ~/iopipe-python
+    docker:
+      - image: circleci/python:3.6
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: sudo chown -R circleci:circleci /usr/local/bin
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
+      - run:
+          name: Install publish dependencies
+          command: sudo pip install -U awscli
+      - run:
+          name: Publish layers
+          command: ./publish-layers.sh
+
 workflows:
   version: 2
   build-all:
@@ -166,6 +182,18 @@ workflows:
             - build-py36
             - build-py37
             - code-style
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
+      - publish-layers:
+          requires:
+            - build-py27
+            - build-py36
+            - build-py37
+            - code-style
+            - release
           filters:
             branches:
               ignore: /.*/
