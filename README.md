@@ -468,14 +468,14 @@ This package supports Python 2.7, 3.6 and 3.7, the runtimes supported by AWS Lam
 
 ## Lambda Layers
 
-IOpipe publishes AWS Lambda Layers which are publicly available on AWS. Using a framework that supports lambda layers (such as SAM), you can use the following ARNs for your runtime:
+IOpipe publishes [AWS Lambda Layers](https://docs.aws.amazon.com/lambda/latest/dg/configuration-layers.html) which are publicly available on AWS. Using a framework that supports lambda layers (such as SAM or Serverless), you can use the following ARNs for your runtime:
 
 * python3.6, python3.7: `arn:aws:lambda:$REGION:146318645305:layer:IOpipePython:$VERSION_NUMBER`
 * python2.7: `arn:aws:lambda:$REGION:146318645305:layer:IOpipePython27:$VERSION_NUMBER`
 
 Where `$REGION` is your AWS region and `$VERSION_NUMBER` is an integer representing the IOpipe release. You can get the version number via the [Releases](https://github.com/iopipe/iopipe-python/releases) page.
 
-Then in your SAM template (for example), you could add:
+Then in your SAM template (for example), you can add:
 
 ```yaml
 Globals:
@@ -503,6 +503,8 @@ Resources:
           IOPIPE_HANDLER: path.to.your.handler
           IOPIPE_TOKEN: 'your token here'
 ```
+
+Here's an [example app](https://github.com/iopipe/iopipe-python/tree/master/acceptance/serverless-layers) using layers with Serverless. It also demonstrates how to use layers without a code change.
 
 ## Framework Integration
 
