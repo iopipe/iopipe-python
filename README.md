@@ -490,7 +490,7 @@ You can also wrap your IOpipe functions without a code change using layers. For 
 
 ```yaml
 Resources:
-  YourFunctionHere:
+  YourFunctionere:
     Type: 'AWS::Serverless::Function'
     Properties:
       CodeUri: path/to/your/code
@@ -504,7 +504,7 @@ Resources:
           IOPIPE_TOKEN: 'your token here'
 ```
 
-Here's an [example app](https://github.com/iopipe/iopipe-python/tree/master/acceptance/serverless-layers) using layers with Serverless. It also demonstrates how to use layers without a code change.
+We also have an [example app](https://github.com/iopipe/iopipe-python/tree/master/acceptance/serverless-layers) using layers with Serverless. It also demonstrates how to use layers without a code change.
 
 ## Framework Integration
 
