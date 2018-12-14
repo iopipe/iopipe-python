@@ -129,6 +129,11 @@ jobs:
           name: Install publish dependencies
           command: sudo pip install -U awscli
       - run:
+          name: Override AWS Credentials
+          command: |
+            echo 'export AWS_ACCESS_KEY_ID="$LAYER_AWS_ACCESS_KEY_ID"' >> $BASH_ENV
+            echo 'export AWS_SECRET_ACCESS_KEY="$LAYER_SECRET_ACCESS_KEY"' >> $BASH_ENV
+      - run:
           name: Publish layers
           command: ./publish-layers.sh python2.7
 
@@ -143,6 +148,11 @@ jobs:
       - run:
           name: Install publish dependencies
           command: sudo pip install -U awscli
+      - run:
+          name: Override AWS Credentials
+          command: |
+            echo 'export AWS_ACCESS_KEY_ID="$LAYER_AWS_ACCESS_KEY_ID"' >> $BASH_ENV
+            echo 'export AWS_SECRET_ACCESS_KEY="$LAYER_SECRET_ACCESS_KEY"' >> $BASH_ENV
       - run:
           name: Publish layers
           command: ./publish-layers.sh python3.x
