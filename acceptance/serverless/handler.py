@@ -20,10 +20,10 @@ iopipe = IOpipe(debug=True)
 eventinfo_plugin = EventInfoPlugin()
 iopipe_with_eventinfo = IOpipeCore(debug=True, plugins=[eventinfo_plugin])
 
-logger_plugin = LoggerPlugin()
+logger_plugin = LoggerPlugin(enabled=True)
 iopipe_with_logging = IOpipeCore(debug=True, plugins=[logger_plugin])
 
-logger_plugin_tmp = LoggerPlugin(use_tmp=True)
+logger_plugin_tmp = LoggerPlugin(enabled=True, use_tmp=True)
 iopipe_with_logging_tmp = IOpipeCore(debug=True, plugins=[logger_plugin_tmp])
 
 profiler_plugin = ProfilerPlugin(enabled=True)

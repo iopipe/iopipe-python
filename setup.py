@@ -16,7 +16,7 @@ if sys.version_info[0] == 2:
 
 setup(
     name="iopipe",
-    version="1.7.8",
+    version="1.7.9",
     description="IOpipe agent for serverless Application Performance Monitoring",
     long_description=README,
     author="IOpipe",
