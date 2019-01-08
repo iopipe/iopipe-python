@@ -57,7 +57,7 @@ def iopipe_with_logger_debug():
 def handler_with_logger_disabled(iopipe_with_logger_disabled):
     @iopipe_with_logger_disabled
     def _handler(event, context):
-        context.iopipe.log.debug("I shouldn't be logged.")
+        pass
 
     return iopipe_with_logger_disabled, _handler
 

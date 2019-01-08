@@ -97,7 +97,7 @@ def test__logger_plugin__disabled(
     assert iopipe.plugins[0].enabled is False
 
     assert not mock_get_signed_request.called
-    assert mock_upload_log_data.called
+    assert not mock_upload_log_data.called
 
 
 @mock.patch("iopipe.contrib.logger.plugin.upload_log_data", autospec=True)

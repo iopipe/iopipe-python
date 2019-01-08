@@ -79,11 +79,11 @@ class LoggerPlugin(Plugin):
         self.context = context
         self.signed_request = None
 
-        self.context.iopipe.register(
-            "log", LogWrapper(self.logger, context), force=True
-        )
-
         if self.enabled:
+            self.context.iopipe.register(
+                "log", LogWrapper(self.logger, context), force=True
+            )
+
             self.signed_request = self.iopipe.submit_future(
                 get_signed_request, self.iopipe.config, self.context, ".log"
             )
