@@ -68,12 +68,9 @@ class ProfilerPlugin(Plugin):
             if self.signed_request is not None:
                 if isinstance(self.signed_request, Future):
                     wait([self.signed_request])
-                if hasattr(self.signed_request, "result") and callable(
-                    self.signed_request.result
-                ):
                     self.signed_request = self.signed_request.result()
             if (
-                isinstance(self.signed_request, dict)
+                self.signed_request is not None
                 and "signedRequest" in self.signed_request
             ):
                 with tempfile.NamedTemporaryFile(delete=False) as stats_file:
