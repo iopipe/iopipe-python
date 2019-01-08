@@ -24,7 +24,7 @@ class LoggerPlugin(Plugin):
         self,
         name=None,
         level=logging.INFO,
-        enabled=True,
+        enabled=False,
         redirect_stdout=True,
         use_tmp=False,
     ):
@@ -43,25 +43,29 @@ class LoggerPlugin(Plugin):
         :type use_tmp: bool
         """
         self._enabled = enabled
+        self.handler = None
+        self.level = level
+        self.logger = logging.getLogger(name)
         self.redirect_stdout = redirect_stdout
         self.use_tmp = use_tmp
 
         if self.enabled:
-            formatter = JSONFormatter()
-
-            self.handler = logging.StreamHandler(StringIO())
-            self.handler.setFormatter(formatter)
-            self.handler.setLevel(level)
-
-            self.logger = logging.getLogger(name)
-            self.logger.addHandler(self.handler)
-            self.logger.setLevel(level)
+            self.init_handler()
 
     @property
     def enabled(self):
         return self._enabled is True or bool(
             strtobool(os.getenv("IOPIPE_LOGGER_ENABLED", "false"))
         )
+
+    def init_handler(self):
+        formatter = JSONFormatter()
+
+        self.handler = logging.StreamHandler(StringIO())
+        self.handler.setFormatter(formatter)
+        self.handler.setLevel(self.level)
+        self.logger.addHandler(self.handler)
+        self.logger.setLevel(self.level)
 
     def pre_setup(self, iopipe):
         self.iopipe = iopipe
@@ -75,14 +79,17 @@ class LoggerPlugin(Plugin):
         self.context = context
         self.signed_request = None
 
+        self.context.iopipe.register(
+            "log", LogWrapper(self.logger, context), force=True
+        )
+
         if self.enabled:
             self.signed_request = self.iopipe.submit_future(
                 get_signed_request, self.iopipe.config, self.context, ".log"
             )
 
-            self.context.iopipe.register(
-                "log", LogWrapper(self.logger, context), force=True
-            )
+            if not self.handler:
+                self.init_handler()
 
             if self.use_tmp is True:
                 self.handler.stream = tempfile.NamedTemporaryFile(
@@ -95,44 +102,46 @@ class LoggerPlugin(Plugin):
                 sys.stdout = StreamToLogger(self.logger)
 
     def post_invoke(self, event, context):
+        if self.enabled and self.redirect_stdout is True:
+            sys.stdout = sys.__stdout__
+
+    def pre_report(self, report):
         if self.enabled:
             self.handler.flush()
 
-            if self.redirect_stdout is True:
-                sys.stdout = sys.__stdout__
+            if self.handler.stream.tell():
+                stream = self.handler.stream
 
-    def pre_report(self, report):
-        if self.enabled and self.handler.stream.tell():
-            stream = self.handler.stream
+                if hasattr(stream, "getvalue"):
+                    stream = StringIO(stream.getvalue())
 
-            if hasattr(stream, "getvalue"):
-                stream = StringIO(stream.getvalue())
+                if hasattr(stream, "file"):
+                    stream = stream.name
+                    self.handler.stream.close()
+                if self.signed_request is not None:
 
-            if hasattr(stream, "file"):
-                stream = stream.name
-                self.handler.stream.close()
-            if self.signed_request is not None:
+                    if isinstance(self.signed_request, Future):
+                        wait([self.signed_request])
+                        self.signed_request = self.signed_request.result()
 
-                if isinstance(self.signed_request, Future):
-                    wait([self.signed_request])
-                    self.signed_request = self.signed_request.result()
+                if (
+                    self.signed_request is not None
+                    and "signedRequest" in self.signed_request
+                ):
+                    self.iopipe.submit_future(
+                        upload_log_data,
+                        self.signed_request["signedRequest"],
+                        stream,
+                        self.iopipe.config,
+                    )
+                    if "jwtAccess" in self.signed_request:
+                        plugin = next(
+                            (p for p in report.plugins if p["name"] == self.name)
+                        )
 
-            if (
-                self.signed_request is not None
-                and "signedRequest" in self.signed_request
-            ):
-                self.iopipe.submit_future(
-                    upload_log_data,
-                    self.signed_request["signedRequest"],
-                    stream,
-                    self.iopipe.config,
-                )
-                if "jwtAccess" in self.signed_request:
-                    plugin = next((p for p in report.plugins if p["name"] == self.name))
-
-                    if "uploads" not in plugin:
-                        plugin["uploads"] = []
-                    plugin["uploads"].append(self.signed_request["jwtAccess"])
+                        if "uploads" not in plugin:
+                            plugin["uploads"] = []
+                        plugin["uploads"].append(self.signed_request["jwtAccess"])
 
     def post_report(self, report):
         pass

@@ -83,6 +83,26 @@ def test__logger_plugin(
 @mock.patch("iopipe.contrib.logger.plugin.upload_log_data", autospec=True)
 @mock.patch("iopipe.contrib.logger.plugin.get_signed_request", autospec=True)
 @mock.patch("iopipe.report.send_report", autospec=True)
+def test__logger_plugin__disabled(
+    mock_send_report,
+    mock_get_signed_request,
+    mock_upload_log_data,
+    handler_with_logger_disabled,
+    mock_context,
+):
+    iopipe, handler = handler_with_logger_disabled
+
+    handler({}, mock_context)
+
+    assert iopipe.plugins[0].enabled is False
+
+    assert not mock_get_signed_request.called
+    assert mock_upload_log_data.called
+
+
+@mock.patch("iopipe.contrib.logger.plugin.upload_log_data", autospec=True)
+@mock.patch("iopipe.contrib.logger.plugin.get_signed_request", autospec=True)
+@mock.patch("iopipe.report.send_report", autospec=True)
 def test__logger_plugin__debug(
     mock_send_report,
     mock_get_signed_request,

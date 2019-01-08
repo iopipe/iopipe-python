@@ -8,7 +8,7 @@ from iopipe.contrib.logger import LoggerPlugin
 
 @pytest.fixture
 def iopipe_with_logger():
-    plugin = LoggerPlugin("testlog")
+    plugin = LoggerPlugin("testlog", enabled=True)
     return IOpipeCore(
         token="test-suite", url="https://metrics-api.iopipe.com", plugins=[plugin]
     )
@@ -35,14 +35,31 @@ def handler_with_logger(iopipe_with_logger):
 
 
 @pytest.fixture
+def iopipe_with_logger_disabled():
+    plugin = LoggerPlugin(name="testlog", enabled=False)
+    return IOpipeCore(
+        token="test-suite", url="https://metrics-api.iopipe.com", plugins=[plugin]
+    )
+
+
+@pytest.fixture
 def iopipe_with_logger_debug():
-    plugin = LoggerPlugin(name="testlog")
+    plugin = LoggerPlugin(name="testlog", enabled=True)
     return IOpipeCore(
         token="test-suite",
         url="https://metrics-api.iopipe.com",
         debug=True,
         plugins=[plugin],
     )
+
+
+@pytest.fixture
+def handler_with_logger_disabled(iopipe_with_logger_disabled):
+    @iopipe_with_logger_disabled
+    def _handler(event, context):
+        context.iopipe.log.debug("I shouldn't be logged.")
+
+    return iopipe_with_logger_disabled, _handler
 
 
 @pytest.fixture
@@ -56,7 +73,7 @@ def handler_with_logger_debug(iopipe_with_logger_debug):
 
 @pytest.fixture
 def iopipe_with_logger_use_tmp():
-    plugin = LoggerPlugin(name="testlog", use_tmp=True)
+    plugin = LoggerPlugin(name="testlog", enabled=True, use_tmp=True)
     return IOpipeCore(
         token="test-suite", url="https://metrics-api.iopipe.com", plugins=[plugin]
     )
