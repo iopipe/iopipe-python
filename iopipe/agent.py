@@ -230,7 +230,15 @@ class IOpipeCore(object):
         }
 
         if name in hooks:
-            [hooks[name](p) for p in self.plugins if p.enabled]
+            for p in self.plugins:
+                if p.enabled:
+                    try:
+                        hooks[name](p)
+                    except Exception as e:
+                        logger.error(
+                            "IOpipe plugin %s hook raised error" % (name, str(e))
+                        )
+                        logger.exception(e)
 
     def submit_future(self, func, *args, **kwargs):
         """

@@ -234,7 +234,7 @@ Here's an example of how to use the logger plugin:
 from iopipe import IOpipe
 from iopipe.contrib.logger import LoggerPlugin
 
-iopipe = IOpipe(plugins=[LoggerPlugin()])
+iopipe = IOpipe(plugins=[LoggerPlugin(enabled=True)])
 
 @iopipe
 def handler(event, context):
@@ -249,7 +249,7 @@ import logging
 from iopipe import IOpipe
 from iopipe.contrib.logger import LoggerPlugin
 
-iopipe = IOpipe(plugins=[LoggerPlugin()])
+iopipe = IOpipe(plugins=[LoggerPlugin(enabled=True)])
 logger = logging.getLogger()
 
 @iopipe
@@ -263,12 +263,14 @@ You can also specify a log name, such as if you only wanted to log messages for 
 from iopipe import IOpipe
 from iopipe.contrib.logger import LoggerPlugin
 
-iopipe = IOpipe(plugins=[LoggerPlugin('mymodule')])
+iopipe = IOpipe(plugins=[LoggerPlugin('mymodule', enabled=True)])
 ```
 
 This would be equivalent to `logging.getLogger('mymodule')`.
 
-By default, the logger plugin log level is `logging.INFO`, but it can be set like this:
+By default the logger plugin is disabled. You must explicitly set `enabled=True` when instantiating or use the `IOPIPE_LOGGER_ENABLED` environment variable to enable it.
+
+The default logger plugin log level is `logging.INFO`, but it can be set like this:
 
 ```python
 import logging
@@ -276,7 +278,7 @@ import logging
 from iopipe import IOpipe
 from iopipe.contrib.logger import LoggerPlugin
 
-iopipe = IOpipe(plugins=[LoggerPlugin(level=logging.DEBUG)])
+iopipe = IOpipe(plugins=[LoggerPlugin(enabled=True, level=logging.DEBUG)])
 ```
 
 Putting IOpipe into `debug` mode also sets the log level to `logging.DEBUG`.
@@ -287,7 +289,7 @@ The logger plugin also redirects stdout by default, so you can do the following:
 from iopipe import IOpipe
 from iopipe.contrib.logger import LoggerPlugin
 
-iopipe = IOpipe(plugins=[LoggerPlugin()])
+iopipe = IOpipe(plugins=[LoggerPlugin(enabled=True)])
 
 @iopipe
 def handler(event, context):
@@ -299,13 +301,13 @@ Now in your IOpipe invocation view you will see log messages for that invocation
 If you prefer your print statements not to be logged, you can disable this by setting `redirect_stdout` to `False`:
 
 ```python
-iopipe = IOpipe(plugins=[LoggerPlugin(redirect_stdout=False)])
+iopipe = IOpipe(plugins=[LoggerPlugin(enabled=True, redirect_stdout=False)])
 ```
 
 By default the logger plugin will log messages to an in-memory buffer. If you prefer to log messages to your Lambda function's `/tmp` directory:
 
 ```python
-iopipe = IOpipe(plugins=[LoggerPlugin(use_tmp=True)])
+iopipe = IOpipe(plugins=[LoggerPlugin(enabled=True, use_tmp=True)])
 ```
 
 With `use_tmp` enabled, the plugin will automatically delete log files written to `/tmp` after each invocation.

@@ -68,7 +68,7 @@ class ProfilerPlugin(Plugin):
             if self.signed_request is not None:
                 if isinstance(self.signed_request, Future):
                     wait([self.signed_request])
-                self.signed_request = self.signed_request.result()
+                    self.signed_request = self.signed_request.result()
             if (
                 self.signed_request is not None
                 and "signedRequest" in self.signed_request

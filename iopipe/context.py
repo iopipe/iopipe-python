@@ -1,8 +1,27 @@
 import decimal
+import logging
 import numbers
 import warnings
+
 from . import constants
 from .compat import string_types
+
+
+class LogWrapper(object):
+    def __init__(self, context):
+        self.context = context
+        self.logger = logging.getLogger()
+
+    def __call__(self, key, value):
+        warnings.warn(
+            "Calling context.iopipe.log() has been deprecated, use "
+            "context.iopipe.metric() instead"
+        )
+
+        self.context.metric(key, value)
+
+    def __getattr__(self, name):
+        return getattr(self.logger, name)
 
 
 class ContextWrapper(object):
@@ -18,6 +37,7 @@ class ContextWrapper(object):
 class IOpipeContext(object):
     def __init__(self, instance):
         self.instance = instance
+        self.log = LogWrapper(self)
 
     def metric(self, key, value):
         if self.instance.report is None:
@@ -51,8 +71,6 @@ class IOpipeContext(object):
 
         if not name.startswith("@iopipe"):
             self.label("@iopipe/metrics")
-
-    log = metric
 
     def label(self, name):
         if self.instance.report is None:
