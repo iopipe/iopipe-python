@@ -69,8 +69,9 @@ class LoggerPlugin(Plugin):
         if self.redirect_stdout is True:
             sys.stdout = StreamToLogger(self.logger)
 
-    def post_invoke(self, event, context):
         self.signed_request = None
+
+    def post_invoke(self, event, context):
         self.handler.flush()
         if self.handler.stream.tell():
             self.signed_request = self.iopipe.submit_future(
