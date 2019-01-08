@@ -90,9 +90,12 @@ class LoggerPlugin(Plugin):
             if self.signed_request is not None:
                 if isinstance(self.signed_request, Future):
                     wait([self.signed_request])
-                self.signed_request = self.signed_request.result()
+                if hasattr(self.signed_request, "result") and callable(
+                    self.signed_request.result
+                ):
+                    self.signed_request = self.signed_request.result()
             if (
-                self.signed_request is not None
+                isinstance(self.signed_request, dict)
                 and "signedRequest" in self.signed_request
             ):
                 self.iopipe.submit_future(
