@@ -37,8 +37,9 @@ case "$1" in
         rm -rf python
         echo "Build complete: ${PY27_DIST}"
 
-        py27_md5sum=$(md5 -q $PY27_DIST)
-        py27_s3key="iopipe-python2.7/${py27_md5sum}.zip"
+        py27_hash=$(git rev-parse HEAD)
+
+        py27_s3key="iopipe-python2.7/${py27_hash}.zip"
 
         for region in "${REGIONS[@]}"; do
             bucket_name="iopipe-layers-${region}"
@@ -77,8 +78,9 @@ case "$1" in
         rm -rf python
         echo "Build complete: ${PY3X_DIST}" \
 
-        py3x_md5sum=$(md5 -q $PY3X_DIST)
-        py3x_s3key="iopipe-python3.x/${py3x_md5sum}.zip"
+        py3x_hash=$(git rev-parse HEAD)
+
+        py3x_s3key="iopipe-python3.x/${py3x_hash}.zip"
 
         for region in "${REGIONS[@]}"; do
             bucket_name="iopipe-layers-${region}"
