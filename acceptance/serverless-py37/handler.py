@@ -95,6 +95,8 @@ def logging(event, context):
     # This should still work (backwards compatibility)
     context.iopipe.log("time", time.time())
 
+    print("I'm redirecting stdout")
+
     context.iopipe.log.debug("I'm a debug message.")
     context.iopipe.log.info("I'm an info message.")
     context.iopipe.log.warn("I'm a warning message.")
