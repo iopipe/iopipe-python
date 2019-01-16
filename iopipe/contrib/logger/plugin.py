@@ -5,7 +5,7 @@ import os
 import sys
 import tempfile
 
-from iopipe.compat import StringIO
+from iopipe.compat import StringIO, PY37
 from iopipe.plugins import Plugin
 from iopipe.signer import get_signed_request
 
@@ -48,6 +48,11 @@ class LoggerPlugin(Plugin):
         self.logger = logging.getLogger(name)
         self.redirect_stdout = redirect_stdout
         self.use_tmp = use_tmp
+
+        # Due to a change in python3.7 runtime's logging config, we cannot redirect
+        # stdout without resulting in a recursion error.
+        if PY37:
+            self.redirect_stdout = False
 
         if self.enabled:
             self.init_handler()

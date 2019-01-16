@@ -304,6 +304,8 @@ If you prefer your print statements not to be logged, you can disable this by se
 iopipe = IOpipe(plugins=[LoggerPlugin(enabled=True, redirect_stdout=False)])
 ```
 
+**Note:** Due to a change to the way the python3.7 runtime configures logging, stdout redirection is disabled for this runtime. Use `context.iopipe.log.*` instead.
+
 By default the logger plugin will log messages to an in-memory buffer. If you prefer to log messages to your Lambda function's `/tmp` directory:
 
 ```python
