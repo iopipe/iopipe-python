@@ -123,16 +123,14 @@ jobs:
       - image: circleci/python:2.7
     steps:
       - checkout
-      - run: sudo chown -R circleci:circleci /usr/local/bin
-      - run: sudo chown -R circleci:circleci /usr/local/lib/python2.7/site-packages
       - run:
           name: Install publish dependencies
           command: sudo pip install -U awscli
       - run:
           name: Override AWS Credentials
           command: |
-            echo 'export AWS_ACCESS_KEY_ID="$LAYER_AWS_ACCESS_KEY_ID"' >> $BASH_ENV
-            echo 'export AWS_SECRET_ACCESS_KEY="$LAYER_SECRET_ACCESS_KEY"' >> $BASH_ENV
+            echo "export AWS_ACCESS_KEY_ID=$LAYER_AWS_ACCESS_KEY_ID" >> $BASH_ENV
+            echo "export AWS_SECRET_ACCESS_KEY=$LAYER_AWS_SECRET_ACCESS_KEY" >> $BASH_ENV
       - run:
           name: Publish layers
           command: ./publish-layers.sh python2.7
@@ -143,16 +141,14 @@ jobs:
       - image: circleci/python:3.6
     steps:
       - checkout
-      - run: sudo chown -R circleci:circleci /usr/local/bin
-      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
       - run:
           name: Install publish dependencies
           command: sudo pip install -U awscli
       - run:
           name: Override AWS Credentials
           command: |
-            echo 'export AWS_ACCESS_KEY_ID="$LAYER_AWS_ACCESS_KEY_ID"' >> $BASH_ENV
-            echo 'export AWS_SECRET_ACCESS_KEY="$LAYER_SECRET_ACCESS_KEY"' >> $BASH_ENV
+            echo "export AWS_ACCESS_KEY_ID=$LAYER_AWS_ACCESS_KEY_ID" >> $BASH_ENV
+            echo "export AWS_SECRET_ACCESS_KEY=$LAYER_AWS_SECRET_ACCESS_KEY" >> $BASH_ENV
       - run:
           name: Publish layers
           command: ./publish-layers.sh python3.x
