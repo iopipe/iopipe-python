@@ -129,8 +129,8 @@ jobs:
       - run:
           name: Override AWS Credentials
           command: |
-            echo "export AWS_ACCESS_KEY_ID=$LAYER_AWS_ACCESS_KEY_ID" >> $BASH_ENV
-            echo "export AWS_SECRET_ACCESS_KEY=$LAYER_AWS_SECRET_ACCESS_KEY" >> $BASH_ENV
+            echo 'export AWS_ACCESS_KEY_ID="$LAYER_AWS_ACCESS_KEY_ID"' >> $BASH_ENV
+            echo 'export AWS_SECRET_ACCESS_KEY="$LAYER_AWS_SECRET_ACCESS_KEY"' >> $BASH_ENV
       - run:
           name: Publish layers
           command: ./publish-layers.sh python2.7
@@ -147,8 +147,8 @@ jobs:
       - run:
           name: Override AWS Credentials
           command: |
-            echo "export AWS_ACCESS_KEY_ID=$LAYER_AWS_ACCESS_KEY_ID" >> $BASH_ENV
-            echo "export AWS_SECRET_ACCESS_KEY=$LAYER_AWS_SECRET_ACCESS_KEY" >> $BASH_ENV
+            echo 'export AWS_ACCESS_KEY_ID="$LAYER_AWS_ACCESS_KEY_ID"' >> $BASH_ENV
+            echo 'export AWS_SECRET_ACCESS_KEY="$LAYER_AWS_SECRET_ACCESS_KEY"' >> $BASH_ENV
       - run:
           name: Publish layers
           command: ./publish-layers.sh python3.x
