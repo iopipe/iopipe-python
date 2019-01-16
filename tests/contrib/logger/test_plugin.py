@@ -5,6 +5,7 @@ import sys
 
 import pytest
 
+from iopipe.compat import PY37
 from iopipe.system import read_disk
 
 
@@ -63,10 +64,11 @@ def test__logger_plugin(
         in stream.getvalue()
     )
 
-    assert (
-        '"message": "This is not a misprint.", "name": "testlog", "severity": "INFO"'
-        in stream.getvalue()
-    )
+    if not PY37:
+        assert (
+            '"message": "This is not a misprint.", "name": "testlog", "severity": "INFO"'
+            in stream.getvalue()
+        )
 
     stream.seek(0)
 
