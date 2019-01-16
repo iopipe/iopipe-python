@@ -45,6 +45,11 @@ functions:
       - schedule: rate(5 minutes)
     handler: handler.custom_metrics
 
+  logging:
+    events:
+      - schedule: rate(15 minutes)
+    handler: handler.logging
+
   logging-tmp:
     events:
       - schedule: rate(1 hour)
