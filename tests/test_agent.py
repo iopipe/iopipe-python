@@ -57,7 +57,7 @@ def test_labels(mock_send_report, handler_with_labels, mock_context):
     iopipe, handler = handler_with_labels
     handler(None, mock_context)
 
-    assert len(iopipe.report.labels) == 2
+    assert len(iopipe.report.labels) == 5
 
 
 @mock.patch("iopipe.report.send_report", autospec=True)

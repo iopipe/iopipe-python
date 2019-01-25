@@ -72,7 +72,7 @@ class IOpipeContext(object):
         if not name.startswith("@iopipe"):
             self.label("@iopipe/metrics")
 
-    def label(self, name):
+    def label(self, *names):
         if self.instance.report is None:
             warnings.warn(
                 "Attempting to add label before function decorated with IOpipe. "
@@ -80,22 +80,23 @@ class IOpipeContext(object):
             )
             return
 
-        if not isinstance(name, string_types):
-            warnings.warn(
-                "Attempted to add a label that is not of type string. "
-                "This label will not be recorded."
-            )
-            return
+        for name in names:
+            if not isinstance(name, string_types):
+                warnings.warn(
+                    "Attempted to add a label that is not of type string. This label "
+                    "will not be recorded."
+                )
+                continue
 
-        if len(name) > constants.METRIC_NAME_LIMIT:
-            warnings.warn(
-                "Label of name %s is longer than allowed limit of "
-                "%s characters. "
-                "This label will not be recorded." % (name, constants.METRIC_NAME_LIMIT)
-            )
-            return
+            if len(name) > constants.METRIC_NAME_LIMIT:
+                warnings.warn(
+                    "Label of name %s is longer than allowed limit of %s characters. "
+                    "This label will not be recorded."
+                    % (name, constants.METRIC_NAME_LIMIT)
+                )
+                continue
 
-        self.instance.report.labels.add(name)
+            self.instance.report.labels.add(name)
 
     def error(self, error):
         if self.instance.report is None:
