@@ -11,7 +11,7 @@ from .util import add_timeline_measures
 
 class TracePlugin(Plugin):
     name = "trace"
-    version = "1.1.0"
+    version = "1.1.1"
     homepage = "https://github.com/iopipe/iopipe-python#trace-plugin"
     enabled = True
 
