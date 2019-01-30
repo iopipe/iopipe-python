@@ -110,7 +110,7 @@ jobs:
           name: Install release dependencies
           command: |
             sudo apt-get install -y pandoc
-            sudo pip install -U pypandoc setuptools twine
+            sudo pip install -U pyOpenSSL pypandoc setuptools twine
       - run:
           name: Release package
           command: |
