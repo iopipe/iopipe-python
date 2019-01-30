@@ -23,7 +23,7 @@ functions:
       - schedule: rate(5 minutes)
     handler: iopipe.handler.wrapper
     layers:
-      - arn:aws:lambda:us-west-2:146318645305:layer:IOpipePython27:2
+      - arn:aws:lambda:us-west-2:146318645305:layer:IOpipePython27:8
     runtime: python2.7
   py36-layer:
     environment:
@@ -32,7 +32,7 @@ functions:
       - schedule: rate(5 minutes)
     handler: iopipe.handler.wrapper
     layers:
-      - arn:aws:lambda:us-west-2:146318645305:layer:IOpipePython:2
+      - arn:aws:lambda:us-west-2:146318645305:layer:IOpipePython:8
     runtime: python3.6
   py37-layer:
     environment:
@@ -41,5 +41,5 @@ functions:
       - schedule: rate(5 minutes)
     handler: iopipe.handler.wrapper
     layers:
-      - arn:aws:lambda:us-west-2:146318645305:layer:IOpipePython:2
+      - arn:aws:lambda:us-west-2:146318645305:layer:IOpipePython:8
     runtime: python3.7
