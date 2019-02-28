@@ -32,6 +32,7 @@ setup(
         "coverage==5.0a2",
         "jmespath>=0.7.1,<1.0.0",
         "mock",
+        "more-itertools<6.0.0",
         "pytest==4.1.0",
         "pytest-benchmark==3.2.0",
         "pytest-cov==2.6.1",
