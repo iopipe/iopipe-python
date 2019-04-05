@@ -33,6 +33,8 @@ class IOpipeCore(object):
     The stock IOpipe agent, without any plugins loaded.
     """
 
+    pool = None
+
     def __init__(self, token=None, url=None, debug=None, plugins=None, **options):
         self.plugins = []
         if plugins is not None and isinstance(plugins, list):
@@ -60,7 +62,8 @@ class IOpipeCore(object):
         self.run_hooks("post:setup")
 
     def __del__(self):
-        self.pool.shutdown()
+        if self.pool:
+            self.pool.shutdown()
 
     def log(self, key, value):
         if self.report is None:
