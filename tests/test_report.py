@@ -11,6 +11,7 @@ def test_report_linux_system_success(iopipe, mock_context, assert_valid_schema):
     assert_valid_schema(
         report.report,
         optional_fields=[
+            "clientId",
             "environment.runtime.vendor",
             "environment.runtime.vmVendor",
             "environment.runtime.vmVersion",
@@ -41,6 +42,7 @@ def test_report_linux_system_error(iopipe, mock_context, assert_valid_schema):
     assert_valid_schema(
         report.report,
         optional_fields=[
+            "clientId",
             "environment.runtime.vendor",
             "environment.runtime.vmVendor",
             "environment.runtime.vmVersion",

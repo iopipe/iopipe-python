@@ -42,6 +42,7 @@ def test__trace_plugin__valid_schema(
     assert_valid_schema(
         iopipe.report.report,
         optional_fields=[
+            "clientId",
             "environment.nodejs",
             "environment.runtime.vendor",
             "environment.runtime.vmVendor",
