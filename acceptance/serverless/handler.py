@@ -15,7 +15,7 @@ from iopipe.contrib.logger import LoggerPlugin
 from iopipe.contrib.profiler import ProfilerPlugin
 from iopipe.contrib.trace import TracePlugin
 
-url = "https://metrics-api.ca-central-1.iopipe.com/v0/event"
+url = "https://metrics-api.ca-central-1.iopipe.com"
 
 iopipe = IOpipe(debug=True, url=url)
 
