@@ -2,13 +2,13 @@ import concurrent.futures as futures
 import functools
 import inspect
 import logging
-import signal
 import warnings
 
 from .config import set_config
 from .context import ContextWrapper
 from .plugins import is_plugin
 from .report import Report
+from .timeout import Timeout, TimeoutError
 
 logging.basicConfig()
 
@@ -22,10 +22,6 @@ class MockFuture(object):
 
     def result(self):
         return self._result
-
-
-class TimeoutError(Exception):
-    pass
 
 
 class IOpipeCore(object):
@@ -117,7 +113,7 @@ class IOpipeCore(object):
 
             self.report = Report(self, context)
 
-            signal.signal(signal.SIGALRM, self.handle_timeout)
+            timeout_duration = 0
 
             # Disable timeout if timeout_window <= 0, or if our context doesn't have a
             # get_remaining_time_in_millis method
@@ -139,25 +135,27 @@ class IOpipeCore(object):
                     [timeout_duration, 60 * 60 * 15 - self.config["timeout_window"]]
                 )
 
+            if timeout_duration > 0:
                 logger.debug("Setting timeout duration to %s" % timeout_duration)
-
-                # Using signal.setitimer instead of signal.alarm because the latter
-                # only accepts integers and we want to be able to timeout at
-                # millisecond granularity
-                signal.setitimer(signal.ITIMER_REAL, timeout_duration)
 
             result = None
 
             try:
-                result = func(event, context)
+                with Timeout(timeout_duration, False) as timeout:
+                    result = func(event, context)
             except Exception as e:
+
                 self.run_hooks("post:invoke", event=event, context=context)
+
+                frame = None
+                if isinstance(e, TimeoutError):
+                    frame = inspect.currentframe()
 
                 # This prevents this block from being executed a second time in the
                 # event that a timeout occurs and an exception is subsequently raised
                 # within the handler
                 if self.report.sent is False:
-                    self.report.prepare(e)
+                    self.report.prepare(e, frame)
                     self.run_hooks("pre:report")
                     self.report.send()
                     self.run_hooks("post:report")
@@ -170,7 +168,7 @@ class IOpipeCore(object):
                 self.report.send()
                 self.run_hooks("post:report")
             finally:
-                signal.setitimer(signal.ITIMER_REAL, 0)
+                timeout.cancel()
                 self.wait_for_futures()
 
             return result
@@ -178,22 +176,6 @@ class IOpipeCore(object):
         return wrapped
 
     decorator = __call__
-
-    def handle_timeout(self, signum, frame):
-        """
-        Catches a timeout (SIGALRM) and sends the report before actual timeout occurs.
-
-        The signum and frame parameters are passed by the signal module to this handler.
-
-        :param signum: The signal number being handled.
-        :param frame: The stack frame when signal was raised.
-        """
-        logger.debug("Function is about to timeout, sending report")
-        self.report.prepare(TimeoutError("Timeout Exceeded."), frame)
-        self.run_hooks("pre:report")
-        self.report.send()
-        self.run_hooks("post:report")
-        self.wait_for_futures()
 
     def load_plugins(self, plugins):
         """
