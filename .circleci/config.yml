@@ -6,13 +6,11 @@ jobs:
       - image: circleci/python:2.7
     steps:
       - checkout
-      - run: sudo chown -R circleci:circleci /usr/local/bin
-      - run: sudo chown -R circleci:circleci /usr/local/lib/python2.7/site-packages
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           name: Run tests
-          command: |
-            unset AWS_REGION IOPIPE_DEBUG IOPIPE_ENABLED IOPIPE_TIMEOUT_WINDOW IOPIPE_TOKEN
-            python setup.py test
+          command: make test-python2.7
 
   build-py36:
     working_directory: ~/iopipe-python
@@ -20,13 +18,11 @@ jobs:
       - image: circleci/python:3.6
     steps:
       - checkout
-      - run: sudo chown -R circleci:circleci /usr/local/bin
-      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           name: Run tests
-          command: |
-            unset AWS_REGION IOPIPE_DEBUG IOPIPE_ENABLED IOPIPE_TIMEOUT_WINDOW IOPIPE_TOKEN
-            python setup.py test
+          command: make test-python3.6
 
   build-py37:
     working_directory: ~/iopipe-python
@@ -34,13 +30,11 @@ jobs:
       - image: circleci/python:3.7
     steps:
       - checkout
-      - run: sudo chown -R circleci:circleci /usr/local/bin
-      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.7/site-packages
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           name: Run tests
-          command: |
-            unset AWS_REGION IOPIPE_DEBUG IOPIPE_ENABLED IOPIPE_TIMEOUT_WINDOW IOPIPE_TOKEN
-            python setup.py test
+          command: make test-python3.7
 
   code-style:
     working_directory: ~/iopipe-python
@@ -69,6 +63,7 @@ jobs:
           name: Generate coverage report
           command: |
             unset AWS_REGION IOPIPE_DEBUG IOPIPE_ENABLED IOPIPE_TIMEOUT_WINDOW IOPIPE_TOKEN
+            pip install coverage==5.0a2 pytest-cov==2.6.1
             python setup.py test --addopts="--cov iopipe"
       - run:
           name: Upload coverage report
@@ -95,7 +90,6 @@ jobs:
             cd acceptance/serverless && sls deploy --conceal
             cd ../serverless-layers && sls deploy --conceal
             cd ../serverless-py37 && sls deploy --conceal
-
             cd ../serverless-wsgi && npm install && sls deploy --conceal
 
   release:
