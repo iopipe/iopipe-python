@@ -63,8 +63,8 @@ jobs:
           name: Generate coverage report
           command: |
             unset AWS_REGION IOPIPE_DEBUG IOPIPE_ENABLED IOPIPE_TIMEOUT_WINDOW IOPIPE_TOKEN
-            pip install coverage==5.0a2 pytest-cov==2.6.1
-            python setup.py test --addopts="--cov iopipe"
+            pip install ".[coverage]"
+            pytest --cov=iopipe tests/
       - run:
           name: Upload coverage report
           command: |
