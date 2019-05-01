@@ -23,6 +23,7 @@ def get_handler():
             "Improperly formated handler value: %s" % os.environ["IOPIPE_HANDLER"]
         )
 
+    module_path = module_path.replace("/", ".")
     file_handle, pathname, desc = None, None, None
 
     try:
