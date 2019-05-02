@@ -14,6 +14,19 @@ install_requires = []
 if sys.version_info[0] == 2:
     install_requires.append("futures")
 
+tests_require = [
+    "jmespath>=0.7.1,<1.0.0",
+    "mock",
+    "more-itertools<6.0.0",
+    "pytest==4.1.0",
+    "pytest-benchmark==3.2.0",
+    "requests",
+]
+
+# Lambda doesn't come with sqlite3 support, which is a dependency of pytest-cov, so we
+# have to define these dependencies outside the test suite.
+coverage_requires = tests_require + ["coverage==5.0a2", "pytest-cov==2.6.1"]
+
 setup(
     name="iopipe",
     version="1.7.17",
@@ -24,20 +37,12 @@ setup(
     url="https://github.com/iopipe/iopipe-python",
     packages=find_packages(exclude=("tests", "tests.*")),
     extras_require={
-        "dev": ["black", "jmespath>=0.7.1,<1.0.0", "pre-commit", "requests"]
+        "coverage": coverage_requires,
+        "dev": tests_require + ["black==18.6b2", "pre-commit"],
     },
     install_requires=install_requires,
     setup_requires=["pytest-runner==4.2"],
-    tests_require=[
-        "coverage==5.0a2",
-        "jmespath>=0.7.1,<1.0.0",
-        "mock",
-        "more-itertools<6.0.0",
-        "pytest==4.1.0",
-        "pytest-benchmark==3.2.0",
-        "pytest-cov==2.6.1",
-        "requests",
-    ],
+    tests_require=tests_require,
     zip_safe=True,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
