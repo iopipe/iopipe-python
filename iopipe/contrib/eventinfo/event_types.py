@@ -129,7 +129,7 @@ class S3(EventType):
     def has_required_keys(self):
         return (
             super(S3, self).has_required_keys()
-            and get_value(self.event, "Records[0].eventVersion") == "2.0"
+            and get_value(self.event, "Records[0].eventVersion") in ("2.0", "2.1")
             and get_value(self.event, "Records[0].eventSource") == "aws:s3"
         )
 
