@@ -9,6 +9,8 @@ try:
 except ImportError:
     import requests
 
+import boto3
+
 from iopipe import IOpipe, IOpipeCore
 from iopipe.contrib.eventinfo import EventInfoPlugin
 from iopipe.contrib.logger import LoggerPlugin
@@ -47,9 +49,13 @@ def api_gateway(event, context):
 def api_trigger(event, context):
     gateway_url = os.getenv("PY_API_GATEWAY_URL")
     context.iopipe.metric("gateway_url", gateway_url or "")
+
     if gateway_url is not None:
         response = requests.get(gateway_url)
         context.iopipe.metric("response_status", response.status_code)
+
+    client = boto3.client("s3")
+    client.list_buckets()
 
 
 @iopipe_with_auto_http
