@@ -43,6 +43,7 @@ def test__trace_plugin__valid_schema(
         iopipe.report.report,
         optional_fields=[
             "clientId",
+            "dbTraceEntries",
             "environment.nodejs",
             "environment.runtime.vendor",
             "environment.runtime.vmVendor",
