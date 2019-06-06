@@ -143,12 +143,15 @@ class IOpipeCore(object):
             try:
                 with Timeout(timeout_duration, False) as timeout:
                     result = func(event, context)
+                    timeout.cancel()
             except Exception as e:
-
                 self.run_hooks("post:invoke", event=event, context=context)
 
                 frame = None
                 if isinstance(e, TimeoutError):
+                    logger.debug(
+                        "Function about to timeout; reporting current stack frame"
+                    )
                     frame = inspect.currentframe()
 
                 # This prevents this block from being executed a second time in the
@@ -168,7 +171,6 @@ class IOpipeCore(object):
                 self.report.send()
                 self.run_hooks("post:report")
             finally:
-                timeout.cancel()
                 self.wait_for_futures()
 
             return result
