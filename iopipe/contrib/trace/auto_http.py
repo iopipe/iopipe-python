@@ -8,10 +8,8 @@ except ImportError:
     RequestsSession = None
 
 try:
-    from botocore.awsrequest import AWSResponse
     from botocore.httpsession import URLLib3Session as BotocoreSession
 except ImportError:
-    AWSResponse = None
     BotocoreSession = None
 
 try:
