@@ -186,14 +186,14 @@ def collect_metrics_for_response(
     request = None
     if http_request:
         parsed_url = None
-        if hasattr(http_response.request, "url"):
-            parsed_url = urlparse(http_response.request.url)
+        if hasattr(http_request, "url"):
+            parsed_url = urlparse(http_request.url)
 
         request_headers = []
-        if hasattr(http_response.request, "headers"):
+        if hasattr(http_request, "headers"):
             request_headers = [
                 {"key": ensure_utf8(k), "string": ensure_utf8(v)}
-                for k, v in http_response.request.headers.items()
+                for k, v in http_request.headers.items()
                 if k.lower() in INCLUDE_HEADERS
             ]
 
@@ -201,14 +201,14 @@ def collect_metrics_for_response(
             hash=ensure_utf8(getattr(parsed_url, "fragment", None)),
             headers=request_headers,
             hostname=ensure_utf8(getattr(parsed_url, "hostname", None)),
-            method=ensure_utf8(getattr(http_response.request, "method", None)),
+            method=ensure_utf8(getattr(http_request, "method", None)),
             path=ensure_utf8(getattr(parsed_url, "path", None)),
             # TODO: Determine if this is redundant
             pathname=ensure_utf8(getattr(parsed_url, "path", None)),
             port=ensure_utf8(getattr(parsed_url, "port", None)),
             protocol=ensure_utf8(getattr(parsed_url, "scheme", None)),
             query=ensure_utf8(getattr(parsed_url, "query", None)),
-            url=ensure_utf8(getattr(http_response.request, "url", None)),
+            url=ensure_utf8(getattr(http_request, "url", None)),
         )
 
         # TODO: Possibly remove the namedtuple in favor of just a dict
