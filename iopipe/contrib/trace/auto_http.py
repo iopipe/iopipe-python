@@ -1,5 +1,4 @@
 import collections
-import copy
 import uuid
 
 try:
@@ -85,7 +84,9 @@ def patch_requests_session_send(context, http_filter):
             response = original_requests_session_send(self, *args, **kwargs)
         trace = context.iopipe.mark.measure(id)
         context.iopipe.mark.delete(id)
-        collect_metrics_for_response(response, context, trace, http_filter)
+        collect_metrics_for_response(
+            response.request, response, context, trace, http_filter
+        )
         return response
 
     RequestsSession.send = send
@@ -109,9 +110,7 @@ def patch_botocore_session_send(context, http_filter):
             response = original_botocore_session_send(self, *args, **kwargs)
         trace = context.iopipe.mark.measure(id)
         context.iopipe.mark.delete(id)
-        collect_metrics_for_response(
-            response, context, trace, http_filter, http_request=args[0]
-        )
+        collect_metrics_for_response(args[0], response, context, trace, http_filter)
         return response
 
     BotocoreSession.send = send
@@ -135,7 +134,9 @@ def patch_botocore_vendored_session_send(context, http_filter):
             response = original_botocore_vendored_session_send(self, *args, **kwargs)
         trace = context.iopipe.mark.measure(id)
         context.iopipe.mark.delete(id)
-        collect_metrics_for_response(response, context, trace, http_filter)
+        collect_metrics_for_response(
+            response.request, response, context, trace, http_filter
+        )
         return response
 
     BotocoreVendoredSession.send = send
@@ -176,24 +177,14 @@ def restore_requests():
 
 
 def collect_metrics_for_response(
-    http_response, context, trace, http_filter, http_request=None
+    http_request, http_response, context, trace, http_filter
 ):
     """
     Collects relevant metrics from a requests Response object and adds them to
     the IOpipe context.
     """
-    # We make copies to let the user mutate these objects via http_filter
-    http_response = copy.deepcopy(http_response)
-    if http_request is not None:
-        http_response.request = copy.deepcopy(http_request)
-
-    if http_filter is not None and callable(http_filter):
-        http_response = http_filter(http_response)
-        if http_response is False:
-            return
-
     request = None
-    if hasattr(http_response, "request"):
+    if http_request:
         parsed_url = None
         if hasattr(http_response.request, "url"):
             parsed_url = urlparse(http_response.request.url)
@@ -220,6 +211,9 @@ def collect_metrics_for_response(
             url=ensure_utf8(getattr(http_response.request, "url", None)),
         )
 
+        # TODO: Possibly remove the namedtuple in favor of just a dict
+        request = request._asdict()
+
     response_headers = []
     if hasattr(http_response, "headers"):
         response_headers = [
@@ -233,5 +227,14 @@ def collect_metrics_for_response(
         statusCode=ensure_utf8(getattr(http_response, "status_code", None)),
         statusMessage=None,
     )
+
+    # TODO: Possibly remove the namedtuple in favor of just a dict
+    response = response._asdict()
+
+    if http_filter is not None and callable(http_filter):
+        try:
+            request, response = http_filter(request, response)
+        except Exception:
+            return
 
     context.iopipe.mark.http_trace(trace, request, response)

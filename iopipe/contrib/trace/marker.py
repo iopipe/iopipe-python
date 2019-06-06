@@ -41,9 +41,11 @@ class Marker(object):
 
         entry = trace._asdict()
         entry["type"] = entry.pop("entryType")
+
         if request is not None:
-            entry["request"] = request._asdict()
+            entry["request"] = request
+
         if response is not None:
-            entry["response"] = response._asdict()
+            entry["response"] = response
 
         self.context.instance.report.http_trace_entries.append(entry)

@@ -42,8 +42,9 @@ def iopipe_with_trace_auto_http():
 
 @pytest.fixture
 def iopipe_with_trace_auto_http_filter():
-    def http_filter(response):
-        return not response.request.url.startswith("https://www.iopipe.com")
+    def http_filter(request, response):
+        if request.url.startswith("https://www.iopipe.com"):
+            raise Exception("Do not trace this URL")
 
     plugin = TracePlugin(auto_http=True, http_filter=http_filter)
     return IOpipeCore(
@@ -115,9 +116,8 @@ def handler_with_trace_auto_http_filter(iopipe_with_trace_auto_http_filter):
 
 @pytest.fixture
 def iopipe_with_trace_auto_http_filter_request():
-    def http_filter(response):
-        delattr(response, "request")
-        return response
+    def http_filter(request, response):
+        return None, response
 
     plugin = TracePlugin(auto_http=True, http_filter=http_filter)
     return IOpipeCore(
