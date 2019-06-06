@@ -15,6 +15,7 @@ if sys.version_info[0] == 2:
     install_requires.append("futures")
 
 tests_require = [
+    "botocore==1.12.162",
     "jmespath>=0.7.1,<1.0.0",
     "mock",
     "more-itertools<6.0.0",
