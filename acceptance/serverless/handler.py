@@ -9,6 +9,8 @@ try:
 except ImportError:
     import requests
 
+import boto3
+
 from iopipe import IOpipe, IOpipeCore
 from iopipe.contrib.eventinfo import EventInfoPlugin
 from iopipe.contrib.logger import LoggerPlugin
@@ -55,6 +57,9 @@ def api_trigger(event, context):
 @iopipe_with_auto_http
 def auto_http(event, context):
     requests.get("https://www.iopipe.com")
+
+    client = boto3.client("s3")
+    client.list_buckets()
 
 
 def baseline(event, context):

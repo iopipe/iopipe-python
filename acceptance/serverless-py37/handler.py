@@ -54,13 +54,13 @@ def api_trigger(event, context):
         response = requests.get(gateway_url)
         context.iopipe.metric("response_status", response.status_code)
 
-    client = boto3.client("s3")
-    client.list_buckets()
-
 
 @iopipe_with_auto_http
 def auto_http(event, context):
     requests.get("https://www.iopipe.com")
+
+    client = boto3.client("s3")
+    client.list_buckets()
 
 
 def baseline(event, context):
