@@ -409,6 +409,20 @@ iopipe = IOpipe(plugins=[TracePlugin(auto_http=True)])
 
 With `auto_http` enabled, you will see traces for any HTTP/HTTPS requests you make within your function on your IOpipe dashboard. Currently this feature only supports the `requests` library, including `boto3` and `botocore` support.
 
+To filter which HTTP requests are traced use `http_filter`:
+
+```python
+def http_filter(request, response):
+    if request['url'].startswith('https://www.iopipe.com'):
+        # Exceptions raised will delete the trace
+        raise Exception(Do not trace this URL')
+    # You can also remove data from the trace
+    response['headers'].pop('Content-Type', None)
+    return request, response
+
+iopipe = IOpipe(plugins=[TracePlugin(auto_http=True, http_filter=http_filter)])
+```
+
 ### Creating Plugins
 
 To create an IOpipe plugin you must implement the `iopipe.plugins.Plugin` interface.

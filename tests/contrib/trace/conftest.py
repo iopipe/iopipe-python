@@ -43,7 +43,7 @@ def iopipe_with_trace_auto_http():
 @pytest.fixture
 def iopipe_with_trace_auto_http_filter():
     def http_filter(request, response):
-        if request.url.startswith("https://www.iopipe.com"):
+        if request["url"].startswith("https://www.iopipe.com"):
             raise Exception("Do not trace this URL")
 
     plugin = TracePlugin(auto_http=True, http_filter=http_filter)
