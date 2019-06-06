@@ -143,7 +143,6 @@ class IOpipeCore(object):
             try:
                 with Timeout(timeout_duration) as timeout:
                     result = func(event, context)
-                    timeout.cancel()
             except Exception as e:
                 self.run_hooks("post:invoke", event=event, context=context)
 
