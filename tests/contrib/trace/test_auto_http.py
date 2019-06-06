@@ -10,7 +10,10 @@ def test_monkey_patching(mock_context):
     assert not hasattr(BotocoreSession.send, "monkey_patched")
     assert not hasattr(BotocoreVendoredSession.send, "monkey_patched")
 
-    patch_requests(mock_context, None)
+    def mock_filter(http_response):
+        return http_response
+
+    patch_requests(mock_context, mock_filter)
 
     assert hasattr(RequestsSession.send, "monkey_patched")
     assert hasattr(BotocoreSession.send, "monkey_patched")
