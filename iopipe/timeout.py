@@ -1,4 +1,6 @@
 import ctypes
+import signal
+import sys
 import threading
 
 
@@ -16,56 +18,49 @@ def async_raise(target_tid, exception):
         raise SystemError("PyThreadState_SetAsyncExc failed")
 
 
-class Timeout(object):
-    EXECUTED, EXECUTING, TIMED_OUT, INTERRUPTED, CANCELED = range(5)
-
-    def __init__(self, seconds, swallow_exc=True):
+class SignalTimeout(object):
+    def __init__(self, seconds):
         self.seconds = seconds
-        self.swallow_exc = swallow_exc
-        self.state = Timeout.EXECUTED
-        self.target_tid = threading.current_thread().ident
-        self.timer = None
-
-    def __bool__(self):
-        return self.state in (Timeout.EXECUTED, Timeout.EXECUTING, Timeout.CANCELED)
-
-    __nonzero__ = __bool__
-
-    def __repr__(self):
-        return "<{0} in state: {1}>".format(self.__class__.__name__, self.state)
 
     def __enter__(self):
-        self.state = Timeout.EXECUTING
-        self.setup_interrupt()
+        signal.signal(signal.SIGALRM, self.stop)
+        if self.seconds > 0:
+            signal.setitimer(signal.ITIMER_REAL, self.seconds)
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        if exc_type is TimeoutError:
-            if self.state != Timeout.TIMED_OUT:
-                self.state = Timeout.INTERRUPTED
-                self.suppress_interrupt()
-            return self.swallow_exc
-        else:
-            if exc_type is None:
-                self.state = Timeout.EXECUTED
-            self.suppress_interrupt()
+        self.cancel()
         return False
 
     def cancel(self):
-        self.state = Timeout.CANCELED
-        self.suppress_interrupt()
+        signal.setitimer(signal.ITIMER_REAL, 0)
 
-    def stop(self):
-        self.state = Timeout.TIMED_OUT
-        async_raise(self.target_tid, TimeoutError)
+    def stop(self, signum, frame):
+        raise TimeoutError
 
-    def setup_interrupt(self):
+
+class ThreadTimeout(object):
+    def __init__(self, seconds):
+        self.seconds = seconds
+        self.target_tid = threading.current_thread().ident
+        self.timer = None
+
+    def __enter__(self):
         self.timer = threading.Timer(self.seconds, self.stop)
         if self.seconds > 0:
             self.timer.start()
+        return self
 
-    def suppress_interrupt(self):
-        self.timer.cancel()
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.cancel()
+        return False
+
+    def cancel(self):
+        if self.timer:
+            self.timer.cancel()
+
+    def stop(self):
+        async_raise(self.target_tid, TimeoutError)
 
 
 class TimeoutError(Exception):
@@ -74,3 +69,9 @@ class TimeoutError(Exception):
         if not (args or kwargs):
             args = (default_message,)
         super(TimeoutError, self).__init__(*args, **kwargs)
+
+
+if sys.platform == "win32":
+    Timeout = ThreadTimeout
+else:
+    Timeout = SignalTimeout

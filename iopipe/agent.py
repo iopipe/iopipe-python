@@ -141,7 +141,7 @@ class IOpipeCore(object):
             result = None
 
             try:
-                with Timeout(timeout_duration, False) as timeout:
+                with Timeout(timeout_duration) as timeout:
                     result = func(event, context)
                     timeout.cancel()
             except Exception as e:
