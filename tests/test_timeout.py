@@ -20,14 +20,16 @@ def test_signal_timeout_cancel():
         time.sleep(0.1)
 
 
-def test_signal_exception():
+def test_signal_timeout_exception():
+    with pytest.raises(MockException):
+        with SignalTimeout(0.1):
+            raise MockException
+
+
+def test_signal_timeout_override_exception():
     with pytest.raises(TimeoutError):
         with SignalTimeout(0.1):
             time.sleep(0.2)
-            raise MockException
-
-    with pytest.raises(MockException):
-        with SignalTimeout(0.1):
             raise MockException
 
 
@@ -42,12 +44,14 @@ def test_thread_timeout_cancel():
         time.sleep(0.1)
 
 
-def test_thread_exception():
+def test_thread_timeout_override_exception():
     with pytest.raises(TimeoutError):
         with ThreadTimeout(0.1):
             time.sleep(0.2)
             raise MockException
 
+
+def test_thread_timeout_exception():
     with pytest.raises(MockException):
         with ThreadTimeout(0.1):
             raise MockException

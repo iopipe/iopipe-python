@@ -141,7 +141,7 @@ class IOpipeCore(object):
             result = None
 
             try:
-                with Timeout(timeout_duration) as timeout:
+                with Timeout(timeout_duration):
                     result = func(event, context)
             except Exception as e:
                 self.run_hooks("post:invoke", event=event, context=context)
