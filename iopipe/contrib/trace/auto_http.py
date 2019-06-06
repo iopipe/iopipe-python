@@ -76,9 +76,7 @@ def patch_requests_session_send(context, http_filter):
     if RequestsSession is None:
         return
 
-    if hasattr(RequestsSession, "send") and hasattr(
-        RequestsSession.send, "monkey_patched"
-    ):
+    if hasattr(RequestsSession, "__monkey_patched"):
         return
 
     def send(self, *args, **kwargs):
@@ -91,7 +89,7 @@ def patch_requests_session_send(context, http_filter):
         return response
 
     RequestsSession.send = send
-    RequestsSession.send.monkey_patched = True
+    RequestsSession.__monkey_patched = True
 
 
 def patch_botocore_session_send(context, http_filter):
@@ -102,9 +100,7 @@ def patch_botocore_session_send(context, http_filter):
     if BotocoreSession is None:
         return
 
-    if hasattr(BotocoreSession, "send") and hasattr(
-        BotocoreSession.send, "monkey_patched"
-    ):
+    if hasattr(BotocoreSession, "__monkey_patched"):
         return
 
     def send(self, *args, **kwargs):
@@ -119,7 +115,7 @@ def patch_botocore_session_send(context, http_filter):
         return response
 
     BotocoreSession.send = send
-    BotocoreSession.send.monkey_patched = True
+    BotocoreSession.__monkey_patched = True
 
 
 def patch_botocore_vendored_session_send(context, http_filter):
@@ -130,9 +126,7 @@ def patch_botocore_vendored_session_send(context, http_filter):
     if BotocoreVendoredSession is None:
         return
 
-    if hasattr(BotocoreVendoredSession, "send") and hasattr(
-        BotocoreVendoredSession.send, "monkey_patched"
-    ):
+    if hasattr(BotocoreVendoredSession, "__monkey_patched"):
         return
 
     def send(self, *args, **kwargs):
@@ -145,25 +139,28 @@ def patch_botocore_vendored_session_send(context, http_filter):
         return response
 
     BotocoreVendoredSession.send = send
-    BotocoreVendoredSession.send.monkey_patched = True
+    BotocoreVendoredSession.__monkey_patched = True
 
 
 def restore_requests_session_send():
     """Restores the original requests session send method"""
     if RequestsSession is not None:
         RequestsSession.send = original_requests_session_send
+        delattr(RequestsSession, "__monkey_patched")
 
 
 def restore_botocore_session_send():
     """Restores the original botocore session send method"""
     if BotocoreSession is not None:
         BotocoreSession.send = original_botocore_session_send
+        delattr(BotocoreSession, "__monkey_patched")
 
 
 def restore_botocore_vendored_session_send():
     """Restores the original botocore vendored session send method"""
     if BotocoreVendoredSession is not None:
         BotocoreVendoredSession.send = original_botocore_vendored_session_send
+        delattr(BotocoreVendoredSession, "__monkey_patched")
 
 
 def patch_requests(context, http_filter):
