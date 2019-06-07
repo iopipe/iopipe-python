@@ -372,9 +372,8 @@ Or you can use it as a context manager:
 
 ```python
 from iopipe import IOpipe
-from iopipe.contrib.trace import TracePlugin
 
-iopipe = IOpipe(plugins=[TracePlugin()])
+iopipe = IOpipe()
 
 @iopipe
 def handler(event, context):
@@ -382,7 +381,23 @@ def handler(event, context):
         # do something here
 ```
 
-Any block of code wrapped with `start` and `end` or using the context manager will be traced and the data collected will be available on your IOpipe dashboard.
+Or you can use it as a decorator:
+
+```python
+from iopipe import IOpipe
+
+iopipe = IOpipe()
+
+@iopipe
+def handler(event, context):
+    @context.iopipe.mark.decorator('expensive operation'):
+	def expensive_operation():
+        # do something here
+
+    expensive_operation()
+```
+
+Any block of code wrapped with `start` and `end` or using the context manager or decorator will be traced and the data collected will be available on your IOpipe dashboard.
 
 By default, the trace plugin will auto-measure any trace you make. But you can disable this by setting `auto_measure` to `False`:
 
