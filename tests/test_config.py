@@ -102,7 +102,7 @@ def test_set_config__iopipe_timeout_window(monkeypatch):
         os, "getenv", partial(mock_getenv, "IOPIPE_TIMEOUT_WINDOW", "not a number")
     )
     config = set_config()
-    assert config["timeout_window"] == 0.5
+    assert config["timeout_window"] == 0.15
 
 
 def test_set_config__iopipe_token(monkeypatch):

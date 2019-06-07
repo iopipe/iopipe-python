@@ -176,7 +176,7 @@ def handler_that_errors(iopipe):
 def handler_that_timeouts(iopipe):
     @iopipe.decorator
     def _handler_that_timeouts(event, context):
-        time.sleep(2)
+        time.sleep(1)
         raise Exception("Should timeout before this is raised")
 
     return iopipe, _handler_that_timeouts
