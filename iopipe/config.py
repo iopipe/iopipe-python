@@ -17,7 +17,7 @@ def set_config(**config):
     config.setdefault("path", get_collector_path())
     config.setdefault("plugins", [])
     config.setdefault("sync_http", False)
-    config.setdefault("timeout_window", os.getenv("IOPIPE_TIMEOUT_WINDOW", 500))
+    config.setdefault("timeout_window", os.getenv("IOPIPE_TIMEOUT_WINDOW", 150))
     config.setdefault(
         "token", os.getenv("IOPIPE_TOKEN") or os.getenv("IOPIPE_CLIENTID") or ""
     )
@@ -54,6 +54,6 @@ def set_config(**config):
     try:
         config["timeout_window"] = int(config["timeout_window"]) / 1000.0
     except ValueError:
-        config["timeout_window"] = 0.5
+        config["timeout_window"] = 0.15
 
     return config

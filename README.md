@@ -104,9 +104,9 @@ Conditionally enable/disable the agent. For example, you will likely want to dis
 
 The number of milliseconds IOpipe will wait while sending a report before timing out. If not supplied, the environment variable `$IOPIPE_NETWORK_TIMEOUT` will be used if present.
 
-#### `timeout_window` (int: optional = 500)
+#### `timeout_window` (int: optional = 150)
 
-By default, IOpipe will capture timeouts by exiting your function 500 milliseconds early from the AWS configured timeout, to allow time for reporting. You can disable this feature by setting `timeout_window` to `0` in your configuration. If not supplied, the environment variable `$IOPIPE_TIMEOUT_WINDOW` will be used if present.
+By default, IOpipe will capture timeouts by exiting your function 150 milliseconds early from the AWS configured timeout, to allow time for reporting. You can disable this feature by setting `timeout_window` to `0` in your configuration. If not supplied, the environment variable `$IOPIPE_TIMEOUT_WINDOW` will be used if present.
 
 ### Reporting Exceptions
 
