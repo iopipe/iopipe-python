@@ -1,4 +1,5 @@
 import mock
+import pytest
 
 from iopipe import constants
 
@@ -65,10 +66,8 @@ def test_erroring(mock_send_report, handler_that_errors, mock_context):
     """Assert that the agent catches and traces uncaught exceptions"""
     iopipe, handler = handler_that_errors
 
-    try:
+    with pytest.raises(ValueError):
         handler(None, mock_context)
-    except Exception:
-        pass
 
     assert iopipe.report.report["errors"]["name"] == "ValueError"
     assert iopipe.report.report["errors"]["message"] == "Behold, a value error"
@@ -101,10 +100,8 @@ def test_timeouts_disable(mock_send_report, handler_that_timeouts, mock_context)
     # The default is 0.15, so 150 / 1000 - 0.15 = 0
     mock_context.set_remaining_time_in_millis(150)
 
-    try:
+    with pytest.raises(Exception):
         handler(None, mock_context)
-    except Exception:
-        pass
 
     # Exception will occur because timeout is disabled
     assert iopipe.report.report["errors"] != {}
@@ -135,3 +132,23 @@ def test_validate_context(iopipe, mock_context):
     invalid_context = InvalidContext()
 
     assert iopipe.validate_context(invalid_context) is False
+
+
+def test_disabled_reporting(handler_that_disables_reporting, mock_context):
+    """Assert that reporting is disabled for an invocation"""
+    iopipe, handler = handler_that_disables_reporting
+    handler(None, mock_context)
+
+    assert iopipe.report.sent is False
+
+
+def test_disabled_reporting_with_error(
+    handler_that_disables_reporting_with_error, mock_context
+):
+    """Assert that reporting is disabled for an invocation with error"""
+    iopipe, handler = handler_that_disables_reporting_with_error
+
+    with pytest.raises(Exception):
+        handler(None, mock_context)
+
+    assert iopipe.report.sent is False

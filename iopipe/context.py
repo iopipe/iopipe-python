@@ -38,6 +38,7 @@ class IOpipeContext(object):
     def __init__(self, instance):
         self.instance = instance
         self.log = LogWrapper(self)
+        self.disabled = False
 
     def metric(self, key, value):
         if self.instance.report is None:
@@ -125,3 +126,6 @@ class IOpipeContext(object):
     def unregister(self, name):
         if hasattr(self, name):
             delattr(self, name)
+
+    def disable(self):
+        self.disabled = True
