@@ -22,6 +22,7 @@ This package provides analytics and distributed tracing for event-driven applica
   - [Custom Metrics](https://github.com/iopipe/iopipe-python#custom-metrics)
   - [Labels](https://github.com/iopipe/iopipe-python#labels)
   - [Core Agent](https://github.com/iopipe/iopipe-python#core-agent)
+  - [Disabling Reporting](https://github.com/iopipe/iopipe-python#disabling-reporting)
 - [Plugins](https://github.com/iopipe/iopipe-python#plugins)
   - [Event Info Plugin](https://github.com/iopipe/iopipe-python#event-info-plugin)
   - [Logger Plugin](https://github.com/iopipe/iopipe-python#logger-plugin)
@@ -79,7 +80,7 @@ iopipe = IOpipe('your project token here')
 
 @iopipe
 def handler(event, context):
-  pass
+    pass
 ```
 
  The agent comes preloaded with the [Event Info](https://github.com/iopipe/iopipe-python#event-info-plugin), [Profiler](https://github.com/iopipe/iopipe-python#profiler-plugin) and [Trace](https://github.com/iopipe/iopipe-python#trace-plugin) plugins. See the relevant plugin sections for usage.
@@ -121,17 +122,17 @@ iopipe = IOpipe()
 
 @iopipe
 def handler(event, context):
-  raise Exception('This exception will be added to the IOpipe report automatically')
+    raise Exception('This exception will be added to the IOpipe report automatically')
 
 # Example 2: caught exceptions
 
 @iopipe
 def handler(event, context):
-  try:
-    raise Exception('This exception is being caught by your function')
-  except Exception as e:
-    # Makes sure the exception is added to the report
-    context.iopipe.error(e)
+    try:
+        raise Exception('This exception is being caught by your function')
+    except Exception as e:
+        # Makes sure the exception is added to the report
+        context.iopipe.error(e)
 ```
 
 It is important to note that a report is sent to IOpipe when `error()` is called. So you should only record exceptions this way for failure states. For caught exceptions that are not a failure state, it is recommended to use custom metrics (see below).
@@ -147,9 +148,9 @@ iopipe = IOpipe()
 
 @iopipe
 def handler(event, context):
-  # the name of the metric must be a string
-  # numerical (int, long, float) and string types supported for values
-  context.iopipe.metric('my_metric', 42)
+    # the name of the metric must be a string
+    # numerical (int, long, float) and string types supported for values
+    context.iopipe.metric('my_metric', 42)
 ```
 
 Metric key names are limited to 128 characters, and string values are limited to 1024 characters.
@@ -165,8 +166,8 @@ iopipe = IOpipe()
 
 @iopipe
 def handler(event, context):
-  # the name of the tag must be a string
-  context.iopipe.label('this-invocation-is-special')
+    # the name of the label must be a string
+    context.iopipe.label('this-invocation-is-special')
 ```
 
 ### Core Agent
@@ -182,8 +183,25 @@ iopipe = IOpipeCore(plugins=[TracePlugin()])
 
 @iopipe
 def handler(event, context):
-pass
+    pass
 ```
+
+### Disabling Reporting
+
+You can programmatically disable IOpipe reporting for a single invocation using the `disable` method:
+
+```python
+from iopipe import IOpipe
+
+iopipe = IOpipe()
+
+@iopipe
+def handler(event, context):
+    if some_condition:
+        context.iopipe.disable()
+```
+
+Reporting will be re-enabled on the next invocation.
 
 ## Plugins
 
