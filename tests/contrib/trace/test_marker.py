@@ -46,3 +46,13 @@ def test_marker__nested_context_manager(marker):
             pass
 
     assert len(marker.timeline.get_entries()) == 4
+
+
+def test_marker__decorator(marker):
+    @marker.decorator("foobar")
+    def mock_func():
+        pass
+
+    mock_func()
+
+    assert len(marker.timeline.get_entries()) == 2

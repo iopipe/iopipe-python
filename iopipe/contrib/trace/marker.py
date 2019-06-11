@@ -1,3 +1,6 @@
+import functools
+
+
 class Marker(object):
     def __init__(self, timeline, context):
         self.timeline = timeline
@@ -17,6 +20,9 @@ class Marker(object):
         if self.contexts:
             self.end(self.contexts[-1])
             self.contexts.pop()
+
+    def decorator(self, name):
+        return MarkerDecorator(self, name)
 
     def start(self, name):
         self.timeline.mark("start:%s" % name)
@@ -49,3 +55,22 @@ class Marker(object):
             entry["response"] = response
 
         self.context.instance.report.http_trace_entries.append(entry)
+
+
+class MarkerDecorator(object):
+    def __init__(self, marker, name):
+        self.marker = marker
+        self.name = name
+
+    def __call__(self, func):
+        self.marker.contexts.append(self.name)
+
+        @functools.wraps(func)
+        def wrapped(*args, **kwargs):
+            self.marker.start(self.marker.contexts[-1])
+            return_value = func(*args, **kwargs)
+            self.marker.end(self.marker.contexts[-1])
+            self.marker.contexts.pop()
+            return return_value
+
+        return wrapped
