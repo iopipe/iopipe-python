@@ -125,7 +125,7 @@ def mock_context():
 
 @pytest.fixture
 def handler(iopipe):
-    @iopipe.decorator
+    @iopipe
     def _handler(event, context):
         pass
 
@@ -134,7 +134,7 @@ def handler(iopipe):
 
 @pytest.fixture
 def handler_with_events(iopipe):
-    @iopipe.decorator
+    @iopipe
     def _handler_with_events(event, context):
         iopipe.log("key1", 2)
         iopipe.log("key2", "qualitative value")
@@ -150,7 +150,7 @@ def handler_with_events(iopipe):
 
 @pytest.fixture
 def handler_with_labels(iopipe):
-    @iopipe.decorator
+    @iopipe
     def _handler_with_labels(event, context):
         context.iopipe.label("a-label")
         context.iopipe.label("a-label")  # duplicates are dropped
@@ -165,7 +165,7 @@ def handler_with_labels(iopipe):
 
 @pytest.fixture
 def handler_that_errors(iopipe):
-    @iopipe.decorator
+    @iopipe
     def _handler_that_errors(event, context):
         raise ValueError("Behold, a value error")
 
@@ -174,7 +174,7 @@ def handler_that_errors(iopipe):
 
 @pytest.fixture
 def handler_that_timeouts(iopipe):
-    @iopipe.decorator
+    @iopipe
     def _handler_that_timeouts(event, context):
         time.sleep(1)
         raise Exception("Should timeout before this is raised")
@@ -189,3 +189,22 @@ def handler_with_sync_http(iopipe_with_sync_http):
         pass
 
     return iopipe_with_sync_http, _handler
+
+
+@pytest.fixture
+def handler_that_disables_reporting(iopipe):
+    @iopipe
+    def _handler_that_disables_reporting(event, context):
+        context.iopipe.disable()
+
+    return iopipe, _handler_that_disables_reporting
+
+
+@pytest.fixture
+def handler_that_disables_reporting_with_error(iopipe):
+    @iopipe
+    def _handler_that_disables_reporting_with_error(event, context):
+        context.iopipe.disable()
+        raise Exception("An error happened")
+
+    return iopipe, _handler_that_disables_reporting_with_error

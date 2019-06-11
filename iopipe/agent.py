@@ -146,6 +146,10 @@ class IOpipeCore(object):
             except Exception as e:
                 self.run_hooks("post:invoke", event=event, context=context)
 
+                if context.iopipe.disabled:
+                    logger.debug("Reporting disabled for this invocation")
+                    raise e
+
                 frame = None
                 if isinstance(e, TimeoutError):
                     logger.debug(
@@ -165,14 +169,19 @@ class IOpipeCore(object):
                 raise e
             else:
                 self.run_hooks("post:invoke", event=event, context=context)
+
+                if context.iopipe.disabled:
+                    logger.debug("Reporting disabled for this invocation")
+                    return result
+
                 self.report.prepare()
                 self.run_hooks("pre:report")
                 self.report.send()
                 self.run_hooks("post:report")
+
+                return result
             finally:
                 self.wait_for_futures()
-
-            return result
 
         return wrapped
 
