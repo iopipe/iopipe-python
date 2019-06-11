@@ -456,6 +456,16 @@ def http_filter(request, response):
 iopipe = IOpipe(plugins=[TracePlugin(auto_http=True, http_filter=http_filter)])
 ```
 
+To add additional HTTP headers to your ttrace data use `http_headers`:
+
+```python
+http_headers = ['Cache-Control', 'Etag']
+
+iopipe = IOpipe(plugins=[TracePlugin(auto_http=True, http_headers=http_headers)
+```
+
+## Plugins
+
 ### Creating Plugins
 
 To create an IOpipe plugin you must implement the `iopipe.plugins.Plugin` interface.

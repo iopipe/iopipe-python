@@ -16,7 +16,7 @@ try:
 except ImportError:
     BotocoreVendoredSession = None
 
-from iopipe.compat import urlparse
+from iopipe.compat import string_types, urlparse
 from .util import ensure_utf8
 
 if RequestsSession is not None:
@@ -29,21 +29,12 @@ if BotocoreVendoredSession is not None:
     original_botocore_vendored_session_send = BotocoreVendoredSession.send
 
 INCLUDE_HEADERS = [
-    "accept",
-    "accept-encoding",
-    "age",
-    "cache-control",
-    "connection",
-    "content-encoding",
     "content-length",
     "content-type",
-    "date",
-    "etag",
     "host",
     "server",
-    "strict-transport-security",
     "user-agent",
-    "vary",
+    "x-amz-target",
 ]
 
 Request = collections.namedtuple(
@@ -67,7 +58,7 @@ Response = collections.namedtuple(
 )
 
 
-def patch_requests_session_send(context, http_filter):
+def patch_requests_session_send(context, http_filter, http_headers):
     """
     Monkey patches requests' session class, if available. Overloads the
     send method to add tracing and metrics collection.
@@ -85,7 +76,7 @@ def patch_requests_session_send(context, http_filter):
         trace = context.iopipe.mark.measure(id)
         context.iopipe.mark.delete(id)
         collect_metrics_for_response(
-            response.request, response, context, trace, http_filter
+            response.request, response, context, trace, http_filter, http_headers
         )
         return response
 
@@ -93,7 +84,7 @@ def patch_requests_session_send(context, http_filter):
     RequestsSession.__monkey_patched = True
 
 
-def patch_botocore_session_send(context, http_filter):
+def patch_botocore_session_send(context, http_filter, http_headers):
     """
     Monkey patches botocore's session, if available. Overloads the
     session class' send method to add tracing and metric collection.
@@ -110,14 +101,16 @@ def patch_botocore_session_send(context, http_filter):
             response = original_botocore_session_send(self, *args, **kwargs)
         trace = context.iopipe.mark.measure(id)
         context.iopipe.mark.delete(id)
-        collect_metrics_for_response(args[0], response, context, trace, http_filter)
+        collect_metrics_for_response(
+            args[0], response, context, trace, http_filter, http_headers
+        )
         return response
 
     BotocoreSession.send = send
     BotocoreSession.__monkey_patched = True
 
 
-def patch_botocore_vendored_session_send(context, http_filter):
+def patch_botocore_vendored_session_send(context, http_filter, http_headers):
     """
     Monkey patches botocore's vendored requests, if available. Overloads the
     session class' send method to add tracing and metric collection.
@@ -135,7 +128,7 @@ def patch_botocore_vendored_session_send(context, http_filter):
         trace = context.iopipe.mark.measure(id)
         context.iopipe.mark.delete(id)
         collect_metrics_for_response(
-            response.request, response, context, trace, http_filter
+            response.request, response, context, trace, http_filter, http_headers
         )
         return response
 
@@ -164,25 +157,33 @@ def restore_botocore_vendored_session_send():
         delattr(BotocoreVendoredSession, "__monkey_patched")
 
 
-def patch_requests(context, http_filter):
-    patch_requests_session_send(context, http_filter)
-    patch_botocore_session_send(context, http_filter)
-    patch_botocore_vendored_session_send(context, http_filter)
+def patch_http_requests(context, http_filter, http_headers):
+    patch_requests_session_send(context, http_filter, http_headers)
+    patch_botocore_session_send(context, http_filter, http_headers)
+    patch_botocore_vendored_session_send(context, http_filter, http_headers)
 
 
-def restore_requests():
+def restore_http_requests():
     restore_requests_session_send()
     restore_botocore_session_send()
     restore_botocore_vendored_session_send()
 
 
 def collect_metrics_for_response(
-    http_request, http_response, context, trace, http_filter
+    http_request, http_response, context, trace, http_filter, http_headers
 ):
     """
     Collects relevant metrics from a requests Response object and adds them to
     the IOpipe context.
     """
+    include_headers = INCLUDE_HEADERS
+    if isinstance(http_headers, (list, tuple)):
+        include_headers = include_headers + [
+            key.lower()
+            for key in http_headers
+            if isinstance(http_headers, string_types)
+        ]
+
     request = None
     if http_request:
         parsed_url = None
@@ -194,7 +195,7 @@ def collect_metrics_for_response(
             request_headers = [
                 {"key": ensure_utf8(k), "string": ensure_utf8(v)}
                 for k, v in http_request.headers.items()
-                if k.lower() in INCLUDE_HEADERS
+                if k.lower() in include_headers
             ]
 
         request = Request(
@@ -219,7 +220,7 @@ def collect_metrics_for_response(
         response_headers = [
             {"key": ensure_utf8(k), "string": ensure_utf8(v)}
             for k, v in http_response.headers.items()
-            if k.lower() in INCLUDE_HEADERS
+            if k.lower() in include_headers
         ]
 
     response = Response(
