@@ -2,6 +2,19 @@ from iopipe.contrib.eventinfo import event_types as et
 from iopipe.contrib.eventinfo.util import get_value
 
 
+def test__event_types__alb(event_alb):
+    event = et.ALB(event_alb)
+
+    assert event.has_required_keys() is True
+
+    event_info = event.collect()
+    expected_keys = ["@iopipe/event-info.eventType"] + [
+        "@iopipe/event-info.alb.%s" % key for key in event.keys
+    ]
+    assert list(event_info.keys()).sort() == expected_keys.sort()
+    assert len(list(event_info.keys())) == len(event.keys) + 1
+
+
 def test__event_types__alexa_skill(event_alexa_skill):
     event = et.AlexaSkill(event_alexa_skill)
     assert event.has_required_keys() is True

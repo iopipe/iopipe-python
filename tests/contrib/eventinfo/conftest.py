@@ -34,6 +34,11 @@ def _load_event(name):
 
 
 @pytest.fixture
+def event_alb():
+    return _load_event("alb")
+
+
+@pytest.fixture
 def event_alexa_skill():
     return _load_event("alexa_skill")
 

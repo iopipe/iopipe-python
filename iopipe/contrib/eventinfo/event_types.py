@@ -40,6 +40,19 @@ class EventType(object):
         return event_info
 
 
+class ALB(EventType):
+    type = "alb"
+    keys = [
+        "headers.host",
+        'headers.["user-agent"]',
+        'headers.["x-amzn-trace-id"]',
+        "httpMethod",
+        "path",
+        "requestContext.elb.targetGroupArn",
+    ]
+    required_keys = ["httpMethod", "requestContext.elb"]
+
+
 class AlexaSkill(EventType):
     type = "alexaSkill"
     keys = "all"
@@ -208,16 +221,17 @@ class SQS(EventType):
 
 
 EVENT_TYPES = [
+    ALB,
     AlexaSkill,
     ApiGateway,
     CloudFront,
     Firehose,
     Kinesis,
     S3,
-    Scheduled,
-    ServerlessLambda,
     SNS,
     SQS,
+    Scheduled,
+    ServerlessLambda,
 ]
 
 
