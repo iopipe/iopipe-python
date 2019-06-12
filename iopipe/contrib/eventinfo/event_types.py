@@ -174,6 +174,26 @@ class ServerlessLambda(EventType):
     required_keys = ["identity.userAgent", "identity.sourceIp", "identity.accountId"]
 
 
+class SES(EventType):
+    type = "ses"
+    keys = [
+        "Records[0].ses.mail.commonHeaders.date",
+        "Records[0].ses.mail.commonHeaders.messageId",
+        "Records[0].ses.mail.commonHeaders.returnPath",
+        "Records[0].ses.mail.commonHeaders.subject",
+        "Records[0].ses.mail.messageId",
+        "Records[0].ses.mail.source",
+    ]
+    required_keys = ["Records[0].eventVersion", "Records[0].eventSource"]
+
+    def has_required_keys(self):
+        return (
+            super(SES, self).has_required_keys()
+            and get_value(self.event, "Records[0].eventVersion") == "1.0"
+            and get_value(self.event, "Records[0].eventSource") == "aws:ses"
+        )
+
+
 class SNS(EventType):
     type = "sns"
     keys = [
@@ -228,6 +248,7 @@ EVENT_TYPES = [
     Firehose,
     Kinesis,
     S3,
+    SES,
     SNS,
     SQS,
     Scheduled,
