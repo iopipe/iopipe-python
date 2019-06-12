@@ -48,6 +48,7 @@ class IOpipeCore(object):
 
         self.config = set_config(**options)
         self.config["plugins"] = self.load_plugins(self.config["plugins"])
+        self.context = None
         self.futures = []
         self.pool = futures.ThreadPoolExecutor()
         self.report = None
@@ -88,7 +89,7 @@ class IOpipeCore(object):
         def wrapped(event, context):
             logger.debug("%s wrapped with IOpipe decorator" % repr(func))
 
-            context = ContextWrapper(context, self)
+            self.context = context = ContextWrapper(context, self)
 
             # if env var IOPIPE_ENABLED is set to False skip reporting
             if self.config["enabled"] is False:
