@@ -35,6 +35,8 @@ This package provides analytics and distributed tracing for event-driven applica
   - [Chalice](https://github.com/iopipe/iopipe-python#chalice)
   - [Serverless](https://github.com/iopipe/iopipe-python#serverless)
   - [Zappa](https://github.com/iopipe/iopipe-python#zappa)
+  - [Accessing Context](https://github.com/iopipe/iopipe-python#accessing-context)
+
 - [Contributing](https://github.com/iopipe/iopipe-python#contributing)
 - [Running Tests](https://github.com/iopipe/iopipe-python#running-tests)
 - [License](https://github.com/iopipe/iopipe-python#license)
@@ -674,6 +676,20 @@ Then in your `zappa_settings.json` file include the following:
 ```
 
 Where `module-path.to.lambda_handler` is the Python module path to the `lambda_handler` you created above. For example, if you put it in `myproject/__init__.py` the path would be `myproject.lambda_handler`.
+
+### Accessing Context
+
+If the framework you're using makes it non-trivial to access the Lamba context, you can use `iopipe.context`. The `iopipe.context` is `None` if outside of an invocation.
+
+```python
+from iopipe import IOpipe
+
+iopipe = IOpipe()
+
+# Be sure to check, can be None
+if iopipe.context:
+    # do something with context
+```
 
 ## Contributing
 

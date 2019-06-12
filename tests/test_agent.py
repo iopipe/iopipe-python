@@ -152,3 +152,16 @@ def test_disabled_reporting_with_error(
         handler(None, mock_context)
 
     assert iopipe.report.sent is False
+
+
+@mock.patch("iopipe.report.send_report", autospec=True)
+def test_context_attribute(mock_send_report, handler, mock_context):
+    """Assert that the current context is available as an iopipe attribute"""
+    iopipe, handler = handler
+
+    assert hasattr(iopipe, "context")
+    assert iopipe.context is None
+
+    handler(None, mock_context)
+
+    assert iopipe.context is not None
