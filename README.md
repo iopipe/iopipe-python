@@ -230,6 +230,7 @@ def handler(event, context):
 When this plugin is installed, custom metrics will be created automatically for the following event source data:
 
 * API Gateway
+* ALB
 * Alexa Skill Kit
 * CloudFront
 * Kinesis
