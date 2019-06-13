@@ -102,6 +102,22 @@ def test__event_types__serverless_lambda(event_serverless_lambda):
     assert event_info["@iopipe/event-info.eventType.source"] == event.source
 
 
+def test__event_types__ses(event_ses):
+    event = et.SES(event_ses)
+
+    assert event.has_required_keys() is True
+
+    event_info = event.collect()
+
+    assert event_info != {}
+
+    expected_keys = ["@iopipe/event-info.eventType"] + [
+        "@iopipe/event-info.ses.%s" % key for key in event.keys
+    ]
+
+    assert list(event_info.keys()).sort() == expected_keys.sort()
+
+
 def test__event_types__sns(event_sns):
     event = et.SNS(event_sns)
     assert event.has_required_keys() is True
