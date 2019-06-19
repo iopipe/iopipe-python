@@ -31,9 +31,11 @@ class TracePlugin(Plugin):
         :type http_headers: list|tuple
         """
         self.auto_measure = auto_measure
-        self.auto_http = auto_http is True or strtobool(
-            os.getenv("IOPIPE_TRACE_AUTO_HTTP_ENABLED", "false")
-        )
+        self.auto_http = auto_http
+        if "IOPIPE_TRACE_AUTO_HTTP_ENABLED" in os.environ:
+            self.auto_http = bool(
+                strtobool(os.environ["IOPIPE_TRACE_AUTO_HTTP_ENABLED"])
+            )
         self.http_filter = http_filter
         self.http_headers = http_headers
 
