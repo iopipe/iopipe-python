@@ -1,5 +1,8 @@
 import mock
 
+from iopipe import IOpipeCore
+from iopipe.contrib.trace import TracePlugin
+
 
 @mock.patch("iopipe.report.send_report", autospec=True)
 def test__trace_plugin(mock_send_report, handler_with_trace, mock_context):
@@ -180,3 +183,11 @@ def test_trace_plugin__auto_http__filter_request(
     assert len(traces) == 1
     assert "request" not in traces[0]
     assert "response" in traces[0]
+
+
+def test__trace_plugin__auto_http__env_var(monkeypatch):
+    monkeypatch.setenv("IOPIPE_TRACE_AUTO_HTTP_ENABLED", "false")
+
+    iopipe = IOpipeCore(plugins=[TracePlugin()])
+
+    assert iopipe.plugins[0].auto_http is False
