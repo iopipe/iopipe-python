@@ -49,14 +49,12 @@ class TracePlugin(Plugin):
 
     def pre_invoke(self, event, context):
         self.timeline = Timeline()
-        context.iopipe.register("mark", Marker(self.timeline, context))
+        context.iopipe.register("mark", Marker(self.timeline, context), force=True)
 
         if self.auto_http is True:
             patch_http_requests(context, self.http_filter, self.http_headers)
 
     def post_invoke(self, event, context):
-        context.iopipe.unregister("mark")
-
         if self.auto_http is True:
             restore_http_requests()
 
