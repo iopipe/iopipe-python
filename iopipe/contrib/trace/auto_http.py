@@ -70,6 +70,8 @@ def patch_requests_session_send(context, http_filter, http_headers):
         return
 
     def send(self, *args, **kwargs):
+        if not hasattr(context, "iopipe") or not hasattr(context.iopipe, "mark"):
+            return original_requests_session_send(self, *args, **kwargs)
         id = ensure_utf8(str(uuid.uuid4()))
         with context.iopipe.mark(id):
             response = original_requests_session_send(self, *args, **kwargs)
@@ -96,6 +98,8 @@ def patch_botocore_session_send(context, http_filter, http_headers):
         return
 
     def send(self, *args, **kwargs):
+        if not hasattr(context, "iopipe") or not hasattr(context.iopipe, "mark"):
+            return original_botocore_session_send(self, *args, **kwargs)
         id = str(uuid.uuid4())
         with context.iopipe.mark(id):
             response = original_botocore_session_send(self, *args, **kwargs)
@@ -122,6 +126,8 @@ def patch_botocore_vendored_session_send(context, http_filter, http_headers):
         return
 
     def send(self, *args, **kwargs):
+        if not hasattr(context, "iopipe") or not hasattr(context.iopipe, "mark"):
+            return original_botocore_vendored_session_send(self, *args, **kwargs)
         id = str(uuid.uuid4())
         with context.iopipe.mark(id):
             response = original_botocore_vendored_session_send(self, *args, **kwargs)

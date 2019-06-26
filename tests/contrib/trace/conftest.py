@@ -2,6 +2,7 @@ import pytest
 import requests
 
 from iopipe import IOpipeCore
+from iopipe.context import ContextWrapper
 from iopipe.contrib.trace.marker import Marker
 from iopipe.contrib.trace import TracePlugin
 from iopipe.contrib.trace.timeline import Timeline
@@ -16,6 +17,11 @@ def iopipe_with_trace():
         debug=True,
         plugins=[plugin],
     )
+
+
+@pytest.fixture
+def mock_context_wrapper(mock_context, iopipe_with_trace):
+    return ContextWrapper(mock_context, iopipe_with_trace)
 
 
 @pytest.fixture
