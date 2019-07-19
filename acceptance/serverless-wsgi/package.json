@@ -1,5 +1,5 @@
 {
   "devDependencies": {
-    "serverless-wsgi": "^1.4.8"
+    "serverless-wsgi": "^1.7.2"
   }
 }
