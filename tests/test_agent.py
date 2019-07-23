@@ -165,3 +165,15 @@ def test_context_attribute(mock_send_report, handler, mock_context):
     handler(None, mock_context)
 
     assert iopipe.context is not None
+
+
+@mock.patch("iopipe.report.send_report", autospec=True)
+def test_double_instrumentation(mock_send_report, handler, mock_context, monkeypatch):
+    """Assert that a function can only be instrumented once"""
+    iopipe, handler = handler
+
+    double_wrapped = iopipe(handler)
+
+    double_wrapped(None, mock_context)
+
+    assert mock_send_report.call_count == 1
