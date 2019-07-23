@@ -87,7 +87,14 @@ class IOpipeCore(object):
     def __call__(self, func):
         @functools.wraps(func)
         def wrapped(event, context):
-            logger.debug("%s wrapped with IOpipe decorator" % repr(func))
+            # Skip if function is already instrumented
+            if getattr(func, "__iopipe_instrumented", False):
+                warnings.warn("Function is already wrapped with IOpipe")
+                return func(event, context)
+
+            func.__iopipe_instrumented = True
+
+            logger.debug("Wrapping %s with IOpipe decorator" % repr(func))
 
             self.context = context = ContextWrapper(context, self)
 
@@ -99,7 +106,7 @@ class IOpipeCore(object):
             # If a token is not present, skip reporting
             if not self.config["token"]:
                 warnings.warn(
-                    "Your function is decorated with iopipe, but a valid token was not "
+                    "Function is decorated with iopipe, but a valid token was not "
                     "found. Set the IOPIPE_TOKEN environment variable with your IOpipe "
                     "project token."
                 )
