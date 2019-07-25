@@ -58,6 +58,9 @@ class TracePlugin(Plugin):
         if self.auto_http is True:
             restore_http_requests()
 
+    def post_response(self, response):
+        pass
+
     def pre_report(self, report):
         if self.auto_measure:
             add_timeline_measures(self.timeline)

@@ -50,6 +50,9 @@ def test_plugins_incomplete_interface():
         def post_invoke(self, event, context):
             pass
 
+        def post_response(self, response):
+            pass
+
         def pre_report(self, report):
             pass
 

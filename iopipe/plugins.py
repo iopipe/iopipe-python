@@ -80,6 +80,10 @@ class Plugin(with_metaclass(abc.ABCMeta, object)):
         return NotImplemented
 
     @abc.abstractmethod
+    def post_response(self, response):
+        return NotImplemented
+
+    @abc.abstractmethod
     def pre_report(self, report):
         return NotImplemented
 
