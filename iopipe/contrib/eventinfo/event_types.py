@@ -3,6 +3,7 @@ from .util import collect_all_keys, get_value, has_key, slugify
 
 class EventType(object):
     keys = []
+    response_keys = []
     exclude_keys = []
     required_keys = []
     source = None
@@ -266,3 +267,9 @@ def metrics_for_event_type(event, context):
             event_info = event_type.collect()
             [context.iopipe.metric(k, v) for k, v in event_info.items()]
             break
+
+    if context.iopipe.is_step_function:
+        context.iopipe.collect_step_meta(event)
+        if context.iopipe.step_meta:
+            for key, value in context.iopipe.step_meta.items():
+                context.iopipe.metric("@iopipe/event-info.stepFunction.%s" % key, value)

@@ -84,7 +84,7 @@ class IOpipeCore(object):
 
     err = error
 
-    def __call__(self, func):
+    def __call__(self, func, **kwargs):
         @functools.wraps(func)
         def wrapped(event, context):
             # Skip if function is already instrumented
@@ -96,7 +96,7 @@ class IOpipeCore(object):
 
             logger.debug("Wrapping %s with IOpipe decorator" % repr(func))
 
-            self.context = context = ContextWrapper(context, self)
+            self.context = context = ContextWrapper(context, self, **kwargs)
 
             # if env var IOPIPE_ENABLED is set to False skip reporting
             if self.config["enabled"] is False:
@@ -196,6 +196,9 @@ class IOpipeCore(object):
         return wrapped
 
     decorator = __call__
+
+    def step(self, func):
+        return self(func, step_function=True)
 
     def load_plugins(self, plugins):
         """

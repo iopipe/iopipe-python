@@ -35,14 +35,15 @@ class EventInfoPlugin(Plugin):
         pass
 
     def pre_invoke(self, event, context):
-        pass
+        self.context = context
 
     def post_invoke(self, event, context):
         if self.enabled:
             metrics_for_event_type(event, context)
 
     def post_response(self, response):
-        pass
+        if self.enabled:
+            self.context.iopipe.inject_step_meta(response)
 
     def pre_report(self, report):
         pass
