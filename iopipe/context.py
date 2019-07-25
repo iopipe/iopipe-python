@@ -139,5 +139,6 @@ class IOpipeContext(object):
 
     def inject_step_meta(self, response):
         if self.step_meta and isinstance(response, dict):
-            self.step_meta["step"] += 1
-            response["iopipe"] = self.step_meta
+            step_meta = self.step_meta.copy()
+            step_meta["step"] += 1
+            response["iopipe"] = step_meta

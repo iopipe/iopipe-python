@@ -26,6 +26,16 @@ def handler_with_eventinfo(iopipe_with_eventinfo):
     return iopipe_with_eventinfo, _handler
 
 
+@pytest.fixture
+def handler_step_function_with_eventinfo(iopipe_with_eventinfo):
+    @iopipe_with_eventinfo.step
+    def _handler(event, context):
+        assert context.iopipe.is_step_function is True
+        return {}
+
+    return iopipe_with_eventinfo, _handler
+
+
 def _load_event(name):
     json_file = os.path.join(os.path.dirname(__file__), "events", "%s.json" % name)
     with open(json_file) as f:

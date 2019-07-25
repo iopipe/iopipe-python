@@ -208,3 +208,16 @@ def handler_that_disables_reporting_with_error(iopipe):
         raise Exception("An error happened")
 
     return iopipe, _handler_that_disables_reporting_with_error
+
+
+@pytest.fixture
+def handler_step_function(iopipe):
+    @iopipe
+    def _handler_not_step_function(event, context):
+        assert context.iopipe.is_step_function is False
+
+    @iopipe.step
+    def _handler_step_function(event, context):
+        assert context.iopipe.is_step_function is True
+
+    return iopipe, _handler_step_function
