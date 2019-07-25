@@ -41,6 +41,9 @@ class EventInfoPlugin(Plugin):
         if self.enabled:
             metrics_for_event_type(event, context)
 
+    def post_response(self, response):
+        pass
+
     def pre_report(self, report):
         pass
 

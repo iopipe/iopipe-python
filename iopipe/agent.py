@@ -146,11 +146,11 @@ class IOpipeCore(object):
             if timeout_duration > 0:
                 logger.debug("Setting timeout duration to %s" % timeout_duration)
 
-            result = None
+            response = None
 
             try:
                 with Timeout(timeout_duration):
-                    result = func(event, context)
+                    response = func(event, context)
             except Exception as e:
                 self.run_hooks("post:invoke", event=event, context=context)
 
@@ -169,6 +169,7 @@ class IOpipeCore(object):
                 # event that a timeout occurs and an exception is subsequently raised
                 # within the handler
                 if self.report.sent is False:
+                    self.run_hooks("post:response", response=response)
                     self.report.prepare(e, frame)
                     self.run_hooks("pre:report")
                     self.report.send()
@@ -180,14 +181,15 @@ class IOpipeCore(object):
 
                 if context.iopipe.disabled:
                     logger.debug("Reporting disabled for this invocation")
-                    return result
+                    return response
 
+                self.run_hooks("post:response", response=response)
                 self.report.prepare()
                 self.run_hooks("pre:report")
                 self.report.send()
                 self.run_hooks("post:report")
 
-                return result
+                return response
             finally:
                 self.wait_for_futures()
 
@@ -219,7 +221,7 @@ class IOpipeCore(object):
 
         return loaded_plugins
 
-    def run_hooks(self, name, event=None, context=None):
+    def run_hooks(self, name, event=None, context=None, response=None):
         """
         Runs plugin hooks for each registered plugin.
         """
@@ -228,6 +230,7 @@ class IOpipeCore(object):
             "post:setup": lambda p: p.post_setup(self),
             "pre:invoke": lambda p: p.pre_invoke(event, context),
             "post:invoke": lambda p: p.post_invoke(event, context),
+            "post:response": lambda p: p.post_response(response),
             "pre:report": lambda p: p.pre_report(self.report),
             "post:report": lambda p: p.post_report(self.report),
         }

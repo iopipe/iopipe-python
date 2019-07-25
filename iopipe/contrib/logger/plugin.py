@@ -110,6 +110,9 @@ class LoggerPlugin(Plugin):
         if self.enabled and self.redirect_stdout is True:
             sys.stdout = sys.__stdout__
 
+    def post_response(self, response):
+        pass
+
     def pre_report(self, report):
         if self.enabled:
             self.handler.flush()

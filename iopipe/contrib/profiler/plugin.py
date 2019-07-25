@@ -63,6 +63,9 @@ class ProfilerPlugin(Plugin):
             self.profile.disable()
             self.context.iopipe.label("@iopipe/plugin-profiler")
 
+    def post_response(self, response):
+        pass
+
     def pre_report(self, report):
         if self.profile is not None:
             if self.signed_request is not None:
