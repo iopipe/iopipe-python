@@ -23,6 +23,7 @@ This package provides analytics and distributed tracing for event-driven applica
   - [Labels](https://github.com/iopipe/iopipe-python#labels)
   - [Core Agent](https://github.com/iopipe/iopipe-python#core-agent)
   - [Disabling Reporting](https://github.com/iopipe/iopipe-python#disabling-reporting)
+  - [Step Functions](https://github.com/iopipe/iopipe-python#step-functions)
 - [Plugins](https://github.com/iopipe/iopipe-python#plugins)
   - [Event Info Plugin](https://github.com/iopipe/iopipe-python#event-info-plugin)
   - [Logger Plugin](https://github.com/iopipe/iopipe-python#logger-plugin)
@@ -204,6 +205,22 @@ def handler(event, context):
 ```
 
 Reporting will be re-enabled on the next invocation.
+
+### Step Functions
+
+IOpipe is compatible with AWS Lambda step functions. To enable step function tracing:
+
+```python
+from iopipe import IOpipe
+
+iopipe = IOpipe()
+
+@iopipe.step
+def handler(event, context):
+    pass
+```
+
+The `@iopipe.step` decorator will enable step function mode, which will collect additional meta data about your step functions.
 
 ## Plugins
 
