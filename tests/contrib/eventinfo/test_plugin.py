@@ -135,3 +135,29 @@ def test__eventinfo_plugin__step_function(
     assert "iopipe" in response2
     assert response1["iopipe"]["id"] == response2["iopipe"]["id"]
     assert response2["iopipe"]["step"] > response1["iopipe"]["step"]
+
+
+@mock.patch("iopipe.report.send_report", autospec=True)
+def test__eventinfo_plugin__http_response(
+    mock_send_report, handler_http_response_with_eventinfo, event_apigw, mock_context
+):
+    iopipe, handler = handler_http_response_with_eventinfo
+
+    handler(event_apigw, mock_context)
+    metrics = iopipe.report.custom_metrics
+
+    assert any(
+        (
+            m["name"] == "@iopipe/event-info.apiGateway.response.statusCode"
+            for m in metrics
+        )
+    )
+
+    metric = next(
+        (
+            m
+            for m in metrics
+            if m["name"] == "@iopipe/event-info.apiGateway.response.statusCode"
+        )
+    )
+    assert metric["n"] == 200
