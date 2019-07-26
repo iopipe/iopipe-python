@@ -29,7 +29,7 @@ def handler_with_logger(iopipe_with_logger):
         except Exception as e:
             context.iopipe.log.exception(e)
 
-        print("This is not a misprint.")
+        print ("This is not a misprint.")
 
     return iopipe_with_logger, _handler
 

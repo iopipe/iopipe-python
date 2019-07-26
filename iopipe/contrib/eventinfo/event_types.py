@@ -1,14 +1,19 @@
+from .response_types import LambdaProxy
 from .util import collect_all_keys, get_value, has_key, slugify
 
 
 class EventType(object):
     keys = []
+    response_keys = []
     exclude_keys = []
     required_keys = []
+    response_type = None
     source = None
 
     def __init__(self, event):
         self.event = event
+        if self.response_type:
+            self.response_type = self.response_type(self.type)
 
     @property
     def slug(self):
@@ -83,6 +88,7 @@ class ApiGateway(EventType):
         "resource",
     ]
     required_keys = ["headers", "httpMethod", "path", "requestContext", "resource"]
+    response_type = LambdaProxy
 
 
 class CloudFront(EventType):
@@ -172,6 +178,7 @@ class ServerlessLambda(EventType):
         ("stage", "requestContext.stage"),
     ]
     required_keys = ["identity.userAgent", "identity.sourceIp", "identity.accountId"]
+    response_type = LambdaProxy
 
 
 class SES(EventType):
@@ -266,3 +273,17 @@ def metrics_for_event_type(event, context):
             event_info = event_type.collect()
             [context.iopipe.metric(k, v) for k, v in event_info.items()]
             break
+
+    if context.iopipe.is_step_function:
+        context.iopipe.collect_step_meta(event)
+        if context.iopipe.step_meta:
+            for key, value in context.iopipe.step_meta.items():
+                context.iopipe.metric("@iopipe/event-info.stepFunction.%s" % key, value)
+
+    return event_type
+
+
+def metrics_for_response_type(event_type, context, response):
+    if event_type.response_type:
+        response_info = event_type.response_type.collect(response)
+        [context.iopipe.metric(k, v) for k, v in response_info.items()]

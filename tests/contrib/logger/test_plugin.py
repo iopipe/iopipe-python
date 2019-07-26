@@ -161,7 +161,7 @@ def test__logger_plugin__use_tmp__disk_used(
         pytest.skip("this test requires linux, skipping")
 
     disk_usage = read_disk()
-    print(disk_usage)
+    print (disk_usage)
 
     iopipe, handler = handler_with_logger_use_tmp
     handler({}, mock_context)

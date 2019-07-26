@@ -3,7 +3,7 @@ import os
 
 from iopipe.plugins import Plugin
 
-from .event_types import metrics_for_event_type
+from .event_types import metrics_for_event_type, metrics_for_response_type
 
 
 class EventInfoPlugin(Plugin):
@@ -35,14 +35,16 @@ class EventInfoPlugin(Plugin):
         pass
 
     def pre_invoke(self, event, context):
-        pass
+        self.context = context
 
     def post_invoke(self, event, context):
         if self.enabled:
-            metrics_for_event_type(event, context)
+            self.event_type = metrics_for_event_type(event, context)
 
     def post_response(self, response):
-        pass
+        if self.enabled:
+            metrics_for_response_type(self.event_type, self.context, response)
+            self.context.iopipe.inject_step_meta(response)
 
     def pre_report(self, report):
         pass

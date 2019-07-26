@@ -39,7 +39,7 @@ setup(
     packages=find_packages(exclude=("tests", "tests.*")),
     extras_require={
         "coverage": coverage_requires,
-        "dev": tests_require + ["black==18.6b2", "pre-commit"],
+        "dev": tests_require + ["black==19.3b0", "pre-commit"],
     },
     install_requires=install_requires,
     setup_requires=["pytest-runner==4.2"],

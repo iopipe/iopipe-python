@@ -177,3 +177,13 @@ def test_double_instrumentation(mock_send_report, handler, mock_context, monkeyp
     double_wrapped(None, mock_context)
 
     assert mock_send_report.call_count == 1
+
+
+@mock.patch("iopipe.report.send_report", autospec=True)
+def test_step_function(mock_send_report, handler_step_function, mock_context):
+    """Assert that step functions are identified as such"""
+    iopipe, handler = handler_step_function
+
+    handler(None, mock_context)
+
+    assert iopipe.context.iopipe.is_step_function is True

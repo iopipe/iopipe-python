@@ -112,3 +112,52 @@ def test__eventinfo_plugin__enabled(monkeypatch):
     plugin = EventInfoPlugin(enabled=False)
 
     assert plugin.enabled is True
+
+
+@mock.patch("iopipe.report.send_report", autospec=True)
+def test__eventinfo_plugin__step_function(
+    mock_send_report, handler_step_function_with_eventinfo, event_apigw, mock_context
+):
+    iopipe, handler = handler_step_function_with_eventinfo
+
+    plugins = iopipe.config["plugins"]
+    assert len(plugins) == 1
+    assert plugins[0].enabled is True
+    assert plugins[0].name == "event-info"
+
+    response1 = handler(event_apigw, mock_context)
+    assert "iopipe" in response1
+    assert "id" in response1["iopipe"]
+    assert "step" in response1["iopipe"]
+
+    response2 = handler(response1, mock_context)
+
+    assert "iopipe" in response2
+    assert response1["iopipe"]["id"] == response2["iopipe"]["id"]
+    assert response2["iopipe"]["step"] > response1["iopipe"]["step"]
+
+
+@mock.patch("iopipe.report.send_report", autospec=True)
+def test__eventinfo_plugin__http_response(
+    mock_send_report, handler_http_response_with_eventinfo, event_apigw, mock_context
+):
+    iopipe, handler = handler_http_response_with_eventinfo
+
+    handler(event_apigw, mock_context)
+    metrics = iopipe.report.custom_metrics
+
+    assert any(
+        (
+            m["name"] == "@iopipe/event-info.apiGateway.response.statusCode"
+            for m in metrics
+        )
+    )
+
+    metric = next(
+        (
+            m
+            for m in metrics
+            if m["name"] == "@iopipe/event-info.apiGateway.response.statusCode"
+        )
+    )
+    assert metric["n"] == 200

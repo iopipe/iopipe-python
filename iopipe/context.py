@@ -1,6 +1,7 @@
 import decimal
 import logging
 import numbers
+import uuid
 import warnings
 
 from . import constants
@@ -25,20 +26,22 @@ class LogWrapper(object):
 
 
 class ContextWrapper(object):
-    def __init__(self, base_context, instance):
+    def __init__(self, base_context, instance, **kwargs):
         self.base_context = base_context
         self.instance = instance
-        self.iopipe = IOpipeContext(self.instance)
+        self.iopipe = IOpipeContext(self.instance, **kwargs)
 
     def __getattr__(self, name):
         return getattr(self.base_context, name)
 
 
 class IOpipeContext(object):
-    def __init__(self, instance):
+    def __init__(self, instance, **kwargs):
         self.instance = instance
         self.log = LogWrapper(self)
         self.disabled = False
+        self.is_step_function = kwargs.pop("step_function", False)
+        self.step_meta = None
 
     def metric(self, key, value):
         if self.instance.report is None:
@@ -129,3 +132,13 @@ class IOpipeContext(object):
 
     def disable(self):
         self.disabled = True
+
+    def collect_step_meta(self, event):
+        if self.is_step_function:
+            self.step_meta = event.get("iopipe", {"id": str(uuid.uuid4()), "step": 0})
+
+    def inject_step_meta(self, response):
+        if self.step_meta and isinstance(response, dict):
+            step_meta = self.step_meta.copy()
+            step_meta["step"] += 1
+            response["iopipe"] = step_meta
