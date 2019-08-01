@@ -40,6 +40,8 @@ setup(
     extras_require={
         "coverage": coverage_requires,
         "dev": tests_require + ["black==19.3b0", "pre-commit"],
+        "local": install_requires
+        + ["botocore==1.12.162", "jmespath>=0.7.1,<1.0.0", "requests"],
     },
     install_requires=install_requires,
     setup_requires=["pytest-runner==4.2"],
