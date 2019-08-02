@@ -189,10 +189,12 @@ def test_trace_plugin__auto_http__filter_request(
 
 def test__trace_plugin__auto_http__env_var(monkeypatch):
     monkeypatch.setenv("IOPIPE_TRACE_AUTO_HTTP_ENABLED", "false")
-
     iopipe = IOpipeCore(plugins=[TracePlugin()])
-
     assert iopipe.plugins[0].auto_http is False
+
+    monkeypatch.setenv("IOPIPE_TRACE_AUTO_HTTP_ENABLED", "true")
+    iopipe = IOpipeCore(plugins=[TracePlugin()])
+    assert iopipe.plugins[0].auto_http is True
 
 
 @mock.patch("iopipe.report.send_report", autospec=True)
@@ -227,3 +229,13 @@ def test_trace_plugin__auto_db__redis(
 
     assert db_traces[0]["request"]["command"] == "SET"
     assert db_traces[1]["request"]["command"] == "GET"
+
+
+def test__trace_plugin__auto_db__env_var(monkeypatch):
+    monkeypatch.setenv("IOPIPE_TRACE_AUTO_DB_ENABLED", "false")
+    iopipe = IOpipeCore(plugins=[TracePlugin()])
+    assert iopipe.plugins[0].auto_db is False
+
+    monkeypatch.setenv("IOPIPE_TRACE_AUTO_DB_ENABLED", "true")
+    iopipe = IOpipeCore(plugins=[TracePlugin()])
+    assert iopipe.plugins[0].auto_db is True
