@@ -1,4 +1,6 @@
+import fakeredis
 import mock
+import redis
 
 from iopipe import IOpipeCore
 from iopipe.contrib.trace import TracePlugin
@@ -191,3 +193,37 @@ def test__trace_plugin__auto_http__env_var(monkeypatch):
     iopipe = IOpipeCore(plugins=[TracePlugin()])
 
     assert iopipe.plugins[0].auto_http is False
+
+
+@mock.patch("iopipe.report.send_report", autospec=True)
+def test_trace_plugin__auto_db__redis(
+    mock_send_report, handler_with_trace_auto_db_redis, mock_context, monkeypatch
+):
+    setattr(fakeredis.FakeConnection, "health_check_interval", 1)
+    setattr(fakeredis.FakeConnection, "host", "localhost")
+    setattr(fakeredis.FakeConnection, "port", 6379)
+    setattr(fakeredis.FakeConnection, "db", 0)
+    setattr(fakeredis.FakeConnection, "next_health_check", 1)
+
+    monkeypatch.setattr(redis, "Redis", fakeredis.FakeRedis)
+
+    iopipe, handler = handler_with_trace_auto_db_redis
+
+    assert len(iopipe.config["plugins"]) == 1
+
+    handler({}, mock_context)
+
+    assert len(iopipe.report.performance_entries) == 0
+
+    db_traces = iopipe.report.db_trace_entries
+
+    assert len(db_traces) == 2
+
+    for db_trace in db_traces:
+        assert db_trace["request"]["hostname"] == "localhost"
+        assert db_trace["request"]["port"] == 6379
+        assert db_trace["request"]["db"] == 0
+        assert db_trace["request"]["key"] == "foo"
+
+    assert db_traces[0]["request"]["command"] == "SET"
+    assert db_traces[1]["request"]["command"] == "GET"

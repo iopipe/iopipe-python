@@ -1,3 +1,5 @@
+import mock
+
 from botocore.httpsession import URLLib3Session as BotocoreSession
 from botocore.vendored.requests.sessions import Session as BotocoreVendoredSession
 from requests.sessions import Session as RequestsSession

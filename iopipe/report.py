@@ -41,6 +41,7 @@ class Report(object):
         self.context = context
 
         self.custom_metrics = []
+        self.db_trace_entries = []
         self.http_trace_entries = []
         self.labels = set()
         self.performance_entries = []
@@ -67,6 +68,7 @@ class Report(object):
                 "os": {"linux": {}},
             },
             "errors": {},
+            "dbTraceEntries": self.db_trace_entries,
             "httpTraceEntries": self.http_trace_entries,
             "installMethod": self.config.get("install_method"),
             "performanceEntries": self.performance_entries,
