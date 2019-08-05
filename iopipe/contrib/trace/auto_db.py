@@ -18,10 +18,10 @@ def collect_redis_metrics(context, trace, args, connection):
     request = Request(
         command=ensure_utf8(command),
         key=ensure_utf8(key),
-        hostname=ensure_utf8(connection.host),
-        port=ensure_utf8(connection.port),
+        hostname=ensure_utf8(connection.get("host", "localhost")),
+        port=ensure_utf8(connection.get("port", 6379)),
         connectionName=None,
-        db=ensure_utf8(connection.db),
+        db=ensure_utf8(connection.get("db", 0)),
         table=None,
     )
     request = request._asdict()
@@ -41,20 +41,25 @@ def patch_redis_execute_command(context):
         if not hasattr(context, "iopipe") or not hasattr(context.iopipe, "mark"):
             return wrapped(*args, **kwargs)
 
-        pool = instance.connection_pool
-        command_name = args[0]
-        connection = instance.connection or pool.get_connection(command_name, **kwargs)
-
         id = ensure_utf8(str(uuid.uuid4()))
         with context.iopipe.mark(id):
             response = wrapped(*args, **kwargs)
         trace = context.iopipe.mark.measure(id)
         context.iopipe.mark.delete(id)
-        collect_redis_metrics(context, trace, args, connection)
+        collect_redis_metrics(
+            context, trace, args, instance.connection_pool.connection_kwargs
+        )
         return response
 
     try:
         wrapt.wrap_function_wrapper("redis.client", "Redis.execute_command", wrapper)
+    except ModuleNotFoundError:
+        pass
+
+    try:
+        wrapt.wrap_function_wrapper(
+            "redis.client", "Pipeline.immediate_execute_command", wrapper
+        )
     except ModuleNotFoundError:
         pass
 
