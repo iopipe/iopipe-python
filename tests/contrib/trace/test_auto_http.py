@@ -1,3 +1,6 @@
+import pytest
+import sys
+
 from botocore.awsrequest import AWSRequest
 from botocore.httpsession import URLLib3Session as BotocoreSession
 from botocore.vendored.requests.sessions import (
@@ -51,6 +54,9 @@ def test_patch_http_requests_no_iopipe(mock_context,):
 
 
 def test_patch_http_requests_send(mock_context_wrapper):
+    if sys.version_info[0] != 3:
+        pytest.skip("this test requires python 3+, skipping")
+
     patch_http_requests(mock_context_wrapper, None, None)
 
     assert hasattr(BotocoreSession.send, "__wrapped__")
