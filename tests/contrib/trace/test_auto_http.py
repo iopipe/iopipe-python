@@ -10,6 +10,7 @@ from iopipe.contrib.trace.auto_http import patch_http_requests, restore_http_req
 
 
 def test_patch_http_requests(mock_context_wrapper,):
+    """Asserts that monkey patching occurs if iopipe present"""
     assert not hasattr(BotocoreSession.send, "__wrapped__")
     assert not hasattr(BotocoreVendoredSession.send, "__wrapped__")
     assert not hasattr(RequestsSession.send, "__wrapped__")

@@ -28,16 +28,16 @@ def collect_redis_metrics(context, trace, args, connection):
     context.iopipe.mark.db_trace(trace, "redis", request)
 
 
-def patch_redis_execute_command(context):
+def patch_redis_client(context):
     """
     Monkey patches redis client, if available. Overloads the
     execute methods to add tracing and metrics collection.
     """
-    if not hasattr(context, "iopipe"):
-        return
 
     def wrapper(wrapped, instance, args, kwargs):
-        if not hasattr(context, "iopipe") or not hasattr(context.iopipe, "mark"):
+        if not hasattr(context, "iopipe") or not hasattr(
+            context.iopipe, "mark"
+        ):  # pragma: no cover
             return wrapped(*args, **kwargs)
 
         id = ensure_utf8(str(uuid.uuid4()))
@@ -51,7 +51,9 @@ def patch_redis_execute_command(context):
         return response
 
     def pipeline_wrapper(wrapped, instance, args, kwargs):
-        if not hasattr(context, "iopipe") or not hasattr(context.iopipe, "mark"):
+        if not hasattr(context, "iopipe") or not hasattr(
+            context.iopipe, "mark"
+        ):  # pragma: no cover
             return wrapped(*args, **kwargs)
 
         # We don't need the entire command stack, just collect a stack count
@@ -69,29 +71,31 @@ def patch_redis_execute_command(context):
 
     try:
         wrapt.wrap_function_wrapper("redis.client", "Redis.execute_command", wrapper)
-    except ModuleNotFoundError:
+    except ModuleNotFoundError:  # pragma: no cover
         pass
 
     try:
         wrapt.wrap_function_wrapper(
             "redis.client", "Pipeline.immediate_execute_command", wrapper
         )
-    except ModuleNotFoundError:
+    except ModuleNotFoundError:  # pragma: no cover
+
         pass
 
     try:
         wrapt.wrap_function_wrapper(
             "redis.client", "Pipeline.execute", pipeline_wrapper
         )
-    except ModuleNotFoundError:
+    except ModuleNotFoundError:  # pragma: no cover
+
         pass
 
 
-def restore_redis_execute_command():
+def restore_redis_client():
     """Restores the redis client"""
     try:
         from redis.client import Pipeline, Redis
-    except ImportError:
+    except ImportError:  # pragma: no cover
         pass
     else:
         if hasattr(Pipeline.execute, "__wrapped__"):
@@ -107,8 +111,11 @@ def restore_redis_execute_command():
 
 
 def patch_db_requests(context):
-    patch_redis_execute_command(context)
+    if not hasattr(context, "iopipe"):
+        return
+
+    patch_redis_client(context)
 
 
 def restore_db_requests():
-    restore_redis_execute_command()
+    restore_redis_client()
