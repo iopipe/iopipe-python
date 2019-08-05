@@ -3,6 +3,7 @@ import os
 
 from iopipe.plugins import Plugin
 
+from .auto_db import patch_db_requests, restore_db_requests
 from .auto_http import patch_http_requests, restore_http_requests
 from .marker import Marker
 from .timeline import Timeline
@@ -16,7 +17,12 @@ class TracePlugin(Plugin):
     enabled = True
 
     def __init__(
-        self, auto_measure=True, auto_http=True, http_filter=None, http_headers=None
+        self,
+        auto_measure=True,
+        auto_http=True,
+        http_filter=None,
+        http_headers=None,
+        auto_db=False,
     ):
         """
         Instantiates the trace plugin
@@ -29,6 +35,8 @@ class TracePlugin(Plugin):
         :type http_filter: function
         :param http_headers: Additional HTTP headers to collect
         :type http_headers: list|tuple
+        :param auto_db: Whether or not to automatically trace database requests
+        :type auto_http: bool
         """
         self.auto_measure = auto_measure
         self.auto_http = auto_http
@@ -38,6 +46,10 @@ class TracePlugin(Plugin):
             )
         self.http_filter = http_filter
         self.http_headers = http_headers
+
+        self.auto_db = auto_db
+        if "IOPIPE_TRACE_AUTO_DB_ENABLED" in os.environ:
+            self.auto_db = bool(strtobool(os.environ["IOPIPE_TRACE_AUTO_DB_ENABLED"]))
 
         self.timeline = Timeline()
 
@@ -51,10 +63,16 @@ class TracePlugin(Plugin):
         self.timeline = Timeline()
         context.iopipe.register("mark", Marker(self.timeline, context), force=True)
 
+        if self.auto_db is True:
+            patch_db_requests(context)
+
         if self.auto_http is True:
             patch_http_requests(context, self.http_filter, self.http_headers)
 
     def post_invoke(self, event, context):
+        if self.auto_db is True:
+            restore_db_requests()
+
         if self.auto_http is True:
             restore_http_requests()
 

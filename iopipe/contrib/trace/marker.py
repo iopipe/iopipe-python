@@ -41,6 +41,19 @@ class Marker(object):
     def delete(self, name):
         self.timeline.delete(name)
 
+    def db_trace(self, trace, db_type, request):
+        if self.context.instance.report is None:
+            return
+
+        entry = trace._asdict()
+        entry["type"] = entry.pop("entryType")
+        entry["dbType"] = db_type
+
+        if request is not None:
+            entry["request"] = request
+
+        self.context.instance.report.db_trace_entries.append(entry)
+
     def http_trace(self, trace, request, response):
         if self.context.instance.report is None:
             return

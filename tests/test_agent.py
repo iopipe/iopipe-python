@@ -1,7 +1,7 @@
 import mock
 import pytest
 
-from iopipe import constants
+from iopipe import constants, IOpipeCore
 
 
 @mock.patch("iopipe.report.send_report", autospec=True)
@@ -40,6 +40,11 @@ def test_function_name_from_context(mock_send_report, handler, mock_context):
 @mock.patch("iopipe.report.send_report", autospec=True)
 def test_custom_metrics(mock_send_report, handler_with_events, mock_context):
     """Assert that the agent collects custom metrics"""
+    iopipe = IOpipeCore()
+    assert iopipe.report is None
+    iopipe.log("foo", "bar")
+    assert iopipe.report is None
+
     iopipe, handler = handler_with_events
     handler(None, mock_context)
 
@@ -64,6 +69,13 @@ def test_labels(mock_send_report, handler_with_labels, mock_context):
 @mock.patch("iopipe.report.send_report", autospec=True)
 def test_erroring(mock_send_report, handler_that_errors, mock_context):
     """Assert that the agent catches and traces uncaught exceptions"""
+    iopipe = IOpipeCore()
+    assert iopipe.report is None
+    try:
+        iopipe.error(Exception("Before report is created"))
+    except Exception:
+        pass
+    assert iopipe.report is None
     iopipe, handler = handler_that_errors
 
     with pytest.raises(ValueError):

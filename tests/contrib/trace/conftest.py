@@ -1,4 +1,5 @@
 import pytest
+import redis
 import requests
 
 from iopipe import IOpipeCore
@@ -153,3 +154,25 @@ def marker(timeline, mock_context):
 @pytest.fixture
 def timeline():
     return Timeline()
+
+
+@pytest.fixture
+def iopipe_with_trace_auto_db():
+    plugin = TracePlugin(auto_db=True)
+    return IOpipeCore(
+        token="test-suite",
+        url="https://metrics-api.iopipe.com",
+        debug=True,
+        plugins=[plugin],
+    )
+
+
+@pytest.fixture
+def handler_with_trace_auto_db_redis(iopipe_with_trace_auto_db):
+    @iopipe_with_trace_auto_db
+    def _handler(event, context):
+        r = redis.Redis(host="localhost", port=6379, db=0)
+        r.set("foo", "bar")
+        r.get("foo")
+
+    return iopipe_with_trace_auto_db, _handler

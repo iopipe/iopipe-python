@@ -52,7 +52,7 @@ From your project directory:
 $ pip install iopipe -t .
 
 # If running locally or in other environments _besides_ AWS Lambda:
-$ pip install jmespath>=0.7.1,<1.0.0 requests -t .
+$ pip install iopipe[local] -t .
 ```
 
 Your folder structure for the function should look similar to:
@@ -591,6 +591,8 @@ Resources:
 
 We also have an [example app](https://github.com/iopipe/iopipe-python/tree/master/acceptance/serverless-layers) using layers with Serverless. It also demonstrates how to use layers without a code change.
 
+**NEW:** We have also released a [Serverless Plugin](https://www.github.com/iopipe/serverless-iopipe-layers) to do all this for you automatically.
+
 ## Framework Integration
 
 IOpipe integrates with popular serverless frameworks. See below for examples. If you don't see a framework you'd like to see supported, please create an issue.
@@ -619,7 +621,7 @@ app = iopipe(app)
 
 Using IOpipe with [Serverless](https://github.com/serverless/serverless) is easy.
 
-First, we recommend the [serverless-python-requirements](https://github.com/UnitedIncome/serverless-python-requirements) plugin:
+First, we highly recommend the [serverless-python-requirements](https://github.com/UnitedIncome/serverless-python-requirements) plugin:
 
 ```bash
 $ npm install --save-dev serverless-python-requirements
