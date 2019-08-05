@@ -58,7 +58,7 @@ def patch_requests_session_send(context, http_filter, http_headers):
 
     try:
         wrapt.wrap_function_wrapper("requests.sessions", "Session.send", wrapper)
-    except ModuleNotFoundError:
+    except ModuleNotFoundError:  # pragma: no cover
         pass
 
 
@@ -87,7 +87,7 @@ def patch_botocore_session_send(context, http_filter, http_headers):
         wrapt.wrap_function_wrapper(
             "botocore.httpsession", "URLLib3Session.send", wrapper
         )
-    except ModuleNotFoundError:
+    except ModuleNotFoundError:  # pragma: no cover
         pass
 
 
@@ -116,7 +116,7 @@ def patch_botocore_vendored_session_send(context, http_filter, http_headers):
         wrapt.wrap_function_wrapper(
             "botocore.vendored.requests.sessions", "Session.send", wrapper
         )
-    except ModuleNotFoundError:
+    except ModuleNotFoundError:  # pragma: no cover
         pass
 
 
@@ -124,7 +124,7 @@ def restore_requests_session_send():
     """Restores the original requests session send method"""
     try:
         from requests.sessions import Session as RequestsSession
-    except ImportError:
+    except ImportError:  # pragma: no cover
         pass
     else:
         if hasattr(RequestsSession.send, "__wrapped__"):
@@ -135,7 +135,7 @@ def restore_botocore_session_send():
     """Restores the original botocore session send method"""
     try:
         from botocore.httpsession import URLLib3Session as BotocoreSession
-    except ImportError:
+    except ImportError:  # pragma: no cover
         pass
     else:
         if hasattr(BotocoreSession.send, "__wrapped__"):
@@ -148,7 +148,7 @@ def restore_botocore_vendored_session_send():
         from botocore.vendored.requests.sessions import (
             Session as BotocoreVendoredSession,
         )
-    except ImportError:
+    except ImportError:  # pragma: no cover
         pass
     else:
         if hasattr(BotocoreVendoredSession.send, "__wrapped__"):
