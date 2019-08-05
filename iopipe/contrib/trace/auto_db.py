@@ -25,15 +25,14 @@ def collect_redis_metrics(context, trace, args, connection):
         table=None,
     )
     request = request._asdict()
-    context.iopipe.mark.db_trace(trace, request)
+    context.iopipe.mark.db_trace(trace, "redis", request)
 
 
 def patch_redis_execute_command(context):
     """
     Monkey patches redis client, if available. Overloads the
-    execute_Command method to add tracing and metrics collection.
+    execute methods to add tracing and metrics collection.
     """
-
     if not hasattr(context, "iopipe"):
         return
 
@@ -51,6 +50,23 @@ def patch_redis_execute_command(context):
         )
         return response
 
+    def pipeline_wrapper(wrapped, instance, args, kwargs):
+        if not hasattr(context, "iopipe") or not hasattr(context.iopipe, "mark"):
+            return wrapped(*args, **kwargs)
+
+        # We don't need the entire command stack, just collect a stack count
+        pipeline_args = ("PIPELINE", ensure_utf8(len(instance.command_stack)))
+
+        id = ensure_utf8(str(uuid.uuid4()))
+        with context.iopipe.mark(id):
+            response = wrapped(*args, **kwargs)
+        trace = context.iopipe.mark.measure(id)
+        context.iopipe.mark.delete(id)
+        collect_redis_metrics(
+            context, trace, pipeline_args, instance.connection_pool.connection_kwargs
+        )
+        return response
+
     try:
         wrapt.wrap_function_wrapper("redis.client", "Redis.execute_command", wrapper)
     except ModuleNotFoundError:
@@ -63,14 +79,29 @@ def patch_redis_execute_command(context):
     except ModuleNotFoundError:
         pass
 
+    try:
+        wrapt.wrap_function_wrapper(
+            "redis.client", "Pipeline.execute", pipeline_wrapper
+        )
+    except ModuleNotFoundError:
+        pass
+
 
 def restore_redis_execute_command():
-    """Restroes the original redis client execute_Command method"""
+    """Restores the redis client"""
     try:
-        from redis.client import Redis
+        from redis.client import Pipeline, Redis
     except ImportError:
         pass
     else:
+        if hasattr(Pipeline.execute, "__wrapped__"):
+            setattr(Pipeline, "execute", Pipeline.execute.__wrapped__)
+        if hasattr(Pipeline.immediate_execute_command, "__wrapped__"):
+            setattr(
+                Pipeline,
+                "immediate_execute_command",
+                Pipeline.immediate_execute_command.__wrapped__,
+            )
         if hasattr(Redis.execute_command, "__wrapped__"):
             setattr(Redis, "execute_command", Redis.execute_command.__wrapped__)
 
