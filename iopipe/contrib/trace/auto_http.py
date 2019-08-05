@@ -40,8 +40,6 @@ def patch_requests_session_send(context, http_filter, http_headers):
     Monkey patches requests' session class, if available. Overloads the
     send method to add tracing and metrics collection.
     """
-    if not hasattr(context, "iopipe"):
-        return
 
     def wrapper(wrapped, instance, args, kwargs):
         if not hasattr(context, "iopipe") or not hasattr(context.iopipe, "mark"):
@@ -67,8 +65,6 @@ def patch_botocore_session_send(context, http_filter, http_headers):
     Monkey patches botocore's session, if available. Overloads the
     session class' send method to add tracing and metric collection.
     """
-    if not hasattr(context, "iopipe"):
-        return
 
     def wrapper(wrapped, instance, args, kwargs):
         if not hasattr(context, "iopipe") or not hasattr(context.iopipe, "mark"):
@@ -96,8 +92,6 @@ def patch_botocore_vendored_session_send(context, http_filter, http_headers):
     Monkey patches botocore's vendored requests, if available. Overloads the
     session class' send method to add tracing and metric collection.
     """
-    if not hasattr(context, "iopipe"):
-        return
 
     def wrapper(wrapped, instance, args, kwargs):
         if not hasattr(context, "iopipe") or not hasattr(context.iopipe, "mark"):
@@ -160,6 +154,9 @@ def restore_botocore_vendored_session_send():
 
 
 def patch_http_requests(context, http_filter, http_headers):
+    if not hasattr(context, "iopipe"):
+        return
+
     patch_requests_session_send(context, http_filter, http_headers)
     patch_botocore_session_send(context, http_filter, http_headers)
     patch_botocore_vendored_session_send(context, http_filter, http_headers)
