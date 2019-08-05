@@ -29,6 +29,8 @@ This package provides analytics and distributed tracing for event-driven applica
   - [Logger Plugin](https://github.com/iopipe/iopipe-python#logger-plugin)
   - [Profiler Plugin](https://github.com/iopipe/iopipe-python#profiler-plugin)
   - [Trace Plugin](https://github.com/iopipe/iopipe-python#trace-plugin)
+    - [Auto DB Tracing](https://github.com/iopipe/iopipe-python#auto-db-tracing)
+    - [Auto HTTP Tracing](https://github.com/iopipe/iopipe-python#auto-http-tracing)
   - [Creating Plugins](https://github.com/iopipe/iopipe-python#creating-plugins)
 - [Supported Python Versions](https://github.com/iopipe/iopipe-python#supported-python-versions)
 - [Lambda Layers](https://github.com/iopipe/iopipe-python#lambda-layers)
@@ -429,7 +431,7 @@ iopipe = IOpipe()
 @iopipe
 def handler(event, context):
     @context.iopipe.mark.decorator('expensive operation'):
-	def expensive_operation():
+    def expensive_operation():
         # do something here
 
     expensive_operation()
@@ -454,7 +456,32 @@ def handler(event, context):
     context.iopipe.mark.measure('expensive operation')
 ```
 
-The trace plugin can also trace your HTTP/HTTPS requests automatically. To enable this feature, set `auto_http` to `True` or set the `IOPIPE_TRACE_AUTO_HTTP_ENABLED` environment variable. For example:
+#### Auto DB Tracing
+
+The trace plugin can trace your database requests automatically. To enable this feature, set `auto_db` to `True` or set the `IOPIPE_TRACE_AUTO_DB_ENABLED` environment variable. For example:
+
+```python
+iopipe = IOpipe(plugins=[TracePlugin(auto_db=True)])
+```
+
+With `auto_db` enabled, you will see traces for any database requests you make within your function on your IOpipe dashboard. Currently this feature only supports Redis, but other databases soon to come.
+
+```python
+from iopipe import IOpipe
+from redis import Redis
+
+iopipe = IOpipe(plugins=[TracePlugin(auto_db=True)])
+
+@iopipe
+def handler(event, context):
+    r = redis.Redis(host="your-host-here", port=6379, db=0)
+    r.set("foo", "bar")
+    r.get("foo")
+```
+
+#### Auto HTTP Tracing
+
+The trace plugin can trace your HTTP/HTTPS requests automatically. To enable this feature, set `auto_http` to `True` or set the `IOPIPE_TRACE_AUTO_HTTP_ENABLED` environment variable. For example:
 
 ```python
 iopipe = IOpipe(plugins=[TracePlugin(auto_http=True)])
