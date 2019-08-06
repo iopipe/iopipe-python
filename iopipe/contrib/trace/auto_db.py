@@ -37,6 +37,8 @@ def collect_pymongo_metrics(context, trace, instance, response):
                         break
             else:
                 key = getattr(response, key_attr, None)
+            if key is not None:
+                key = str(key)
             break
 
     if isinstance(response, Cursor):
@@ -184,7 +186,16 @@ def restore_pymongo():
     except ImportError:  # pragma: no cover
         pass
     else:
-        for class_method in ["insert_one", "insert_many"]:
+        for class_method in (
+            "bulk_write",
+            "delete_many",
+            "delete_one",
+            "insert_many",
+            "insert_one",
+            "replace_one",
+            "update_many",
+            "update_one",
+        ):
             if hasattr(getattr(Collection, class_method), "__wrapped__"):
                 setattr(
                     Collection,
