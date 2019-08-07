@@ -1,3 +1,4 @@
+import pymongo
 import pytest
 import redis
 import requests
@@ -174,5 +175,18 @@ def handler_with_trace_auto_db_redis(iopipe_with_trace_auto_db):
         r = redis.Redis(host="localhost", port=6379, db=0)
         r.set("foo", "bar")
         r.get("foo")
+
+    return iopipe_with_trace_auto_db, _handler
+
+
+@pytest.fixture
+def handler_with_trace_auto_db_pymongo(iopipe_with_trace_auto_db):
+    @iopipe_with_trace_auto_db
+    def _handler(event, context):
+        client = pymongo.MongoClient("localhost", 27017)
+        db = client.test
+        db.my_collection.insert_one({"x": 10})
+        db.my_collection.find_one()
+        db.my_collection.update_one({"x": 10}, {"$inc": {"x": 3}})
 
     return iopipe_with_trace_auto_db, _handler

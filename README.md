@@ -464,7 +464,26 @@ The trace plugin can trace your database requests automatically. To enable this 
 iopipe = IOpipe(plugins=[TracePlugin(auto_db=True)])
 ```
 
-With `auto_db` enabled, you will see traces for any database requests you make within your function on your IOpipe dashboard. Currently this feature only supports [Redis](https://github.com/andymccurdy/redis-py), but other databases soon to come.
+With `auto_db` enabled, you will see traces for any database requests you make within your function on your IOpipe dashboard. Currently this feature only supports [MongoDB](https://github.com/mongodb/mongo-python-driver) and [Redis](https://github.com/andymccurdy/redis-py), but other databases soon to come.
+
+MongoDB example:
+
+```python
+from iopipe import IOpipe
+from pymongo import MongoClient
+
+iopipe = IOpipe(plugins=[TracePlugin(auto_db=True)])
+
+@iopipe
+def handler(event, context):
+    client = MongoClient("your-host-here", 27017)
+
+    db = client.test
+    db.my_collection.insert_one({"x": 10})
+    db.my_collection.find_one()
+```
+
+Redis example:
 
 ```python
 from iopipe import IOpipe

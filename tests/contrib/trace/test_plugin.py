@@ -1,5 +1,7 @@
 import fakeredis
 import mock
+import mongomock
+import pymongo
 import redis
 
 from iopipe import IOpipeCore
@@ -222,6 +224,7 @@ def test_trace_plugin__auto_db__redis(
     assert len(db_traces) == 2
 
     for db_trace in db_traces:
+        assert db_trace["dbType"] == "redis"
         assert db_trace["request"]["hostname"] == "localhost"
         assert db_trace["request"]["port"] == 6379
         assert db_trace["request"]["db"] == 0
@@ -239,3 +242,36 @@ def test__trace_plugin__auto_db__env_var(monkeypatch):
     monkeypatch.setenv("IOPIPE_TRACE_AUTO_DB_ENABLED", "true")
     iopipe = IOpipeCore(plugins=[TracePlugin()])
     assert iopipe.plugins[0].auto_db is True
+
+
+@mock.patch("iopipe.report.send_report", autospec=True)
+def test_trace_plugin__auto_db__pymongo(
+    mock_send_report, handler_with_trace_auto_db_pymongo, mock_context, monkeypatch
+):
+    monkeypatch.setattr(
+        pymongo.collection, "Collection", mongomock.collection.Collection
+    )
+    monkeypatch.setattr(pymongo, "MongoClient", mongomock.MongoClient)
+    setattr(mongomock.database.Database, "address", ("localhost", 27017))
+
+    iopipe, handler = handler_with_trace_auto_db_pymongo
+
+    assert len(iopipe.config["plugins"]) == 1
+
+    handler({}, mock_context)
+
+    assert len(iopipe.report.performance_entries) == 0
+
+    db_traces = iopipe.report.db_trace_entries
+
+    assert len(db_traces) == 3
+
+    for db_trace in db_traces:
+        assert db_trace["dbType"] == "mongodb"
+        assert db_trace["request"]["hostname"] == "localhost"
+        assert db_trace["request"]["port"] == 27017
+        assert db_trace["request"]["db"] == "test"
+        assert db_trace["request"]["table"] == "my_collection"
+
+    assert db_traces[0]["request"]["command"] == "insert_one"
+    assert db_traces[2]["request"]["command"] == "update"
