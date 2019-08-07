@@ -264,7 +264,7 @@ def test_trace_plugin__auto_db__pymongo(
 
     db_traces = iopipe.report.db_trace_entries
 
-    assert len(db_traces) == 2
+    assert len(db_traces) == 3
 
     for db_trace in db_traces:
         assert db_trace["dbType"] == "mongodb"
@@ -274,3 +274,4 @@ def test_trace_plugin__auto_db__pymongo(
         assert db_trace["request"]["table"] == "my_collection"
 
     assert db_traces[0]["request"]["command"] == "insert_one"
+    assert db_traces[2]["request"]["command"] == "update"

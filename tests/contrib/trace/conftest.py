@@ -187,5 +187,6 @@ def handler_with_trace_auto_db_pymongo(iopipe_with_trace_auto_db):
         db = client.test
         db.my_collection.insert_one({"x": 10})
         db.my_collection.find_one()
+        db.my_collection.update_one({"x": 10}, {"$inc": {"x": 3}})
 
     return iopipe_with_trace_auto_db, _handler

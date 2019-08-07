@@ -41,7 +41,7 @@ def collect_pymongo_metrics(context, trace, instance, response):
                 key = str(key)
             break
 
-    if isinstance(response, Cursor):
+    if isinstance(response, Cursor):  # pragman: no cover
         command = "find"
         key = response.retrieved
 
@@ -148,7 +148,7 @@ def patch_redis(context):
         )
         return response
 
-    def pipeline_wrapper(wrapped, instance, args, kwargs):
+    def pipeline_wrapper(wrapped, instance, args, kwargs):  # pragma: no cover
         if not hasattr(context, "iopipe") or not hasattr(
             context.iopipe, "mark"
         ):  # pragma: no cover
