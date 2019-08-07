@@ -34,7 +34,7 @@ coverage_requires = tests_require + ["coverage==5.0a2", "pytest-cov==2.6.1"]
 
 setup(
     name="iopipe",
-    version="1.8.2",
+    version="1.9.0",
     description="IOpipe agent for serverless Application Performance Monitoring",
     long_description=README,
     author="IOpipe",
