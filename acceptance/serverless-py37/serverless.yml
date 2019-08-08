@@ -86,3 +86,6 @@ functions:
     events:
       - schedule: rate(5 minutes)
     handler: handler.uncaught_error
+
+plugins:
+  - serverless-python-requirements

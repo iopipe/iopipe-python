@@ -207,3 +207,6 @@ functions:
       - schedule: rate(5 minutes)
     handler: handler.uncaught_error
     runtime: python3.6
+
+plugins:
+  - serverless-python-requirements

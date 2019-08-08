@@ -85,11 +85,9 @@ jobs:
       - run:
           name: Deploy acceptance tests
           command: |
-            python setup.py build --build-lib acceptance/serverless
-            python setup.py build --build-lib acceptance/serverless-py37
-            cd acceptance/serverless && sls deploy --conceal
+            cd acceptance/serverless && npm install && sls deploy --conceal
             cd ../serverless-layers && sls deploy --conceal
-            cd ../serverless-py37 && sls deploy --conceal
+            cd ../serverless-py37 && npm install && sls deploy --conceal
             cd ../serverless-wsgi && npm install && sls deploy --conceal
 
   release:
