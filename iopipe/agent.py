@@ -245,7 +245,8 @@ class IOpipeCore(object):
                         hooks[name](p)
                     except Exception as e:
                         logger.error(
-                            "IOpipe plugin %s hook raised error" % (name, str(e))
+                            "IOpipe plugin %s hook %s raised error: %s"
+                            % (p.name, name, e)
                         )
                         logger.exception(e)
 
