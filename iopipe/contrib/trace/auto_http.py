@@ -56,7 +56,7 @@ def patch_requests_session_send(context, http_filter, http_headers):
 
     try:
         wrapt.wrap_function_wrapper("requests.sessions", "Session.send", wrapper)
-    except ModuleNotFoundError:  # pragma: no cover
+    except Exception:  # pragma: no cover
         pass
 
 
@@ -83,7 +83,7 @@ def patch_botocore_session_send(context, http_filter, http_headers):
         wrapt.wrap_function_wrapper(
             "botocore.httpsession", "URLLib3Session.send", wrapper
         )
-    except ModuleNotFoundError:  # pragma: no cover
+    except Exception:  # pragma: no cover
         pass
 
 
@@ -110,7 +110,7 @@ def patch_botocore_vendored_session_send(context, http_filter, http_headers):
         wrapt.wrap_function_wrapper(
             "botocore.vendored.requests.sessions", "Session.send", wrapper
         )
-    except ModuleNotFoundError:  # pragma: no cover
+    except Exception:  # pragma: no cover
         pass
 
 

@@ -108,7 +108,7 @@ def patch_pymongo(context):
 
     try:
         wrapt.wrap_function_wrapper("pymongo.collection", "Collection.find", wrapper)
-    except ModuleNotFoundError:  # pragma: no cover
+    except Exception:  # pragma: no cover
         pass
     else:
         for class_method in (
@@ -169,7 +169,7 @@ def patch_redis(context):
 
     try:
         wrapt.wrap_function_wrapper("redis.client", "Redis.execute_command", wrapper)
-    except ModuleNotFoundError:  # pragma: no cover
+    except Exception:  # pragma: no cover
         pass
     else:
         for module_name, class_method in [
