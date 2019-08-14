@@ -10,7 +10,7 @@ try:
 except (ImportError, OSError):
     README = open(os.path.join(os.path.dirname(__file__), "README.md"), "r").read()
 
-install_requires = ["wrapt==1.11.2"]
+install_requires = ["wrapt"]
 if sys.version_info[0] == 2:
     install_requires.append("futures")
 
