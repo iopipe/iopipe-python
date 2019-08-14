@@ -21,6 +21,7 @@ tests_require = [
     "mock",
     "mongomock==3.17.0",
     "more-itertools<6.0.0",
+    "psycopg2==2.8.3",
     "pymongo==3.8.0",
     "pytest==4.1.0",
     "pytest-benchmark==3.2.0",

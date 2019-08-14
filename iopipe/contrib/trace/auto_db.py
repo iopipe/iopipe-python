@@ -2,11 +2,16 @@ import collections
 import uuid
 import wrapt
 
+from .dbapi import AdapterProxy, ConnectionProxy, CursorProxy
 from .util import ensure_utf8
 
 Request = collections.namedtuple(
     "Request", ["command", "key", "hostname", "port", "connectionName", "db", "table"]
 )
+
+
+def collect_psycopg2_metrics(context, trace, instance):
+    pass
 
 
 def collect_pymongo_metrics(context, trace, instance, response):
@@ -126,6 +131,69 @@ def patch_pymongo(context):
             )
 
 
+def patch_psycopg2(context):
+    """
+    Monkey patches psycopg2 client, if available. Overloads the
+    execute method to add tracing and metrics collection.
+    """
+
+    class PGCursorProxy(CursorProxy):
+        def execute(self, *args, **kwargs):
+            if not hasattr(context, "iopipe") or not hasattr(
+                context.iopipe, "mark"
+            ):  # pragma: no cover
+                self.__wrapped__.execute(*args, **kwargs)
+
+            id = ensure_utf8(str(uuid.uuid4()))
+            with context.iopipe.mark(id):
+                self.__wrapped__.execute(*args, **kwargs)
+            trace = context.iopipe.mark.measure(id)
+            context.iopipe.mark.delete(id)
+            collect_psycopg2_metrics(context, trace, self)
+
+    class PGConnectionProxy(ConnectionProxy):
+        def cursor(self, *args, **kwargs):
+            cursor = self.__wrapped__.cursor(*args, **kwargs)
+            return PGCursorProxy(cursor, self)
+
+    def adapt_wrapper(wrapped, instance, args, kwargs):
+        adapter = wrapped(*args, **kwargs)
+        return AdapterProxy(adapter) if hasattr(adapter, "prepare") else adapter
+
+    def connect_wrapper(wrapped, instance, args, kwargs):
+        connection = wrapped(*args, **kwargs)
+        return PGConnectionProxy(connection, args, kwargs)
+
+    def register_type_wrapper(wrapped, instance, args, kwargs):
+        def _extract_arguments(obj, scope=None):
+            return obj, scope
+
+        obj, scope = _extract_arguments(*args, **kwargs)
+
+        if scope is not None:
+            if isinstance(scope, wrapt.ObjectProxy):
+                scope = scope.__wrapped__
+            return wrapped(obj, scope)
+
+        return wrapped(obj)
+
+    try:
+        wrapt.wrap_function_wrapper("psycopg2", "connect", connect_wrapper)
+    except Exception:  # pragma: no cover
+        pass
+    else:
+        wrapt.wrap_function_wrapper("psycopg2.extensions", "adapt", adapt_wrapper)
+        wrapt.wrap_function_wrapper(
+            "psycopg2.extensions", "register_type", register_type_wrapper
+        )
+        wrapt.wrap_function_wrapper(
+            "psycopg2._psycopg", "register_type", register_type_wrapper
+        )
+        wrapt.wrap_function_wrapper(
+            "psycopg2._json", "register_type", register_type_wrapper
+        )
+
+
 def patch_redis(context):
     """
     Monkey patches redis client, if available. Overloads the
@@ -179,6 +247,11 @@ def patch_redis(context):
             wrapt.wrap_function_wrapper(module_name, class_method, pipeline_wrapper)
 
 
+def restore_psycopg2():
+    """Restores psycopg2"""
+    pass
+
+
 def restore_pymongo():
     """Restores pymongo"""
     try:
@@ -224,10 +297,12 @@ def patch_db_requests(context):
     if not hasattr(context, "iopipe"):
         return
 
+    patch_psycopg2(context)
     patch_pymongo(context)
     patch_redis(context)
 
 
 def restore_db_requests():
+    restore_psycopg2()
     restore_pymongo()
     restore_redis()
