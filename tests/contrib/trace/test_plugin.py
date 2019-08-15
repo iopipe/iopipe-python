@@ -283,7 +283,12 @@ def test_trace_plugin__auto_db__psycopg2(
     mock_send_report, mock_connect, handler_with_trace_auto_db_psycopg2, mock_context
 ):
     mock_connect.return_value.dsn = "postgres://username:password@localhost:5432/foobar"
-    mock_connect.return_value.cursor.return_value.query = "SELECT * FROM test"
+    type(mock_connect.return_value.cursor.return_value).query = mock.PropertyMock(
+        side_effect=[
+            "INSERT INTO test (num, data) VALUES (%s, %s)",
+            "SELECT * FROM test",
+        ]
+    )
 
     iopipe, handler = handler_with_trace_auto_db_psycopg2
 
@@ -296,3 +301,13 @@ def test_trace_plugin__auto_db__psycopg2(
     db_traces = iopipe.report.db_trace_entries
 
     assert len(db_traces) == 2
+
+    for db_trace in db_traces:
+        assert db_trace["dbType"] == "postgresql"
+        assert db_trace["request"]["hostname"] == "localhost"
+        assert db_trace["request"]["port"] == "5432"
+        assert db_trace["request"]["db"] == "foobar"
+        assert db_trace["request"]["table"] == "test"
+
+    assert db_traces[0]["request"]["command"] == "insert"
+    assert db_traces[1]["request"]["command"] == "select"

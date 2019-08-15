@@ -166,6 +166,7 @@ def patch_psycopg2(context):
                 context.iopipe, "mark"
             ):  # pragma: no cover
                 self.__wrapped__.execute(*args, **kwargs)
+                return
 
             id = ensure_utf8(str(uuid.uuid4()))
             with context.iopipe.mark(id):
