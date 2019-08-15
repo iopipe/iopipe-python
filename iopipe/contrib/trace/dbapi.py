@@ -17,8 +17,6 @@ def table_name(query, command):
         if keyword in parts:
             return parts[parts.index(keyword) + 1]
 
-    return None
-
 
 class CursorProxy(wrapt.ObjectProxy):
     def __init__(self, cursor, connection_proxy):
@@ -41,21 +39,21 @@ class ConnectionProxy(wrapt.ObjectProxy):
         self._self_args = args
         self._self_kwargs = kwargs
 
-    def cursor(self, *args, **kwargs):
+    def cursor(self, *args, **kwargs):  # pragma: no cover
         cursor = self.__wrapped__.cursor(*args, **kwargs)
         return CursorProxy(cursor, self)
 
     @property
-    def extract_hostname(self):
+    def extract_hostname(self):  # pragma: no cover
         return self._self_kwargs.get("host", "localhost")
 
     @property
-    def extract_dbname(self):
+    def extract_dbname(self):  # pragma: no cover
         return self._self_kwargs.get("db", self._self_kwargs.get("database", ""))
 
 
 class AdapterProxy(wrapt.ObjectProxy):
-    def prepare(self, *args, **kwargs):
+    def prepare(self, *args, **kwargs):  # pragma: no cover
         if not args:
             return self.__wrapped__.prepare(*args, **kwargs)
 
