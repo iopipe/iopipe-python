@@ -2,7 +2,7 @@ import collections
 import uuid
 import wrapt
 
-from .dbapi import AdapterProxy, ConnectionProxy, CursorProxy
+from .dbapi import AdapterProxy, ConnectionProxy, CursorProxy, table_name
 from .util import ensure_utf8
 
 Request = collections.namedtuple(
@@ -11,7 +11,30 @@ Request = collections.namedtuple(
 
 
 def collect_psycopg2_metrics(context, trace, instance):
-    pass
+    from psycopg2.extensions import parse_dsn
+
+    connection = instance.connection_proxy
+    dsn = parse_dsn(connection.dsn)
+
+    db = dsn.get("dbname")
+    hostname = dsn.get("host", "localhost")
+    port = dsn.get("port", 5432)
+
+    query = instance.query
+    command = query.split()[0].lower()
+    table = table_name(query, command)
+
+    request = Request(
+        command=ensure_utf8(command),
+        key=None,
+        hostname=ensure_utf8(hostname),
+        port=ensure_utf8(port),
+        connectionName=None,
+        db=ensure_utf8(db),
+        table=ensure_utf8(table),
+    )
+    request = request._asdict()
+    context.iopipe.mark.db_trace(trace, "postgresql", request)
 
 
 def collect_pymongo_metrics(context, trace, instance, response):
@@ -249,7 +272,43 @@ def patch_redis(context):
 
 def restore_psycopg2():
     """Restores psycopg2"""
-    pass
+    try:
+        import psycopg2
+    except ImportError:  # pragma: no cover
+        pass
+    else:
+        setattr(
+            psycopg2,
+            "connect",
+            getattr(psycopg2.connect, "__wrapped__", psycopg2.connect),
+        )
+        setattr(
+            psycopg2.extensions,
+            "register_type",
+            getattr(
+                psycopg2.extensions.register_type,
+                "__wrapped__",
+                psycopg2.extensions.register_type,
+            ),
+        )
+        setattr(
+            psycopg2._psycopg,
+            "register_type",
+            getattr(
+                psycopg2._psycopg.register_type,
+                "__wrapped__",
+                psycopg2._psycopg.register_type,
+            ),
+        )
+        setattr(
+            psycopg2._json,
+            "register_type",
+            getattr(
+                psycopg2._json.register_type,
+                "__wrapped__",
+                psycopg2._json.register_type,
+            ),
+        )
 
 
 def restore_pymongo():

@@ -1,5 +1,24 @@
 import wrapt
 
+COMMAND_KEYWORDS = {
+    "create": "table",
+    "delete": "from",
+    "insert": "into",
+    "select": "from",
+    "update": "update",
+}
+
+
+def table_name(query, command):
+    if command in COMMAND_KEYWORDS:
+        keyword = COMMAND_KEYWORDS[command]
+        parts = query.lower().split()
+
+        if keyword in parts:
+            return parts[parts.index(keyword) + 1]
+
+    return None
+
 
 class CursorProxy(wrapt.ObjectProxy):
     def __init__(self, cursor, connection_proxy):
