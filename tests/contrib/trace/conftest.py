@@ -1,3 +1,4 @@
+import psycopg2
 import pymongo
 import pytest
 import redis
@@ -188,5 +189,18 @@ def handler_with_trace_auto_db_pymongo(iopipe_with_trace_auto_db):
         db.my_collection.insert_one({"x": 10})
         db.my_collection.find_one()
         db.my_collection.update_one({"x": 10}, {"$inc": {"x": 3}})
+
+    return iopipe_with_trace_auto_db, _handler
+
+
+@pytest.fixture
+def handler_with_trace_auto_db_psycopg2(iopipe_with_trace_auto_db):
+    @iopipe_with_trace_auto_db
+    def _handler(event, context):
+        conn = psycopg2.connect("postgres://username:password@localhost:5432/foobar")
+        cur = conn.cursor()
+        cur.execute("INSERT INTO test (num, data) VALUES (%s, %s)", (100, "abc'def"))
+        cur.execute("SELECT * FROM test;")
+        cur.fetchone()
 
     return iopipe_with_trace_auto_db, _handler

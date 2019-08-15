@@ -275,3 +275,24 @@ def test_trace_plugin__auto_db__pymongo(
 
     assert db_traces[0]["request"]["command"] == "insert_one"
     assert db_traces[2]["request"]["command"] == "update"
+
+
+@mock.patch("psycopg2.connect")
+@mock.patch("iopipe.report.send_report", autospec=True)
+def test_trace_plugin__auto_db__psycopg2(
+    mock_send_report, mock_connect, handler_with_trace_auto_db_psycopg2, mock_context
+):
+    mock_connect.return_value.dsn = "postgres://username:password@localhost:5432/foobar"
+    mock_connect.return_value.cursor.return_value.query = "SELECT * FROM test"
+
+    iopipe, handler = handler_with_trace_auto_db_psycopg2
+
+    assert len(iopipe.config["plugins"]) == 1
+
+    handler({}, mock_context)
+
+    assert len(iopipe.report.performance_entries) == 0
+
+    db_traces = iopipe.report.db_trace_entries
+
+    assert len(db_traces) == 2
