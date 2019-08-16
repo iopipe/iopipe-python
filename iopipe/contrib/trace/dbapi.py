@@ -44,12 +44,16 @@ class ConnectionProxy(wrapt.ObjectProxy):
         return CursorProxy(cursor, self)
 
     @property
+    def extract_dbname(self):  # pragma: no cover
+        return self._self_kwargs.get("db", self._self_kwargs.get("database", ""))
+
+    @property
     def extract_hostname(self):  # pragma: no cover
         return self._self_kwargs.get("host", "localhost")
 
     @property
-    def extract_dbname(self):  # pragma: no cover
-        return self._self_kwargs.get("db", self._self_kwargs.get("database", ""))
+    def extract_port(self):  # pragma: no cover
+        return self._self_kwargs.get("port")
 
 
 class AdapterProxy(wrapt.ObjectProxy):

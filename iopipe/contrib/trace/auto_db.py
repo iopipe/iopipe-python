@@ -10,6 +10,10 @@ Request = collections.namedtuple(
 )
 
 
+def collect_mysql_metrics(context, trace, instance):
+    pass
+
+
 def collect_psycopg2_metrics(context, trace, instance):
     from psycopg2.extensions import parse_dsn
 
@@ -114,6 +118,107 @@ def collect_redis_metrics(context, trace, args, connection):
     context.iopipe.mark.db_trace(trace, "redis", request)
 
 
+def patch_mysqldb(context):
+    """
+    Monkey patches mysqldb client, if available. Overloads the
+    execute method to add tracing and metrics collection.
+    """
+
+    class _CursorProxy(CursorProxy):
+        def execute(self, *args, **kwargs):
+            if not hasattr(context, "iopipe") or not hasattr(
+                context.iopipe, "mark"
+            ):  # pragma: no cover
+                self.__wrapped__.execute(*args, **kwargs)
+                return
+
+            id = ensure_utf8(str(uuid.uuid4()))
+            with context.iopipe.mark(id):
+                self.__wrapped__.execute(*args, **kwargs)
+            trace = context.iopipe.mark.measure(id)
+            context.iopipe.mark.delete(id)
+            collect_mysql_metrics(context, trace, self)
+
+    class _ConnectionProxy(ConnectionProxy):
+        def cursor(self, *args, **kwargs):
+            cursor = self.__wrapped__.cursor(*args, **kwargs)
+            return _CursorProxy(cursor, self)
+
+    def connect_wrapper(wrapped, instance, args, kwargs):
+        connection = wrapped(*args, **kwargs)
+        return _ConnectionProxy(connection, args, kwargs)
+
+    for module, attr, wrapper in [
+        ("MySQLdb", "connect", connect_wrapper),
+        ("MySQLdb", "Connection", connect_wrapper),
+        ("MySQLdb", "Connect", connect_wrapper),
+    ]:
+        try:
+            wrapt.wrap_function_wrapper(module, attr, wrapper)
+        except Exception:  # pragma: no cover
+            pass
+
+
+def patch_psycopg2(context):
+    """
+    Monkey patches psycopg2 client, if available. Overloads the
+    execute method to add tracing and metrics collection.
+    """
+
+    class _CursorProxy(CursorProxy):
+        def execute(self, *args, **kwargs):
+            if not hasattr(context, "iopipe") or not hasattr(
+                context.iopipe, "mark"
+            ):  # pragma: no cover
+                self.__wrapped__.execute(*args, **kwargs)
+                return
+
+            id = ensure_utf8(str(uuid.uuid4()))
+            with context.iopipe.mark(id):
+                self.__wrapped__.execute(*args, **kwargs)
+            trace = context.iopipe.mark.measure(id)
+            context.iopipe.mark.delete(id)
+            collect_psycopg2_metrics(context, trace, self)
+
+    class _ConnectionProxy(ConnectionProxy):
+        def cursor(self, *args, **kwargs):
+            cursor = self.__wrapped__.cursor(*args, **kwargs)
+            return _CursorProxy(cursor, self)
+
+    def adapt_wrapper(wrapped, instance, args, kwargs):
+        adapter = wrapped(*args, **kwargs)
+        return AdapterProxy(adapter) if hasattr(adapter, "prepare") else adapter
+
+    def connect_wrapper(wrapped, instance, args, kwargs):
+        connection = wrapped(*args, **kwargs)
+        return _ConnectionProxy(connection, args, kwargs)
+
+    def register_type_wrapper(wrapped, instance, args, kwargs):
+        def _extract_arguments(obj, scope=None):
+            return obj, scope
+
+        obj, scope = _extract_arguments(*args, **kwargs)
+
+        if scope is not None:
+            if isinstance(scope, wrapt.ObjectProxy):
+                scope = scope.__wrapped__
+            return wrapped(obj, scope)
+
+        return wrapped(obj)
+
+    for module, attr, wrapper in [
+        ("psycopg2", "connect", connect_wrapper),
+        ("psycopg2.extensions", "adapt", adapt_wrapper),
+        ("psycopg2.extensions", "register_type", register_type_wrapper),
+        ("psycopg2._psycopg", "register_type", register_type_wrapper),
+        ("psycopg2._json", "register_type", register_type_wrapper),
+    ]:
+        try:
+            wrapt.wrap_function_wrapper(module, attr, wrapper)
+        except Exception:  # pragma: no cover
+            pass
+
+
 def patch_pymongo(context):
     """
     Monkey patches pymongo client, if available. Overloads the
@@ -134,33 +239,30 @@ def patch_pymongo(context):
         collect_pymongo_metrics(context, trace, instance, response)
         return response
 
-    try:
-        wrapt.wrap_function_wrapper("pymongo.collection", "Collection.find", wrapper)
-    except Exception:  # pragma: no cover
-        pass
-    else:
-        for class_method in (
-            "bulk_write",
-            "delete_many",
-            "delete_one",
-            "insert_many",
-            "insert_one",
-            "replace_one",
-            "update_many",
-            "update_one",
-        ):
-            wrapt.wrap_function_wrapper(
-                "pymongo.collection", "Collection.%s" % class_method, wrapper
-            )
+    for module, attr, _wrapper in [
+        ("pymongo.collection", "Collection.find", wrapper),
+        ("pymongo.collection", "Collection.bulk_write", wrapper),
+        ("pymongo.collection", "Collection.delete_many", wrapper),
+        ("pymongo.collection", "Collection.delete_one", wrapper),
+        ("pymongo.collection", "Collection.insert_many", wrapper),
+        ("pymongo.collection", "Collection.insert_one", wrapper),
+        ("pymongo.collection", "Collection.replace_one", wrapper),
+        ("pymongo.collection", "Collection.update_many", wrapper),
+        ("pymongo.collection", "Collection.update_one", wrapper),
+    ]:
+        try:
+            wrapt.wrap_function_wrapper(module, attr, _wrapper)
+        except Exception:  # pragma: no cover
+            pass
 
 
-def patch_psycopg2(context):
+def patch_pymysql(context):
     """
-    Monkey patches psycopg2 client, if available. Overloads the
+    Monkey patches pymysql client, if available. Overloads the
     execute method to add tracing and metrics collection.
     """
 
-    class PGCursorProxy(CursorProxy):
+    class _CursorProxy(CursorProxy):
         def execute(self, *args, **kwargs):
             if not hasattr(context, "iopipe") or not hasattr(
                 context.iopipe, "mark"
@@ -173,49 +275,21 @@ def patch_psycopg2(context):
                 self.__wrapped__.execute(*args, **kwargs)
             trace = context.iopipe.mark.measure(id)
             context.iopipe.mark.delete(id)
-            collect_psycopg2_metrics(context, trace, self)
+            collect_mysql_metrics(context, trace, self)
 
-    class PGConnectionProxy(ConnectionProxy):
+    class _ConnectionProxy(ConnectionProxy):
         def cursor(self, *args, **kwargs):
             cursor = self.__wrapped__.cursor(*args, **kwargs)
-            return PGCursorProxy(cursor, self)
-
-    def adapt_wrapper(wrapped, instance, args, kwargs):
-        adapter = wrapped(*args, **kwargs)
-        return AdapterProxy(adapter) if hasattr(adapter, "prepare") else adapter
+            return _CursorProxy(cursor, self)
 
     def connect_wrapper(wrapped, instance, args, kwargs):
         connection = wrapped(*args, **kwargs)
-        return PGConnectionProxy(connection, args, kwargs)
-
-    def register_type_wrapper(wrapped, instance, args, kwargs):
-        def _extract_arguments(obj, scope=None):
-            return obj, scope
-
-        obj, scope = _extract_arguments(*args, **kwargs)
-
-        if scope is not None:
-            if isinstance(scope, wrapt.ObjectProxy):
-                scope = scope.__wrapped__
-            return wrapped(obj, scope)
-
-        return wrapped(obj)
+        return _ConnectionProxy(connection, args, kwargs)
 
     try:
-        wrapt.wrap_function_wrapper("psycopg2", "connect", connect_wrapper)
+        wrapt.wrap_function_wrapper("pymysql", "connect", connect_wrapper)
     except Exception:  # pragma: no cover
         pass
-    else:
-        wrapt.wrap_function_wrapper("psycopg2.extensions", "adapt", adapt_wrapper)
-        wrapt.wrap_function_wrapper(
-            "psycopg2.extensions", "register_type", register_type_wrapper
-        )
-        wrapt.wrap_function_wrapper(
-            "psycopg2._psycopg", "register_type", register_type_wrapper
-        )
-        wrapt.wrap_function_wrapper(
-            "psycopg2._json", "register_type", register_type_wrapper
-        )
 
 
 def patch_redis(context):
@@ -259,16 +333,15 @@ def patch_redis(context):
         )
         return response
 
-    try:
-        wrapt.wrap_function_wrapper("redis.client", "Redis.execute_command", wrapper)
-    except Exception:  # pragma: no cover
-        pass
-    else:
-        for module_name, class_method in [
-            ("redis.client", "Pipeline.execute"),
-            ("redis.client", "Pipeline.immediate_execute_command"),
-        ]:
-            wrapt.wrap_function_wrapper(module_name, class_method, pipeline_wrapper)
+    for module, attr, _wrapper in [
+        ("redis.client", "Redis.execute_command", wrapper),
+        ("redis.client", "Pipeline.execute", wrapper),
+        ("redis.client", "Pipeline.immediate_execute_command", wrapper),
+    ]:
+        try:
+            wrapt.wrap_function_wrapper(module, attr, _wrapper)
+        except Exception:  # pragma: no cover
+            pass
 
 
 def restore_psycopg2():
@@ -357,8 +430,10 @@ def patch_db_requests(context):
     if not hasattr(context, "iopipe"):
         return
 
+    patch_mysqldb(context)
     patch_psycopg2(context)
     patch_pymongo(context)
+    patch_pymysql(context)
     patch_redis(context)
 
 
