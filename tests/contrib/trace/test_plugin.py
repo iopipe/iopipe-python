@@ -275,3 +275,39 @@ def test_trace_plugin__auto_db__pymongo(
 
     assert db_traces[0]["request"]["command"] == "insert_one"
     assert db_traces[2]["request"]["command"] == "update"
+
+
+@mock.patch("psycopg2.connect")
+@mock.patch("iopipe.report.send_report", autospec=True)
+def test_trace_plugin__auto_db__psycopg2(
+    mock_send_report, mock_connect, handler_with_trace_auto_db_psycopg2, mock_context
+):
+    mock_connect.return_value.dsn = "postgres://username:password@localhost:5432/foobar"
+    type(mock_connect.return_value.cursor.return_value).query = mock.PropertyMock(
+        side_effect=[
+            "INSERT INTO test (num, data) VALUES (%s, %s)",
+            "SELECT * FROM test",
+        ]
+    )
+
+    iopipe, handler = handler_with_trace_auto_db_psycopg2
+
+    assert len(iopipe.config["plugins"]) == 1
+
+    handler({}, mock_context)
+
+    assert len(iopipe.report.performance_entries) == 0
+
+    db_traces = iopipe.report.db_trace_entries
+
+    assert len(db_traces) == 2
+
+    for db_trace in db_traces:
+        assert db_trace["dbType"] == "postgresql"
+        assert db_trace["request"]["hostname"] == "localhost"
+        assert db_trace["request"]["port"] == "5432"
+        assert db_trace["request"]["db"] == "foobar"
+        assert db_trace["request"]["table"] == "test"
+
+    assert db_traces[0]["request"]["command"] == "insert"
+    assert db_traces[1]["request"]["command"] == "select"
