@@ -10,12 +10,35 @@ Request = collections.namedtuple(
 )
 
 
-def collect_mysql_metrics(context, trace, instance):
-    pass
+def collect_mysql_metrics(context, trace, instance, args):
+    connection = instance.connection_proxy
+
+    db = connection.extract_db
+    hostname = connection.extract_hostname
+    port = connection.extract_port
+
+    query = args[0]
+    command = query.split()[0].lower()
+    table = table_name(query, command)
+
+    request = Request(
+        command=ensure_utf8(command),
+        key=None,
+        hostname=ensure_utf8(hostname),
+        port=ensure_utf8(port),
+        connectionName=None,
+        db=ensure_utf8(db),
+        table=ensure_utf8(table),
+    )
+    request = request._asdict()
+    context.iopipe.mark.db_trace(trace, "mysql", request)
 
 
 def collect_psycopg2_metrics(context, trace, instance):
-    from psycopg2.extensions import parse_dsn
+    try:
+        from psycopg2.extensions import parse_dsn
+    except ImportError:  # pragma: no cover
+        from .dbapi import parse_dsn
 
     connection = instance.connection_proxy
     dsn = parse_dsn(connection.dsn)
@@ -137,7 +160,7 @@ def patch_mysqldb(context):
                 self.__wrapped__.execute(*args, **kwargs)
             trace = context.iopipe.mark.measure(id)
             context.iopipe.mark.delete(id)
-            collect_mysql_metrics(context, trace, self)
+            collect_mysql_metrics(context, trace, self, args)
 
     class _ConnectionProxy(ConnectionProxy):
         def cursor(self, *args, **kwargs):
@@ -275,7 +298,7 @@ def patch_pymysql(context):
                 self.__wrapped__.execute(*args, **kwargs)
             trace = context.iopipe.mark.measure(id)
             context.iopipe.mark.delete(id)
-            collect_mysql_metrics(context, trace, self)
+            collect_mysql_metrics(context, trace, self, args)
 
     class _ConnectionProxy(ConnectionProxy):
         def cursor(self, *args, **kwargs):
@@ -344,6 +367,18 @@ def patch_redis(context):
             pass
 
 
+def restore_mysqldb():
+    """Restores mysqldb"""
+    try:
+        import MySQLdb
+    except ImportError:  # pragma: no cover
+        pass
+    else:
+        setattr(
+            MySQLdb, "connect", getattr(MySQLdb.connect, "__wrapped__", MySQLdb.connect)
+        )
+
+
 def restore_psycopg2():
     """Restores psycopg2"""
     try:
@@ -410,6 +445,18 @@ def restore_pymongo():
                 )
 
 
+def restore_pymysql():
+    """Restores pymysql"""
+    try:
+        import pymysql
+    except ImportError:  # pragma: no cover
+        pass
+    else:
+        setattr(
+            pymysql, "connect", getattr(pymysql.connect, "__wrapped__", pymysql.connect)
+        )
+
+
 def restore_redis():
     """Restores the redis client"""
     try:
@@ -438,6 +485,8 @@ def patch_db_requests(context):
 
 
 def restore_db_requests():
+    restore_mysqldb()
     restore_psycopg2()
     restore_pymongo()
+    restore_pymysql()
     restore_redis()
