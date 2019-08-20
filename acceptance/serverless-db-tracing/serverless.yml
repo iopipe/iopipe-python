@@ -14,6 +14,9 @@ provider:
     POSTGRES_HOST: ${self:custom.postgres.host}
     POSTGRES_PORT: ${self:custom.postgres.port}
 
+package:
+  individually: true
+
 custom:
   postgres:
     host:
