@@ -1,4 +1,4 @@
-service: iopipe-py-acceptance-test-serverless-db-tracing
+service: iopipe-py-acceptance-test-db-trace
 
 provider:
   name: aws
@@ -7,46 +7,45 @@ provider:
   region: us-west-2
   role: ${env:IAM_ROLE}
   environment:
+    DB_NAME: ${env:DB_NAME}
+    DB_PASSWORD: ${env:DB_PASSWORD}
+    DB_USERNAME: ${env:DB_USERNAME}
     IOPIPE_TOKEN: ${env:IOPIPE_TOKEN}
-    POSTGRES_DSN: postgres://${env:DB_USERNAME}:${env:DB_PASSWORD}@${self:custom.postgres.host}:${self:custom.postgres.port}/${env:DB_NAME}
+    POSTGRES_HOST: ${self:custom.postgres.host}
+    POSTGRES_PORT: ${self:custom.postgres.port}
 
 custom:
   postgres:
     host:
-      Fn::GetAtt: [PostgreSqlRDSInstance, Endpoint.Address]
+      Fn::GetAtt: [PostgreSQLRDSInstance, Endpoint.Address]
     port:
-      Fn::GetAtt: [PostgreSqlRDSInstance, Endpoint.Port]
-
-package:
-  exclude:
-    - ./**
-  include:
-    - handler.py
+      Fn::GetAtt: [PostgreSQLRDSInstance, Endpoint.Port]
 
 functions:
   py27-psycopg2:
     events:
       - schedule: rate(5 minutes)
-    handler: handler._psycopg2
+    handler: handler.postgres
     runtime: python2.7
   py36-psycopg2:
     events:
       - schedule: rate(5 minutes)
-    handler: handler._psycopg2
+    handler: handler.postgres
     runtime: python3.6
   py37-psycopg2:
     events:
       - schedule: rate(5 minutes)
-    handler: handler._psycopg2
+    handler: handler.postgres
     runtime: python3.7
 
 plugins:
-  - serverless-python-requirements
+
   - serverless-pseudo-parameters
+  - serverless-python-requirements
 
 resources:
   Resources:
-    PostgreSqlRDSInstance:
+    PostgreSQLRDSInstance:
       Type: AWS::RDS::DBInstance
       Properties:
         AllocatedStorage: 10

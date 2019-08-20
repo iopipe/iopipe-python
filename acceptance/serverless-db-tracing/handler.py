@@ -10,8 +10,17 @@ iopipe = IOpipeCore(debug=True, plugins=[trace_plugin])
 
 
 @iopipe
-def _psycopg2(event, context):
-    conn = psycopg2.connect(os.getenv("POSTGRES_DSN"))
+def postgres(event, context):
+    conn = psycopg2.connect(
+        "postgres://%s:%s@%s:%s/%s"
+        % (
+            os.environ["DB_USERNAME"],
+            os.environ["DB_PASSWORD"],
+            os.environ["POSTGRES_HOST"],
+            os.environ["POSTGRES_PORT"],
+            os.environ["DB_NAME"],
+        )
+    )
     cur = conn.cursor()
 
     cur.execute("CREATE TABLE test (id serial PRIMARY KEY, num integer, data varchar);")
