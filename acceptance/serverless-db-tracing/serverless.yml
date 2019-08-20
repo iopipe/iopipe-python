@@ -14,9 +14,6 @@ provider:
     POSTGRES_HOST: ${self:custom.postgres.host}
     POSTGRES_PORT: ${self:custom.postgres.port}
 
-package:
-  individually: true
-
 custom:
   postgres:
     host:
@@ -25,24 +22,13 @@ custom:
       Fn::GetAtt: [PostgreSQLRDSInstance, Endpoint.Port]
 
 functions:
-  py27-psycopg2:
-    events:
-      - schedule: rate(5 minutes)
-    handler: handler.postgres
-    runtime: python2.7
   py36-psycopg2:
     events:
       - schedule: rate(5 minutes)
     handler: handler.postgres
     runtime: python3.6
-  py37-psycopg2:
-    events:
-      - schedule: rate(5 minutes)
-    handler: handler.postgres
-    runtime: python3.7
 
 plugins:
-
   - serverless-pseudo-parameters
   - serverless-python-requirements
 
