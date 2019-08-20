@@ -1,0 +1,57 @@
+service: iopipe-py-acceptance-test-serverless-db-tracing
+
+provider:
+  name: aws
+  runtime: python3.6
+  stage: master
+  region: us-west-2
+  role: ${env:IAM_ROLE}
+  environment:
+    IOPIPE_TOKEN: ${env:IOPIPE_TOKEN}
+    POSTGRES_DSN: postgres://${env:DB_USERNAME}:${env:DB_PASSWORD}@${self:custom.postgres.host}:${self:custom.postgres.port}/${env:DB_NAME}
+
+custom:
+  postgres:
+    host:
+      Fn::GetAtt: [PostgreSqlRDSInstance, Endpoint.Address]
+    port:
+      Fn::GetAtt: [PostgreSqlRDSInstance, Endpoint.Port]
+
+package:
+  exclude:
+    - ./**
+  include:
+    - handler.py
+
+functions:
+  py27-psycopg2:
+    events:
+      - schedule: rate(5 minutes)
+    handler: handler._psycopg2
+    runtime: python2.7
+  py36-psycopg2:
+    events:
+      - schedule: rate(5 minutes)
+    handler: handler._psycopg2
+    runtime: python3.6
+  py37-psycopg2:
+    events:
+      - schedule: rate(5 minutes)
+    handler: handler._psycopg2
+    runtime: python3.7
+
+plugins:
+  - serverless-python-requirements
+
+resources:
+  Resources:
+    PostgreSqlRDSInstance:
+      Type: AWS::RDS::DBInstance
+      Properties:
+        AllocatedStorage: 10
+        DBInstanceClass: db.t2.micro
+        DBName: ${env:DB_NAME}
+        Engine: postgres
+        MasterUserPassword: ${env:DB_PASSWORD}
+        MasterUsername: ${env:DB_USERNAME}
+        PubliclyAccessible: true

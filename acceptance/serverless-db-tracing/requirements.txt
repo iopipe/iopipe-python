@@ -1,0 +1,2 @@
+git+git://github.com/iopipe/iopipe-python.git@master#egg=iopipe
+psycopg2-binary

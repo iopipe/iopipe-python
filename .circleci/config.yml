@@ -86,6 +86,7 @@ jobs:
           name: Deploy acceptance tests
           command: |
             cd acceptance/serverless && npm install && sls deploy --conceal
+            cd ../serverless-db-tracing && npm install && sls deploy --conceal
             cd ../serverless-layers && sls deploy --conceal
             cd ../serverless-py37 && npm install && sls deploy --conceal
             cd ../serverless-wsgi && npm install && sls deploy --conceal
