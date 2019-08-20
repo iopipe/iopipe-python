@@ -42,6 +42,7 @@ functions:
 
 plugins:
   - serverless-python-requirements
+  - serverless-pseudo-parameters
 
 resources:
   Resources:
