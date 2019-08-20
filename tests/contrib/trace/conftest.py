@@ -1,5 +1,7 @@
+import MySQLdb
 import psycopg2
 import pymongo
+import pymysql
 import pytest
 import redis
 import requests
@@ -200,7 +202,45 @@ def handler_with_trace_auto_db_psycopg2(iopipe_with_trace_auto_db):
         conn = psycopg2.connect("postgres://username:password@localhost:5432/foobar")
         cur = conn.cursor()
         cur.execute("INSERT INTO test (num, data) VALUES (%s, %s)", (100, "abc'def"))
-        cur.execute("SELECT * FROM test;")
+        cur.execute("SELECT * FROM test")
+        cur.fetchone()
+
+    return iopipe_with_trace_auto_db, _handler
+
+
+@pytest.fixture
+def handler_with_trace_auto_db_mysqldb(iopipe_with_trace_auto_db):
+    @iopipe_with_trace_auto_db
+    def _handler(event, context):
+        conn = MySQLdb.connect(
+            db="foobar",
+            host="localhost",
+            port="3306",
+            user="username",
+            passwd="password",
+        )
+        cur = conn.cursor()
+        cur.execute("INSERT INTO test (num, data) VALUES (%s, %s)", (100, "abc'def"))
+        cur.execute("SELECT * FROM test")
+        cur.fetchone()
+
+    return iopipe_with_trace_auto_db, _handler
+
+
+@pytest.fixture
+def handler_with_trace_auto_db_pymysql(iopipe_with_trace_auto_db):
+    @iopipe_with_trace_auto_db
+    def _handler(event, context):
+        conn = pymysql.connect(
+            db="foobar",
+            host="localhost",
+            port="3306",
+            user="username",
+            passwd="password",
+        )
+        cur = conn.cursor()
+        cur.execute("INSERT INTO test (num, data) VALUES (%s, %s)", (100, "abc'def"))
+        cur.execute("SELECT * FROM test")
         cur.fetchone()
 
     return iopipe_with_trace_auto_db, _handler

@@ -9,6 +9,10 @@ COMMAND_KEYWORDS = {
 }
 
 
+def parse_dsn(dsn):
+    return dict(attr.split("=") for attr in dsn.split() if "=" in attr)
+
+
 def table_name(query, command):
     if command in COMMAND_KEYWORDS:
         keyword = COMMAND_KEYWORDS[command]
@@ -44,12 +48,16 @@ class ConnectionProxy(wrapt.ObjectProxy):
         return CursorProxy(cursor, self)
 
     @property
-    def extract_hostname(self):  # pragma: no cover
+    def extract_db(self):
+        return self._self_kwargs.get("db", self._self_kwargs.get("database", ""))
+
+    @property
+    def extract_hostname(self):
         return self._self_kwargs.get("host", "localhost")
 
     @property
-    def extract_dbname(self):  # pragma: no cover
-        return self._self_kwargs.get("db", self._self_kwargs.get("database", ""))
+    def extract_port(self):
+        return self._self_kwargs.get("port")
 
 
 class AdapterProxy(wrapt.ObjectProxy):

@@ -1,5 +1,7 @@
+import MySQLdb
 import psycopg2
 from pymongo.collection import Collection
+import pymysql
 from redis.client import Pipeline, Redis
 import wrapt
 
@@ -19,6 +21,9 @@ pymongo_collection_class_methods = (
 
 def test_patch_db_requests(mock_context_wrapper,):
     """Asserts that monkey patching occurs if iopipe present"""
+    assert not hasattr(MySQLdb.connect, "__wrapped__")
+    assert not hasattr(pymysql.connect, "__wrapped__")
+
     assert not isinstance(psycopg2.connect, wrapt.ObjectProxy)
 
     assert not hasattr(Redis.execute_command, "__wrapped__")
@@ -30,6 +35,9 @@ def test_patch_db_requests(mock_context_wrapper,):
 
     patch_db_requests(mock_context_wrapper)
 
+    assert hasattr(MySQLdb.connect, "__wrapped__")
+    assert hasattr(pymysql.connect, "__wrapped__")
+
     assert isinstance(psycopg2.connect, wrapt.ObjectProxy)
 
     assert hasattr(Redis.execute_command, "__wrapped__")
@@ -40,6 +48,9 @@ def test_patch_db_requests(mock_context_wrapper,):
         assert hasattr(getattr(Collection, class_method), "__wrapped__")
 
     restore_db_requests()
+
+    assert not hasattr(MySQLdb.connect, "__wrapped__")
+    assert not hasattr(pymysql.connect, "__wrapped__")
 
     assert not isinstance(psycopg2.connect, wrapt.ObjectProxy)
 
@@ -53,6 +64,9 @@ def test_patch_db_requests(mock_context_wrapper,):
 
 def test_patch_db_requests_no_iopipe(mock_context,):
     """Asserts that monkey patching does not occur if IOpipe not present"""
+    assert not hasattr(MySQLdb.connect, "__wrapped__")
+    assert not hasattr(pymysql.connect, "__wrapped__")
+
     assert not isinstance(psycopg2.connect, wrapt.ObjectProxy)
 
     assert not hasattr(Redis.execute_command, "__wrapped__")
@@ -65,6 +79,9 @@ def test_patch_db_requests_no_iopipe(mock_context,):
     delattr(mock_context, "iopipe")
 
     patch_db_requests(mock_context)
+
+    assert not hasattr(MySQLdb.connect, "__wrapped__")
+    assert not hasattr(pymysql.connect, "__wrapped__")
 
     assert not isinstance(psycopg2.connect, wrapt.ObjectProxy)
 
