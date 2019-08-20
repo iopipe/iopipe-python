@@ -24,9 +24,9 @@ def postgres(event, context):
     cur = conn.cursor()
 
     cur.execute("CREATE TABLE test (id serial PRIMARY KEY, num integer, data varchar);")
-    cur.execute("INSERT INTO test (num, data) VALUES (%s, %s)", ...(100, "abc'def"))
+    cur.execute("INSERT INTO test (num, data) VALUES (%s, %s)", (100, "abcdef"))
 
-    cur.execute("SELECT * FROM test;")
+    cur.execute("SELECT * FROM test")
     cur.fetchone()
 
     cur.close()
