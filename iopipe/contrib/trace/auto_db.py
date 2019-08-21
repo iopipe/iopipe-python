@@ -34,7 +34,7 @@ def collect_mysql_metrics(context, trace, instance, args):
     context.iopipe.mark.db_trace(trace, "mysql", request)
 
 
-def collect_psycopg2_metrics(context, trace, instance):
+def collect_psycopg2_metrics(context, trace, instance, args):
     try:
         from psycopg2.extensions import parse_dsn
     except ImportError:  # pragma: no cover
@@ -50,6 +50,9 @@ def collect_psycopg2_metrics(context, trace, instance):
     query = instance.query
     command = query.split()[0].lower()
     table = table_name(query, command)
+
+    if not table and args:  # pragma: no cover
+        table = table_name(args[0], command)
 
     request = Request(
         command=ensure_utf8(command),
@@ -201,7 +204,7 @@ def patch_psycopg2(context):
                 self.__wrapped__.execute(*args, **kwargs)
             trace = context.iopipe.mark.measure(id)
             context.iopipe.mark.delete(id)
-            collect_psycopg2_metrics(context, trace, self)
+            collect_psycopg2_metrics(context, trace, self, args)
 
     class _ConnectionProxy(ConnectionProxy):
         def cursor(self, *args, **kwargs):
