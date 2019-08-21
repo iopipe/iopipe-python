@@ -51,7 +51,7 @@ def collect_psycopg2_metrics(context, trace, instance, args):
     command = query.split()[0].lower()
     table = table_name(query, command)
 
-    if not table and args:
+    if not table and args:  # pragma: no cover
         table = table_name(args[0], command)
 
     request = Request(
