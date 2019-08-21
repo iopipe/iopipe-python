@@ -1,7 +1,7 @@
 import os
 
-import MySQLdb
 import psycopg2
+import pymysql
 
 from iopipe import IOpipeCore
 from iopipe.contrib.trace import TracePlugin
@@ -11,8 +11,8 @@ iopipe = IOpipeCore(debug=True, plugins=[trace_plugin])
 
 
 @iopipe
-def _mysqldb(event, context):
-    conn = MySQLdb.connect(
+def _pymysql(event, context):
+    conn = pymysql.connect(
         dbname=os.environ["DB_NAME"],
         host=os.environ["MYSQL_HOST"],
         passwd=os.environ["DB_PASSWORD"],

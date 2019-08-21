@@ -29,10 +29,10 @@ custom:
       Fn::GetAtt: [PostgreSQLRDSInstance, Endpoint.Port]
 
 functions:
-  py36-mysqldb:
+  py36-pymysql:
     events:
       - schedule: rate(5 minutes)
-    handler: handler._mysqldb
+    handler: handler._pymysql
     runtime: python3.6
   py36-psycopg2:
     events:
