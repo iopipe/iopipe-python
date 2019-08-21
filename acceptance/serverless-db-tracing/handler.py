@@ -13,11 +13,11 @@ iopipe = IOpipeCore(debug=True, plugins=[trace_plugin])
 @iopipe
 def _pymysql(event, context):
     conn = pymysql.connect(
-        dbname=os.environ["DB_NAME"],
+        db=os.environ["DB_NAME"],
         host=os.environ["MYSQL_HOST"],
-        passwd=os.environ["DB_PASSWORD"],
+        password=os.environ["DB_PASSWORD"],
         port=os.environ["MYSQL_PORT"],
-        username=os.environ["DB_USERNAME"],
+        user=os.environ["DB_USERNAME"],
     )
     cur = conn.cursor()
 
@@ -27,7 +27,6 @@ def _pymysql(event, context):
     cur.execute("SELECT * FROM test")
     cur.fetchone()
 
-    cur.close()
     conn.close()
 
 
