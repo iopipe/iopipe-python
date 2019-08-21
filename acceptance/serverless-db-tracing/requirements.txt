@@ -1,2 +1,3 @@
 git+git://github.com/iopipe/iopipe-python.git@master#egg=iopipe
+mysqlclient
 psycopg2-binary
