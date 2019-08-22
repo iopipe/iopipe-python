@@ -16,7 +16,7 @@ def _pymysql(event, context):
         db=os.environ["DB_NAME"],
         host=os.environ["MYSQL_HOST"],
         password=os.environ["DB_PASSWORD"],
-        port=os.environ["MYSQL_PORT"],
+        port=int(os.environ["MYSQL_PORT"]),
         user=os.environ["DB_USERNAME"],
     )
     cur = conn.cursor()
