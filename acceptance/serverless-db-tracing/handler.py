@@ -22,13 +22,22 @@ def _pymysql(event, context):
     cur = conn.cursor()
 
     cur.execute(
-        "CREATE TABLE test (id int(11) NOT NULL AUTO_INCREMENT, num int(11), data varchar(255), PRIMARY KEY (id));"
+        """
+        CREATE TABLE IF NOT EXISTS test (
+            id int(11) NOT NULL AUTO_INCREMENT,
+            num int(11),
+            data varchar(255),
+            PRIMARY KEY (id)
+        );
+    """
     )
 
     cur.execute("INSERT INTO test (num, data) VALUES (%s, %s)", (100, "abcdef"))
 
     cur.execute("SELECT * FROM test")
     cur.fetchone()
+
+    cur.execute("DROP TABLE IF EXISTS test;")
 
     conn.close()
 
