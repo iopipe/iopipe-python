@@ -1,8 +1,9 @@
 import collections
+import sqlparse
 import uuid
 import wrapt
 
-from .dbapi import AdapterProxy, ConnectionProxy, CursorProxy, table_name
+from .dbapi import AdapterProxy, ConnectionProxy, CursorProxy
 from .util import ensure_utf8
 
 Request = collections.namedtuple(
@@ -17,9 +18,13 @@ def collect_mysql_metrics(context, trace, instance, args):
     hostname = connection.extract_hostname
     port = connection.extract_port
 
-    query = args[0]
-    command = query.split()[0].lower()
-    table = table_name(query, command)
+    command, table = None, None
+
+    query = sqlparse.parse(args[0])
+    if query:
+        query = query[0]
+        command = query.get_type()
+        table = query.get_name()
 
     request = Request(
         command=ensure_utf8(command),
@@ -47,12 +52,17 @@ def collect_psycopg2_metrics(context, trace, instance, args):
     hostname = dsn.get("host", "localhost")
     port = dsn.get("port", 5432)
 
-    query = instance.query
-    command = query.split()[0].lower()
-    table = table_name(query, command)
+    command, table = None, None
 
-    if not table and args:  # pragma: no cover
-        table = table_name(args[0], command)
+    query = sqlparse.parse(instance.query)
+
+    if not query and args:
+        query = sqlparse.parse(args[0])
+
+    if query:
+        query = query[0]
+        command = query.get_type()
+        table = query.get_name()
 
     request = Request(
         command=ensure_utf8(command),

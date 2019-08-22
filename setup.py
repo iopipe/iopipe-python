@@ -10,7 +10,7 @@ try:
 except (ImportError, OSError):
     README = open(os.path.join(os.path.dirname(__file__), "README.md"), "r").read()
 
-install_requires = ["wrapt"]
+install_requires = ["sqlparse", "wrapt"]
 if sys.version_info[0] == 2:
     install_requires.append("futures")
 

@@ -1,25 +1,8 @@
 import wrapt
 
-COMMAND_KEYWORDS = {
-    "create": "table",
-    "delete": "from",
-    "insert": "into",
-    "select": "from",
-    "update": "update",
-}
-
 
 def parse_dsn(dsn):
     return dict(attr.split("=") for attr in dsn.split() if "=" in attr)
-
-
-def table_name(query, command):
-    if command in COMMAND_KEYWORDS:
-        keyword = COMMAND_KEYWORDS[command]
-        parts = query.lower().split()
-
-        if keyword in parts:
-            return parts[parts.index(keyword) + 1]
 
 
 class CursorProxy(wrapt.ObjectProxy):

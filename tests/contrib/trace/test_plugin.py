@@ -309,8 +309,8 @@ def test_trace_plugin__auto_db__psycopg2(
         assert db_trace["request"]["db"] == "foobar"
         assert db_trace["request"]["table"] == "test"
 
-    assert db_traces[0]["request"]["command"] == "insert"
-    assert db_traces[1]["request"]["command"] == "select"
+    assert db_traces[0]["request"]["command"] == "INSERT"
+    assert db_traces[1]["request"]["command"] == "SELECT"
 
 
 @mock.patch("MySQLdb.connect")
@@ -337,8 +337,8 @@ def test_trace_plugin__auto_db__mysqldb(
         assert db_trace["request"]["db"] == "foobar"
         assert db_trace["request"]["table"] == "test"
 
-    assert db_traces[0]["request"]["command"] == "insert"
-    assert db_traces[1]["request"]["command"] == "select"
+    assert db_traces[0]["request"]["command"] == "INSERT"
+    assert db_traces[1]["request"]["command"] == "SELECT"
 
 
 @mock.patch("pymysql.connect")
@@ -365,5 +365,5 @@ def test_trace_plugin__auto_db__pymysql(
         assert db_trace["request"]["db"] == "foobar"
         assert db_trace["request"]["table"] == "test"
 
-    assert db_traces[0]["request"]["command"] == "insert"
-    assert db_traces[1]["request"]["command"] == "select"
+    assert db_traces[0]["request"]["command"] == "INSERT"
+    assert db_traces[1]["request"]["command"] == "SELECT"
