@@ -24,8 +24,16 @@ def test__event_types__alexa_skill(event_alexa_skill):
         "@iopipe/event-info.alexaSkill.%s" % key for key in event.keys
     ]
     assert list(event_info.keys()).sort() == expected_keys.sort()
-
     assert len(list(event_info.keys())) == 32
+
+    assert (
+        "@iopipe/event-info.alexaSkill.context.System.user.accessToken"
+        not in event_info
+    )
+    assert (
+        "@iopipe/event-info.alexaSkill.context.System.user.permissions.consentToken"
+        not in event_info
+    )
 
 
 def test__event_types__apigw(event_apigw):
@@ -65,6 +73,8 @@ def test__event_types__kinesis(event_kinesis):
         "@iopipe/event-info.kinesis.%s" % key for key in event.keys
     ]
     assert list(event_info.keys()).sort() == expected_keys.sort()
+
+    assert isinstance(event_info["@iopipe/event-info.kinesis.Records.length"], int)
 
 
 def test__event_types__scheduled(event_scheduled):
