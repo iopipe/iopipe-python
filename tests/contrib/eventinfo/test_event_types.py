@@ -1,5 +1,5 @@
 from iopipe.contrib.eventinfo import event_types as et
-from iopipe.contrib.eventinfo.util import get_value
+from iopipe.contrib.eventinfo.util import collect_all_keys, get_value
 
 
 def test__event_types__alb(event_alb):
@@ -152,3 +152,16 @@ def test__event_types__sqs(event_sqs):
         "@iopipe/event-info.sqs.%s" % key for key in event.keys
     ]
     assert list(event_info.keys()).sort() == expected_keys.sort()
+
+
+def test__collect_all_keys__coerce_types():
+    info = collect_all_keys(
+        {"foo": {"bar": {"baz": "123", "boo": "wut?"}}},
+        "@iopipe/event-info.test",
+        ["foo.bar.boo"],
+        {"foo.bar.baz": int},
+    )
+
+    assert "@iopipe/event-info.test.foo.bar.baz" in info
+    assert "@iopipe/event-info.test.foo.bar.boo" not in info
+    assert isinstance(info["@iopipe/event-info.test.foo.bar.baz"], int)
