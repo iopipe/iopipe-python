@@ -165,3 +165,17 @@ def test__collect_all_keys__coerce_types():
     assert "@iopipe/event-info.test.foo.bar.baz" in info
     assert "@iopipe/event-info.test.foo.bar.boo" not in info
     assert isinstance(info["@iopipe/event-info.test.foo.bar.baz"], int)
+
+
+def test__get_keys__coerce_types():
+    value1 = get_value(
+        {"foo": {"bar": {"baz": "123", "boo": "wut?"}}}, "foo.bar.baz", int
+    )
+
+    assert value1 == 123
+
+    value2 = get_value(
+        {"foo": {"bar": {"baz": "123", "boo": "wut?"}}}, "foo.bar.boo", int
+    )
+
+    assert value2 == "wut?"
