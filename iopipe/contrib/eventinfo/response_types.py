@@ -3,6 +3,7 @@ from .util import get_value
 
 class ResponseType(object):
     keys = []
+    coerce_types = {}
 
     def __init__(self, event_type):
         self.event_type = event_type
@@ -15,7 +16,7 @@ class ResponseType(object):
                 old_key, new_key = key
             else:
                 old_key = new_key = key
-            value = get_value(response, old_key)
+            value = get_value(response, old_key, self.coerce_types.get(old_key))
             if value is not None:
                 response_info[
                     "@iopipe/event-info.%s.response.%s" % (self.event_type, new_key)
@@ -26,3 +27,4 @@ class ResponseType(object):
 
 class LambdaProxy(ResponseType):
     keys = ["statusCode"]
+    coerce_types = {"statusCode": int}

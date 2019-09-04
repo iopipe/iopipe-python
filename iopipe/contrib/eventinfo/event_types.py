@@ -9,6 +9,7 @@ class EventType(object):
     required_keys = []
     response_type = None
     source = None
+    coerce_types = {}
 
     def __init__(self, event):
         self.event = event
@@ -25,7 +26,10 @@ class EventType(object):
     def collect(self):
         if self.keys == "all":
             event_info = collect_all_keys(
-                self.event, "@iopipe/event-info.%s" % self.type, self.exclude_keys
+                self.event,
+                "@iopipe/event-info.%s" % self.type,
+                self.exclude_keys,
+                self.coerce_types,
             )
             event_info["@iopipe/event-info.eventType"] = self.type
             return event_info
@@ -36,7 +40,7 @@ class EventType(object):
                 old_key, new_key = key
             else:
                 old_key = new_key = key
-            value = get_value(self.event, old_key)
+            value = get_value(self.event, old_key, self.coerce_types.get(old_key))
             if value is not None:
                 event_info["@iopipe/event-info.%s.%s" % (self.type, new_key)] = value
         event_info["@iopipe/event-info.eventType"] = self.type

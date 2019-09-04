@@ -1,5 +1,5 @@
 from iopipe.contrib.eventinfo import event_types as et
-from iopipe.contrib.eventinfo.util import get_value
+from iopipe.contrib.eventinfo.util import collect_all_keys, get_value
 
 
 def test__event_types__alb(event_alb):
@@ -24,8 +24,16 @@ def test__event_types__alexa_skill(event_alexa_skill):
         "@iopipe/event-info.alexaSkill.%s" % key for key in event.keys
     ]
     assert list(event_info.keys()).sort() == expected_keys.sort()
-
     assert len(list(event_info.keys())) == 32
+
+    assert (
+        "@iopipe/event-info.alexaSkill.context.System.user.accessToken"
+        not in event_info
+    )
+    assert (
+        "@iopipe/event-info.alexaSkill.context.System.user.permissions.consentToken"
+        not in event_info
+    )
 
 
 def test__event_types__apigw(event_apigw):
@@ -65,6 +73,8 @@ def test__event_types__kinesis(event_kinesis):
         "@iopipe/event-info.kinesis.%s" % key for key in event.keys
     ]
     assert list(event_info.keys()).sort() == expected_keys.sort()
+
+    assert isinstance(event_info["@iopipe/event-info.kinesis.Records.length"], int)
 
 
 def test__event_types__scheduled(event_scheduled):
@@ -142,3 +152,30 @@ def test__event_types__sqs(event_sqs):
         "@iopipe/event-info.sqs.%s" % key for key in event.keys
     ]
     assert list(event_info.keys()).sort() == expected_keys.sort()
+
+
+def test__collect_all_keys__coerce_types():
+    info = collect_all_keys(
+        {"foo": {"bar": {"baz": "123", "boo": "wut?"}}},
+        "@iopipe/event-info.test",
+        ["foo.bar.boo"],
+        {"foo.bar.baz": int},
+    )
+
+    assert "@iopipe/event-info.test.foo.bar.baz" in info
+    assert "@iopipe/event-info.test.foo.bar.boo" not in info
+    assert isinstance(info["@iopipe/event-info.test.foo.bar.baz"], int)
+
+
+def test__get_keys__coerce_types():
+    value1 = get_value(
+        {"foo": {"bar": {"baz": "123", "boo": "wut?"}}}, "foo.bar.baz", int
+    )
+
+    assert value1 == 123
+
+    value2 = get_value(
+        {"foo": {"bar": {"baz": "123", "boo": "wut?"}}}, "foo.bar.boo", int
+    )
+
+    assert value2 == "wut?"

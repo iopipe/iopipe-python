@@ -18,11 +18,17 @@ def _get_parser(path):
     return parser
 
 
-def get_value(obj, path):
+def get_value(obj, path, coerce_type=None):
     if path.endswith(".length"):
         path = path.replace(".length", "|length(@)")
     parser = _get_parser(path)
-    return parser.search(obj)
+    value = parser.search(obj)
+    if value is not None and callable(coerce_type):
+        try:
+            value = coerce_type(value)
+        except (TypeError, ValueError):
+            pass
+    return value
 
 
 def has_key(obj, path):
@@ -31,7 +37,7 @@ def has_key(obj, path):
     return result is not None
 
 
-def collect_all_keys(obj, initial_path, exclude_keys=None):
+def collect_all_keys(obj, initial_path, exclude_keys=None, coerce_types=None):
     out = {}
 
     def flatten(o, path=None):
@@ -44,8 +50,18 @@ def collect_all_keys(obj, initial_path, exclude_keys=None):
             for i, value in enumerate(o):
                 flatten(value, path + [str(i)])
         else:
-            if exclude_keys and ".".join(path[1:]) in exclude_keys:
+            short_key = ".".join(path[1:])
+            if exclude_keys and short_key in exclude_keys:
                 return
+            if (
+                coerce_types
+                and short_key in coerce_types
+                and callable(coerce_types[short_key])
+            ):
+                try:
+                    o = coerce_types[short_key](o)
+                except (TypeError, ValueError):
+                    pass
             out[".".join(path)] = o
 
     flatten(obj)

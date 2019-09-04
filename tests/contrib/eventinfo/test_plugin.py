@@ -152,6 +152,13 @@ def test__eventinfo_plugin__http_response(
             for m in metrics
         )
     )
+    assert all(
+        (
+            "n" in m
+            for m in metrics
+            if m["name"] == "@iopipe/event-info.apiGateway.response.statusCode"
+        )
+    )
 
     metric = next(
         (
