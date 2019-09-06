@@ -65,7 +65,9 @@ def auto_http(event, context):
 @iopipe_with_auto_http
 def auto_http_30k(event, context):
     for _ in range(30000):
-        requests.get("https://www.iopipe.com/static/logos/iopipe-logo.svg")
+        requests.get(
+            "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png"
+        )
 
 
 def baseline(event, context):
