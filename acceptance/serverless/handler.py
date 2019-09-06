@@ -62,6 +62,12 @@ def auto_http(event, context):
     client.list_buckets()
 
 
+@iopipe_with_auto_http
+def auto_http_30k(event, context):
+    for _ in range(30000):
+        requests.get("https://www.iopipe.com/static/logos/iopipe-logo.svg")
+
+
 def baseline(event, context):
     pass
 
@@ -100,7 +106,7 @@ def logging(event, context):
     # This should still work (backwards compatibility)
     context.iopipe.log("time", time.time())
 
-    print("I'm redirecting stdout")
+    print ("I'm redirecting stdout")
 
     context.iopipe.log.debug("I'm a debug message.")
     context.iopipe.log.info("I'm an info message.")

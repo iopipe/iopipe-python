@@ -58,6 +58,10 @@ functions:
       - schedule: rate(5 minutes)
     handler: handler.auto_http
     runtime: python3.6
+  py3-auto-http-30k:
+    handler: handler.auto_http_30k
+    runtime: python3.6
+    timeout: 900
 
   py2-baseline:
     events:
