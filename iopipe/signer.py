@@ -7,7 +7,23 @@ try:
 except ImportError:
     from botocore.vendored import requests
 
-from .collector import SUPPORTED_REGIONS
+# We don't have signers in all regions yet. Pick the nearest region in that case.
+SUPPORTED_REGIONS = {
+    "ap-northeast-1": "ap-northeast-1",
+    "ap-northeast-2": "ap-northeast-1",
+    "ap-south-1": "ap-southeast-2",
+    "ap-southeast-1": "ap-southeast-2",
+    "ap-southeast-2": "ap-southeast-2",
+    "ca-central-1": "us-east-2",
+    "eu-central-1": "eu-west-1",
+    "eu-west-1": "eu-west-1",
+    "eu-west-2": "eu-west-1",
+    "eu-east-1": "eu-east-1",
+    "us-east-2": "us-east-2",
+    "us-west-1": "us-west-1",
+    "us-west-2": "us-west-2",
+}
+
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +36,10 @@ def get_signer_hostname():
     :rtype str
     """
     region = os.getenv("AWS_REGION", "")
-    region = region if region and region in SUPPORTED_REGIONS else "us-west-2"
+    if region and region in SUPPORTED_REGIONS:
+        region = SUPPORTED_REGIONS[region]
+    else:
+        region = "us-west-2"
     return "signer.{region}.iopipe.com".format(region=region)
 
 
