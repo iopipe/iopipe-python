@@ -25,7 +25,7 @@ tests_require = [
     "psycopg2-binary==2.8.3",
     "pymongo==3.8.0",
     "PyMySQL==0.9.3",
-    "pytest==4.1.0",
+    "pytest==4.6.6",
     "pytest-benchmark==3.2.0",
     "redis==3.3.4",
     "requests",

@@ -47,7 +47,7 @@ jobs:
       - run:
           name: Check code style
           command: |
-            pip install black==19.3b0
+            pip install -q black==19.3b0
             black iopipe
             black tests
 
@@ -63,13 +63,13 @@ jobs:
           name: Generate coverage report
           command: |
             unset AWS_REGION IOPIPE_DEBUG IOPIPE_ENABLED IOPIPE_TIMEOUT_WINDOW IOPIPE_TOKEN
-            pip install ".[coverage]"
-            pip install -U attrs jsonscema
+            pip install -q ".[coverage]"
+            pip install -q -U attrs jsonschema
             pytest --cov=iopipe tests/
       - run:
           name: Upload coverage report
           command: |
-            pip install -U codecov
+            pip install -q -U codecov
             codecov
 
   acceptance:
@@ -104,7 +104,7 @@ jobs:
           name: Install release dependencies
           command: |
             sudo apt-get install -y pandoc
-            sudo pip install -U pyOpenSSL pypandoc setuptools twine
+            sudo pip install -q -U pyOpenSSL pypandoc setuptools twine
       - run:
           name: Release package
           command: |
@@ -119,7 +119,7 @@ jobs:
       - checkout
       - run:
           name: Install publish dependencies
-          command: sudo pip install -U awscli
+          command: sudo pip install -q -U awscli
       - run:
           name: Override AWS Credentials
           command: |
@@ -137,7 +137,7 @@ jobs:
       - checkout
       - run:
           name: Install publish dependencies
-          command: sudo pip install -U awscli
+          command: sudo pip install -q -U awscli
       - run:
           name: Override AWS Credentials
           command: |
