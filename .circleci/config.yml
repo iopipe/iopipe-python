@@ -64,7 +64,7 @@ jobs:
           command: |
             unset AWS_REGION IOPIPE_DEBUG IOPIPE_ENABLED IOPIPE_TIMEOUT_WINDOW IOPIPE_TOKEN
             pip install -q ".[coverage]"
-            pip install -q -U attrs jsonscema
+            pip install -q -U attrs jsonschema
             pytest --cov=iopipe tests/
       - run:
           name: Upload coverage report
