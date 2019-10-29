@@ -36,7 +36,7 @@ class TracePlugin(Plugin):
         :param http_headers: Additional HTTP headers to collect
         :type http_headers: list|tuple
         :param auto_db: Whether or not to automatically trace database requests
-        :type auto_http: bool
+        :type auto_db: bool
         """
         self.auto_measure = auto_measure
         self.auto_http = auto_http
