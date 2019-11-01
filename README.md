@@ -1,3 +1,6 @@
+**✨Special Announcement: We've Joined New Relic Serverless!**
+**Get ready to function faster with full visibility into your serverless applications—and everything else. [Read our founders' note to learn more.](https://read.iopipe.com/founders-note-iopipe-new-relic-acquisition-c15eeda47151)**
+
 # IOpipe Analytics & Distributed Tracing Agent for Python
 
 [![Build Status][1]][2] [![Code Coverage][3]][4] [![PyPI Version][5]][6] [![Apache 2.0][7]][8] [![Slack][9]][10]
